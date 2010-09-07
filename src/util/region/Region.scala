@@ -1,6 +1,7 @@
 package util.region
 
 import scala.collection.mutable.Map
+import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
 import fieldml.domain._
@@ -8,14 +9,23 @@ import fieldml.domain.bounds._
 
 import util.exception._
 
-abstract class Region( val name : String, private val dependancies : Region* )
+import framework.Context
+import framework.EvaluationState
+import framework.value.Value
+import framework.value.ContinuousValue
+import framework.value.EnsembleValue
+
+abstract class Region( val name : String )
 {
+    val context = new Context( name )
+
+    
     protected val objects = Map[String, FieldmlObject]()
     
     //TODO Use region names
     def getObject[A <: FieldmlObject]( objectName : String ) : A =
     {
-        val result = getFromSelfOrDependancies( objectName )
+        val result = objects.get( objectName )
         
         result match
         {
@@ -26,28 +36,38 @@ abstract class Region( val name : String, private val dependancies : Region* )
     }
     
     
-    private def getFromSelfOrDependancies[A <: FieldmlObject]( objectName : String ) : Option[FieldmlObject] =
+    private def evaluate( obj : FieldmlObject ) : Option[Value] =
     {
-        objects.get( objectName ) match
+        val state = new EvaluationState()
+        
+        state.push( context )
+        
+        return state.get( obj )
+    }
+    
+    
+    def getValue( obj : FieldmlObject ) : Option[Value] =
+    {
+        return evaluate( obj )
+    }
+    
+    
+    def getValue( obj : ContinuousDomain ) : Option[ContinuousValue] =
+    {
+        evaluate( obj ) match
         {
-            case s : Some[_] => return s
-            case None => return getFromDependancies( objectName )
+            case v : Some[ContinuousValue] => return v
+            case _ => return None
         }
     }
-
     
-    private def getFromDependancies[A <: FieldmlObject]( objectName : String ) : Option[FieldmlObject] =
+    
+    def getValue( obj : EnsembleDomain ) : Option[EnsembleValue] =
     {
-        val r2 = dependancies
-        
-        for(
-            r <- dependancies;
-            o <- r.getFromSelfOrDependancies( objectName )
-            )
+        evaluate( obj ) match
         {
-            return Some(o)
+            case v : Some[EnsembleValue] => return v
+            case _ => return None
         }
-        
-        return None
     }
 }

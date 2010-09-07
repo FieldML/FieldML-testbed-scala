@@ -13,7 +13,7 @@ import fieldml.jni.DomainBoundsType._
 import util.exception._
 
 class ContinuousDomain( name : String, val componentDomain : EnsembleDomain )
-    extends FieldmlObject( name )
+    extends Domain( name )
 {
     if( ( componentDomain != null ) && ( !componentDomain.isComponent ) )
     {

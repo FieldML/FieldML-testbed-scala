@@ -14,7 +14,7 @@ import fieldml.jni.DomainBoundsType._
 import util.exception._
 
 class EnsembleDomain( name : String, val bounds : EnsembleBounds, val isComponent : Boolean )
-    extends FieldmlObject( name )
+    extends Domain( name )
 {
 }
 

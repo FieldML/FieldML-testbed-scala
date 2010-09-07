@@ -1,23 +1,26 @@
 package util.region
 
-import fieldml.jni.FieldmlApi._
-
 import fieldml._
 import fieldml.domain._
 import fieldml.domain.bounds._
+import fieldml.evaluator._
 
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 import fieldml.jni.FieldmlApi._
+
+import framework.valuesource._
+import framework.value._
+import framework._
 
 import util._
 import util.library._
 import util.exception._
 
 class UserRegion( name : String )
-    extends Region( name, UserRegion.library )
+    extends Region( name )
 {
-    private def put( obj : FieldmlObject ) =
+    private def put( obj : FieldmlObject ) : Unit =
     {
         objects.get( obj.name ) match
         {
@@ -27,10 +30,16 @@ class UserRegion( name : String )
     }
     
     
+    def createEnsembleDomain( objectName : String, bounds : Int, isComponentEnsemble : Boolean ) : EnsembleDomain =
+    {
+        return createEnsembleDomain( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
+    }
+    
+    
     def createEnsembleDomain( objectName : String, bounds : EnsembleBounds, isComponentEnsemble : Boolean ) : EnsembleDomain =
     {
         val domain = new EnsembleDomain( objectName, bounds, isComponentEnsemble )
-        
+
         put( domain )
 
         return domain
@@ -46,6 +55,55 @@ class UserRegion( name : String )
         return domain
     }
 
+    
+    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], domain1 : ContinuousDomain, domain2 : ContinuousDomain, valueDomain : ContinuousDomain ) : Evaluator =
+    {
+        val evaluator = new FunctionEvaluator( name, function, domain1, domain2, valueDomain ) 
+
+        put( evaluator )
+        
+        context.add( new FunctionEvaluatorValueSource( evaluator ) )
+        
+        return evaluator
+    }
+    
+    
+    def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region, valueDomain : Domain ) : ReferenceEvaluator =
+    {
+        val refEvaluator : Evaluator = refRegion.getObject( refEvaluatorName )
+        val evaluator = new ReferenceEvaluator( name, valueDomain, refEvaluator )
+        
+        put( evaluator )
+        
+        context.add( new ReferenceEvaluatorValueSource( evaluator, refRegion.context ) )
+        
+        return evaluator
+    }
+    
+    
+    def createPiecewiseEvaluator( name : String, index : EnsembleDomain, valueDomain : Domain ) : PiecewiseEvaluator =
+    {
+        val evaluator = new PiecewiseEvaluator( name, valueDomain, index )
+        
+        put( evaluator )
+        
+        context.add( new PiecewiseEvaluatorValueSource( evaluator ) )
+        
+        return evaluator
+    }
+    
+    
+    def set( domain : EnsembleDomain, value : Int )
+    {
+        context( domain ) = new EnsembleValue( value )
+    }
+    
+    
+    def set( domain : ContinuousDomain, values : Double* )
+    {
+        context( domain ) = new ContinuousValue( values.toArray )
+    }
+    
     
     def serialize() : Unit =
     {
@@ -67,7 +125,7 @@ class UserRegion( name : String )
 }
 
 
-private object UserRegion
+object UserRegion
 {
     val library = loadLibrary()
     

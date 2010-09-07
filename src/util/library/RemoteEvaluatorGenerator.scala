@@ -18,11 +18,9 @@ import util._
 
 object RemoteEvaluatorGenerator
 {
-    def generateContinuousEvaluator( fmlHandle : Long, objectHandle : Int, region : Region ) :
-        Option[ContinuousEvaluator] =
+    def generateContinuousEvaluator( fmlHandle : Long, objectHandle : Int, region : UserRegion ) :
+        Evaluator =
     {
-        var continuousEvaluator : ContinuousEvaluator = null
-        
         val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
         val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
         
@@ -35,14 +33,32 @@ object RemoteEvaluatorGenerator
             }
         }
 
-        var scalarRealDomain : ContinuousDomain = region.getObject( "library.real.1d" )
+        val scalarRealDomain : ContinuousDomain = region.getObject( "library.real.1d" )
+        val xiDomains = Array[ContinuousDomain](
+            null,
+            region.getObject( "library.xi.1d" ),
+            region.getObject( "library.xi.2d" ),
+            region.getObject( "library.xi.3d" )
+            )
+        val paramDomains = Array[ContinuousDomain](
+            null,
+            region.getObject( "library.parameters.linear_lagrange" ),
+            region.getObject( "library.parameters.bilinear_lagrange" ),
+            region.getObject( "library.parameters.trilinear_lagrange" )
+            )
         
+        var d = 0
         name match
         {
-            case "library.fem.linear_lagrange" => return Some( new LinearLagrange( "library.fem.linear_lagrange", scalarRealDomain, 1 ) )
-            case "library.fem.bilinear_lagrange" => return Some( new LinearLagrange( "library.fem.bilinear_lagrange", scalarRealDomain, 2 ) )
-            case "library.fem.trilinear_lagrange" => return Some( new LinearLagrange( "library.fem.trilinear_lagrange", scalarRealDomain, 3 ) )
-            case _ => return None
+            case "library.fem.linear_lagrange" => d = 1
+            case "library.fem.bilinear_lagrange" => d = 2
+            case "library.fem.trilinear_lagrange" => d = 3
+            case _ => return null
         }
+        
+        val function =  new LinearLagrange( d )
+        val foo = function.evaluate _
+
+        return region.createFunctionEvaluator( name, foo, xiDomains( d ), paramDomains( d ), scalarRealDomain )
     }
 }
