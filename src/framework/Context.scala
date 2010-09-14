@@ -5,6 +5,7 @@ import scala.collection.mutable.Stack
 
 import fieldml._
 import fieldml.domain._
+import fieldml.evaluator._
 
 import value._
 import valuesource._
@@ -37,11 +38,76 @@ class Context( val name : String )
     {
         values( valueSource.domain ) = valueSource
     }
+    
+    
+    private def aliasEnsembleDomain( domain : EnsembleDomain, obj : FieldmlObject ) =
+    {
+        var domain2 : Domain = null
+        
+        obj match
+        {
+            case d : EnsembleDomain => domain2 = d
+            case e : Evaluator => domain2 = e.valueDomain
+        }
+        
+        if( domain2 == domain )
+        {
+            values( domain ) = new AliasValueSource( domain, obj )
+        }
+        else
+        {
+            throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+        }
+    }
 
     
-    def alias( domain1 : Domain, domain2 : FieldmlObject ) =
+    private def aliasContinuousDomain( domain : ContinuousDomain, obj : FieldmlObject ) : Unit =
     {
-        values( domain1 ) = new AliasValueSource( domain1, domain2 )
+        var domain2 : Domain = null
+        
+        obj match
+        {
+            case d : ContinuousDomain => domain2 = d
+            case e : Evaluator => domain2 = e.valueDomain
+        }
+        
+        if( domain2 == domain )
+        {
+            values( domain ) = new AliasValueSource( domain, obj )
+            return
+        }
+        
+        val componentDomain : EnsembleDomain = domain.componentDomain
+        var componentDomain2 : EnsembleDomain = null
+        
+        domain2 match
+        {
+            case d: ContinuousDomain => componentDomain2 = d.componentDomain
+            case e : EnsembleDomain => throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+        }
+        
+        if( componentDomain == componentDomain2 )
+        {
+            values( domain ) = new AliasValueSource( domain, obj )
+        }
+        else if( ( componentDomain != null ) && ( componentDomain2 == null ) )
+        {
+            values( domain ) = new VectorizedAliasValueSource( domain, componentDomain, obj )
+        }
+        else
+        {
+            throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+        }
+    }
+
+    
+    def alias( domain : Domain, obj : FieldmlObject ) =
+    {
+        domain match
+        {
+            case e : EnsembleDomain => aliasEnsembleDomain( e, obj )
+            case c : ContinuousDomain => aliasContinuousDomain( c, obj )
+        }
     }
 
     

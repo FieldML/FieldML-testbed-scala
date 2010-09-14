@@ -1,10 +1,14 @@
 package fieldml.evaluator
 
+import scala.collection.mutable.Map 
+
 import util.DefaultingHashMap
 
 import fieldml.domain.EnsembleDomain
 import fieldml.domain.Domain
 import fieldml.FieldmlObject
+
+import framework.value.EnsembleValue
 
 class PiecewiseEvaluator( name : String, valueDomain : Domain, val index : EnsembleDomain )
     extends Evaluator( name, valueDomain )
@@ -19,8 +23,8 @@ class PiecewiseEvaluator( name : String, valueDomain : Domain, val index : Ensem
         aliases( alias._1 ) = alias._2
     }
 
-
-    def map( pair : Tuple2[ Int, FieldmlObject ] )
+    
+    def map( pair : Tuple2[ Int, FieldmlObject] )
     {
         delegations( pair._1 ) = pair._2
     }

@@ -4,6 +4,7 @@ import fieldml._
 import fieldml.domain._
 import fieldml.domain.bounds._
 import fieldml.evaluator._
+import fieldml.evaluator.datastore._
 
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
@@ -88,6 +89,18 @@ class UserRegion( name : String )
         put( evaluator )
         
         context.add( new PiecewiseEvaluatorValueSource( evaluator ) )
+        
+        return evaluator
+    }
+    
+    
+    def createParameterEvaluator( name : String, valueDomain : Domain, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
+    {
+        val evaluator = new ParameterEvaluator( name, valueDomain, location, description )
+        
+        put( evaluator )
+        
+        context.add( new ParameterEvaluatorValueSource( evaluator ) )
         
         return evaluator
     }

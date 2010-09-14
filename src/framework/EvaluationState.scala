@@ -63,4 +63,14 @@ class EvaluationState
             case _ => return None
         }
     }
+    
+    
+    def getOrElse( obj : EnsembleDomain, default : Int ) : Int =
+    {
+        getValue( obj ) match
+        {
+            case v : Some[EnsembleValue] => return v.get.value
+            case _ => return default
+        }
+    }
 }

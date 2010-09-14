@@ -12,6 +12,9 @@ class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Do
     {
         val arg1 = state.get( domain1 ).get.value
         val arg2 = state.get( domain2 ).get.value
+        
+        println( state.get( domain1 ).get )
+        println( state.get( domain2 ).get )
 
         return new ContinuousValue( function( arg1, arg2 ) )
     }
