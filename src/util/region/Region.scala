@@ -14,6 +14,7 @@ import framework.EvaluationState
 import framework.value.Value
 import framework.value.ContinuousValue
 import framework.value.EnsembleValue
+import framework.value.MeshValue
 
 abstract class Region( val name : String )
 {
@@ -67,6 +68,16 @@ abstract class Region( val name : String )
         evaluate( obj ) match
         {
             case v : Some[EnsembleValue] => return v
+            case _ => return None
+        }
+    }
+    
+    
+    def getValue( obj : MeshDomain ) : Option[MeshValue] =
+    {
+        evaluate( obj ) match
+        {
+            case v : Some[MeshValue] => return v
             case _ => return None
         }
     }

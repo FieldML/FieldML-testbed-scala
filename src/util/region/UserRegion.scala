@@ -57,6 +57,21 @@ class UserRegion( name : String )
     }
 
     
+    def createMeshDomain( objectName : String, bounds : Int, xiComponents : EnsembleDomain ) : MeshDomain =
+    {
+        return createMeshDomain( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
+    }
+    
+    def createMeshDomain( objectName : String, bounds : EnsembleBounds, xiComponents : EnsembleDomain ) : MeshDomain =
+    {
+        val domain = new MeshDomain( objectName, bounds, xiComponents )
+
+        put( domain )
+
+        return domain
+    }
+    
+    
     def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], domain1 : ContinuousDomain, domain2 : ContinuousDomain, valueDomain : ContinuousDomain ) : Evaluator =
     {
         val evaluator = new FunctionEvaluator( name, function, domain1, domain2, valueDomain ) 
@@ -115,6 +130,12 @@ class UserRegion( name : String )
     def set( domain : ContinuousDomain, values : Double* )
     {
         context( domain ) = new ContinuousValue( values.toArray )
+    }
+    
+    
+    def set( domain : MeshDomain, elementValue : Int, xiValues : Double* )
+    {
+        context( domain ) = new MeshValue( elementValue, xiValues.toArray )
     }
     
     

@@ -36,32 +36,29 @@ object TestFieldml
         val rc3domain2 = region.createContinuousDomain( "test.domain.rc3_2" , rc3ensemble )
         
         val bilinearLagrange : FunctionEvaluator = library.getObject( "library.fem.bilinear_lagrange" )
+        
+        val xi2dDomain : ContinuousDomain = library.getObject( "library.xi.2d" )
 
-        val elements = region.createEnsembleDomain( "test.elements", 2, false )
+        val mesh = region.createMeshDomain( "test.mesh", 2, xi2dDomain.componentDomain ) 
 
         val nodes = region.createEnsembleDomain( "test.nodes", 6, false )
         
-        val xi2dDomain : ContinuousDomain = library.getObject( "library.xi.2d" )
         val bilinearParametersDomain : ContinuousDomain = library.getObject( "library.parameters.bilinear_lagrange" )
         val bilinearIndex = bilinearParametersDomain.componentDomain
         
         region.set( xi2dDomain, 0.2, 0.2 )
 //        region.set( bilinearParametersDomain, 1.0, 2.0, 3.0, 4.0 )
         
-        val xi2dComponentDomain : EnsembleDomain = library.getObject( "library.ensemble.xi.2d" )
 
-        val localxi2dDomain = region.createContinuousDomain( "test.domain.xi_2d_v1", xi2dComponentDomain )
-        region.set( localxi2dDomain, 1.0, 1.0 )
-        
         val rawInterpolator = region.createReferenceEvaluator( "test.interpolator_v0", "library.fem.bilinear_lagrange", library, realDomain )
 
 //        println( "*** rawInterpolator(?) = " + region.getValue( rawInterpolator ) )
 
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library, realDomain )
-        firstInterpolator.alias( xi2dDomain -> localxi2dDomain )
+        firstInterpolator.alias( xi2dDomain -> mesh.xiDomain )
         
         val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library, realDomain )
-        secondInterpolator.alias( xi2dDomain -> localxi2dDomain )
+        secondInterpolator.alias( xi2dDomain -> mesh.xiDomain )
         
         val parameterDescription = new SemidenseDataDescription( Array( nodes ), Array() )
         val parameterLocation = new InlineDataLocation()
@@ -78,7 +75,7 @@ object TestFieldml
         println( parameters( 2 ) )
         println( parameters( 1 ) )
 
-        val connectivityDescription = new SemidenseDataDescription( Array( elements, bilinearIndex ), Array() )
+        val connectivityDescription = new SemidenseDataDescription( Array( mesh.elementDomain, bilinearIndex ), Array() )
         val connectivityLocation = new InlineDataLocation()
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityLocation, connectivityDescription )
         
@@ -91,7 +88,7 @@ object TestFieldml
         connectivity( 2, 3 ) = 3
         connectivity( 2, 4 ) = 6
 
-        val piecewise = region.createPiecewiseEvaluator( "test.piecewise", elements, realDomain )
+        val piecewise = region.createPiecewiseEvaluator( "test.piecewise", mesh.elementDomain, realDomain )
         piecewise.map( 1 -> firstInterpolator )
         piecewise.map( 2 -> secondInterpolator )
         
@@ -102,35 +99,30 @@ object TestFieldml
         
         piecewise.alias( bilinearParametersDomain -> bilinearParameters )
         
-        region.set( elements, 2 )
-        region.set( localxi2dDomain, 0, 0 )
+        region.set( mesh, 2, 0, 0 )
 
         println( "*****************************************************" )
         println( "*** piecewise(2) = " + region.getValue( piecewise ) )
         println( "*****************************************************" )
         
-        region.set( elements, 2 )
-        region.set( localxi2dDomain, 1, 0 )
+        region.set( mesh, 2, 1, 0 )
 
         println( "*****************************************************" )
         println( "*** piecewise(2) = " + region.getValue( piecewise ) )
         println( "*****************************************************" )
 
-        region.set( elements, 2 )
-        region.set( localxi2dDomain, 0, 1 )
+        region.set( mesh, 2, 0, 1 )
 
         println( "*****************************************************" )
         println( "*** piecewise(2) = " + region.getValue( piecewise ) )
         println( "*****************************************************" )
         
-        region.set( elements, 2 )
-        region.set( localxi2dDomain, 1, 1 )
+        region.set( mesh, 2, 1, 1 )
 
         println( "*****************************************************" )
         println( "*** piecewise(2) = " + region.getValue( piecewise ) )
         println( "*****************************************************" )
 
         region.serialize()
-
     }
 }
