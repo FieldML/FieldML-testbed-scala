@@ -26,6 +26,7 @@ object TestFieldml
         val region = new UserRegion( "test" )
 
         val realDomain : ContinuousDomain = library.getObject( "library.real.1d" )
+        val real3Domain : ContinuousDomain = library.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleDomain = library.getObject( "library.ensemble.rc.3d" )
        
@@ -123,6 +124,18 @@ object TestFieldml
         println( "*** piecewise(2) = " + region.getValue( piecewise ) )
         println( "*****************************************************" )
 
+        val aggregate = region.createPiecewiseEvaluator( "test.aggregate", real3Domain.componentDomain, real3Domain )
+        aggregate.map( 1 -> piecewise )
+        aggregate.map( 2 -> piecewise )
+        aggregate.map( 3 -> piecewise )
+        
+        region.set( mesh, 1, 0.5, 0.5 )
+
+        println( "*****************************************************" )
+        println( "*** aggregate(1) = " + region.getValue( aggregate ) )
+        println( "*****************************************************" )
+        
+        
         region.serialize()
     }
 }

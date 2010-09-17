@@ -8,7 +8,7 @@ import util.DefaultingHashMap
 class MeshDomain( name : String, val elementBounds : EnsembleBounds, xiComponents : EnsembleDomain )
     extends Domain( name )
 {
-    val elementDomain = new EnsembleDomain( name + ".elements", elementBounds, false )
+    val elementDomain = new EnsembleDomain( name + ".element", elementBounds, false )
     val xiDomain = new ContinuousDomain( name + ".xi", xiComponents )
 
     val shapes = new DefaultingHashMap[Int, String]()

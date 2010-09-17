@@ -67,6 +67,9 @@ class UserRegion( name : String )
         val domain = new MeshDomain( objectName, bounds, xiComponents )
 
         put( domain )
+        
+        context.add( new SubdomainValueSource( domain.elementDomain, domain, "element" ) )
+        context.add( new SubdomainValueSource( domain.xiDomain, domain, "xi" ) )
 
         return domain
     }
@@ -103,7 +106,18 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        context.add( new PiecewiseEvaluatorValueSource( evaluator ) )
+        var valueSource : ValueSource = null
+        valueDomain match
+        {
+            case c : ContinuousDomain => if( index == c.componentDomain ) valueSource = new VectorizedPiecewiseValueSource( evaluator ) else valueSource = new PiecewiseEvaluatorValueSource( evaluator )
+            case _ => valueSource = new PiecewiseEvaluatorValueSource( evaluator )
+        }
+        
+        //valueSource = new PiecewiseEvaluatorValueSource( evaluator )
+        
+        println( ">>>> " + name + " " + valueSource )
+        
+        context.add( valueSource )
         
         return evaluator
     }
