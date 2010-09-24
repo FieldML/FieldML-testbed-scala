@@ -1,4 +1,8 @@
-package util.region
+package framework.region
+
+import scala.collection.mutable.ArrayBuffer
+
+import framework.io.serialize._
 
 import fieldml._
 import fieldml.domain._
@@ -21,6 +25,9 @@ import util.exception._
 class UserRegion( name : String )
     extends Region( name )
 {
+    //Used for serialization, which must be order-sensitive.
+    private val objectList = ArrayBuffer[FieldmlObject]()
+    
     private def put( obj : FieldmlObject ) : Unit =
     {
         objects.get( obj.name ) match
@@ -28,6 +35,8 @@ class UserRegion( name : String )
             case None => objects.put( obj.name, obj )
             case s: Some[_] => throw new FmlObjectCollisionException( s.get, obj )
         }
+        
+        objectList.append( obj )
     }
     
     
@@ -61,7 +70,8 @@ class UserRegion( name : String )
     {
         return createMeshDomain( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
     }
-    
+
+
     def createMeshDomain( objectName : String, bounds : EnsembleBounds, xiComponents : EnsembleDomain ) : MeshDomain =
     {
         val domain = new MeshDomain( objectName, bounds, xiComponents )
@@ -113,10 +123,6 @@ class UserRegion( name : String )
             case _ => valueSource = new PiecewiseEvaluatorValueSource( evaluator )
         }
         
-        //valueSource = new PiecewiseEvaluatorValueSource( evaluator )
-        
-        println( ">>>> " + name + " " + valueSource )
-        
         context.add( valueSource )
         
         return evaluator
@@ -157,12 +163,16 @@ class UserRegion( name : String )
     {
         val handle = Fieldml_Create( "", "test" )
         
-        for( o <- objects.values )
+        for( o <- objectList )
         {
             o match
             {
-            case d : EnsembleDomain => EnsembleDomain.insert( handle, d )
-            case d : ContinuousDomain => ContinuousDomain.insert( handle, d )
+            case d : EnsembleDomain => d.insert( handle )
+            case d : ContinuousDomain => d.insert( handle )
+            case d : MeshDomain => d.insert( handle )
+            case e : PiecewiseEvaluator => e.insert( handle )
+            case e : ParameterEvaluator => e.insert( handle )
+            case e : ReferenceEvaluator => e.insert( handle )
             case unknown => println( "Cannot yet serialize " + unknown ) 
             }
         }
@@ -198,8 +208,8 @@ object UserRegion
         {
             fmlType match
             {
-                case FHT_ENSEMBLE_DOMAIN => EnsembleDomain.extract( fmlHandle, objectHandle, lib )
-                case FHT_CONTINUOUS_DOMAIN => ContinuousDomain.extract( fmlHandle, objectHandle, lib )
+                case FHT_ENSEMBLE_DOMAIN => EnsembleDomainSerializer.extract( fmlHandle, objectHandle, lib )
+                case FHT_CONTINUOUS_DOMAIN => ContinuousDomainSerializer.extract( fmlHandle, objectHandle, lib )
                 case FHT_REMOTE_CONTINUOUS_EVALUATOR => RemoteEvaluatorGenerator.generateContinuousEvaluator( fmlHandle, objectHandle, lib )
                 case _ => println( "Extracting object type " + fmlType + " not yet supported" )
             }

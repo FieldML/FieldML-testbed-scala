@@ -16,8 +16,6 @@ class VectorizedPiecewiseValueSource( private val evaluator : PiecewiseEvaluator
 {
     override def getValue( state : EvaluationState ) : Option[Value] =
     {
-        println( "+++ " + this )
-
         val localContext = new Context( evaluator.name )
         
         for( alias <- evaluator.aliases )

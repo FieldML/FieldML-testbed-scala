@@ -12,8 +12,9 @@ import fieldml.jni.DataLocationType._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 
+import framework.region._
+
 import util.exception._
-import util.region._
 import util._
 
 object RemoteEvaluatorGenerator

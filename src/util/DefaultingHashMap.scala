@@ -2,7 +2,7 @@ package util
 
 import scala.collection.mutable.HashMap
 
-class DefaultingHashMap[A,B]
+class DefaultingHashMap[A,B <: AnyRef]
     extends HashMap[A,B]
 {
     private var _default : Option[B] = None
@@ -21,14 +21,7 @@ class DefaultingHashMap[A,B]
     }
     
     
-    def default : Unit =
-    {
-        _default match
-        {
-            case s : Some[B] => return s.get
-            case None => return null
-        }
-    }
+    def default : Option[B] = _default
 
 
     override def get( key : A ) : Option[B] =

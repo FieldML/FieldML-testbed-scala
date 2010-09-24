@@ -1,7 +1,6 @@
-package util.region
+package framework.region
 
 import scala.collection.mutable.Map
-import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
 import fieldml.domain._
@@ -22,6 +21,7 @@ abstract class Region( val name : String )
 
     
     protected val objects = Map[String, FieldmlObject]()
+    
     
     //TODO Use region names
     def getObject[A <: FieldmlObject]( objectName : String ) : A =

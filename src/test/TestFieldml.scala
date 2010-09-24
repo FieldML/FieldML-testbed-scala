@@ -15,7 +15,9 @@ import framework._
 import fieldml.jni.FieldmlApi._
 
 import util._
-import util.region._
+import framework.region._
+
+import java.io.FileWriter
 
 object TestFieldml
 {
@@ -48,12 +50,8 @@ object TestFieldml
         val bilinearIndex = bilinearParametersDomain.componentDomain
         
         region.set( xi2dDomain, 0.2, 0.2 )
-//        region.set( bilinearParametersDomain, 1.0, 2.0, 3.0, 4.0 )
-        
 
         val rawInterpolator = region.createReferenceEvaluator( "test.interpolator_v0", "library.fem.bilinear_lagrange", library, realDomain )
-
-//        println( "*** rawInterpolator(?) = " + region.getValue( rawInterpolator ) )
 
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library, realDomain )
         firstInterpolator.alias( xi2dDomain -> mesh.xiDomain )
@@ -61,16 +59,30 @@ object TestFieldml
         val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library, realDomain )
         secondInterpolator.alias( xi2dDomain -> mesh.xiDomain )
         
-        val parameterDescription = new SemidenseDataDescription( Array( nodes ), Array() )
+        val parameterDescription = new SemidenseDataDescription( Array( nodes, real3Domain.componentDomain ), Array() )
         val parameterLocation = new InlineDataLocation()
         val parameters = region.createParameterEvaluator( "test.parameters", realDomain, parameterLocation, parameterDescription )
         
-        parameters( 1 ) = 1.0
-        parameters( 2 ) = 1.5
-        parameters( 3 ) = 2.0
-        parameters( 4 ) = 2.5
-        parameters( 5 ) = 3.0
-        parameters( 6 ) = 3.5
+        parameters( 1, 1 ) = 0.0
+        parameters( 2, 1 ) = 0.0
+        parameters( 3, 1 ) = 0.0
+        parameters( 4, 1 ) = 1.0
+        parameters( 5, 1 ) = 1.0
+        parameters( 6, 1 ) = 1.0
+
+        parameters( 1, 2 ) = 0.0
+        parameters( 2, 2 ) = 1.0
+        parameters( 3, 2 ) = 2.0
+        parameters( 4, 2 ) = 0.0
+        parameters( 5, 2 ) = 1.0
+        parameters( 6, 2 ) = 2.0
+
+        parameters( 1, 3 ) = 1.0
+        parameters( 2, 3 ) = 1.5
+        parameters( 3, 3 ) = 2.0
+        parameters( 4, 3 ) = 2.5
+        parameters( 5, 3 ) = 3.0
+        parameters( 6, 3 ) = 3.5
         
         println( parameters( 3 ) )
         println( parameters( 2 ) )
@@ -137,5 +149,12 @@ object TestFieldml
         
         
         region.serialize()
+        
+        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
+        
+        val f = new FileWriter( "collada two quads.xml" )
+        f.write( colladaXml )
+        f.close()
+
     }
 }
