@@ -2,7 +2,7 @@ package framework.valuesource
 
 import scala.collection.mutable.Stack
 
-import fieldml.domain._
+import fieldml.valueType._
 import fieldml.FieldmlObject
 
 import fieldml.evaluator.PiecewiseEvaluator
@@ -11,7 +11,7 @@ import framework.value._
 import framework.Context
 import framework.EvaluationState
 
-class VectorizedPiecewiseValueSource( private val evaluator : PiecewiseEvaluator )
+class VectorizedPiecewiseValueSource( private val evaluator : PiecewiseEvaluator, private val outputType : ValueType )
     extends EvaluatorValueSource( evaluator )
 {
     override def getValue( state : EvaluationState ) : Option[Value] =
@@ -31,7 +31,7 @@ class VectorizedPiecewiseValueSource( private val evaluator : PiecewiseEvaluator
             eval <- evaluator.delegations.get( key )
             )
         {
-            localContext( evaluator.index ) = new EnsembleValue( key )
+            localContext( evaluator.index ) = new EnsembleValue( evaluator.index, key )
             state.get( eval ) match
             {
                 case c : Some[ContinuousValue] => value( key - 1 ) = c.get.value(0)
@@ -41,6 +41,6 @@ class VectorizedPiecewiseValueSource( private val evaluator : PiecewiseEvaluator
         }
 
         state.pop()
-        return Some( new ContinuousValue( value ) )
+        return Some( Value( outputType, value: _* ) )
     }
 }

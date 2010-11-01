@@ -1,4 +1,4 @@
-package fieldml.evaluator.datastore
+package framework.datastore
 
 class InlineDataLocation( var data : String )
     extends DataLocation

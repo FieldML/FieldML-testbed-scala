@@ -1,13 +1,16 @@
 package framework.value
 
-import fieldml.domain.ContinuousDomain
+import fieldml.valueType.MeshType
 
-class MeshValue( val elementValue : Int, val xiValue : Array[Double] )
-    extends Value()
+class MeshValue( vType : MeshType, val elementValue : Int, val xiValue : Array[Double] )
+    extends StructuredValue( vType,
+        Tuple2( "element", new EnsembleValue( vType.elementType, elementValue ) ),
+        Tuple2( "xi", new ContinuousValue( vType.xiType, xiValue ) )
+        )
 {
-    def this( elementValue : Int, xiValue : Double* ) =
+    def this( vType : MeshType, elementValue : Int, xiValue : Double* ) =
     {
-        this( elementValue, xiValue.toArray )
+        this( vType, elementValue, xiValue.toArray )
     }
 
 

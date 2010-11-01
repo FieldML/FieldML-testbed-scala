@@ -9,7 +9,7 @@ import framework.EvaluationState
 
 import scala.collection.mutable.Stack
 
-abstract class ValueSource( val domain : FieldmlObject )
+abstract class ValueSource( val valueType : FieldmlObject )
 {
     def getValue( state : EvaluationState ) : Option[Value]
 }

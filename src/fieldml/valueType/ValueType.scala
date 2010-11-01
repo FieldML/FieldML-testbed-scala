@@ -1,12 +1,12 @@
-package fieldml.domain
+package fieldml.valueType
 
 import fieldml._
 
-class Domain( name : String )
+class ValueType( name : String )
     extends FieldmlObject( name )
 {
     override def toString() : String =
     {
-        return name + "[Domain]"
+        return name + "[Type]"
     }
 }

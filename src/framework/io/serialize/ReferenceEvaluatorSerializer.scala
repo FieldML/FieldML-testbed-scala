@@ -1,6 +1,6 @@
 package framework.io.serialize
 
-import fieldml.domain.ContinuousDomain
+import fieldml.valueType.ContinuousType
 
 import fieldml.evaluator.ReferenceEvaluator
 
@@ -12,22 +12,22 @@ class ReferenceEvaluatorSerializer( evaluator : ReferenceEvaluator )
     def insert( handle : Long ) : Unit =
     {
         val remoteHandle = GetNamedObject( handle, evaluator.refEvaluator.name )
-        val valueHandle = GetNamedObject( handle, evaluator.valueDomain.name )
+        val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
         var objectHandle = 0
         
-        evaluator.valueDomain match
+        evaluator.valueType match
         {
-            case d : ContinuousDomain => objectHandle = Fieldml_CreateContinuousReference( handle, evaluator.name, remoteHandle, valueHandle )
+            case d : ContinuousType => objectHandle = Fieldml_CreateContinuousReference( handle, evaluator.name, remoteHandle, valueHandle )
             case _ => println( "Cannot yet serialize " + evaluator )
         }
         
         for( pair <- evaluator.aliases )
         {
-            val domainHandle = GetNamedObject( handle, pair._1.name )
+            val valueTypeHandle = GetNamedObject( handle, pair._1.name )
             val sourceHandle = GetNamedObject( handle, pair._2.name )
             
-            Fieldml_SetAlias( handle, objectHandle, domainHandle, sourceHandle )
+            Fieldml_SetAlias( handle, objectHandle, valueTypeHandle, sourceHandle )
         }
     }
 }

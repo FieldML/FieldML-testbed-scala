@@ -1,4 +1,4 @@
-package fieldml.domain.bounds
+package fieldml.valueType.bounds
 
 class ContiguousEnsembleBounds( val count : Int )
     extends EnsembleBounds

@@ -1,18 +1,21 @@
 package framework
 
 import fieldml.evaluator._
-import fieldml.domain._
+import fieldml.valueType._
 
 import value.ContinuousValue
 
-class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val domain1 : ContinuousDomain, val domain2 : ContinuousDomain, valueDomain : ContinuousDomain )
-    extends Evaluator( name, valueDomain )
+class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val var1 : AbstractEvaluator, val var2 : AbstractEvaluator, valueType : ContinuousType )
+    extends Evaluator( name, valueType )
 {
+    val variables = Seq[AbstractEvaluator]( var1, var2 )
+
+    
     def evaluate( state : EvaluationState ) : ContinuousValue =
     {
-        val arg1 = state.get( domain1 ).get.value
-        val arg2 = state.get( domain2 ).get.value
+        val arg1 = state.get( var1 ).get.cValue
+        val arg2 = state.get( var2 ).get.cValue
 
-        return new ContinuousValue( function( arg1, arg2 ) )
+        return new ContinuousValue( valueType, function( arg1, arg2 ) )
     }
 }

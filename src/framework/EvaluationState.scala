@@ -3,8 +3,10 @@ package framework
 import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
-import fieldml.domain.ContinuousDomain
-import fieldml.domain.EnsembleDomain
+import fieldml.valueType.ContinuousType
+import fieldml.valueType.EnsembleType
+import fieldml.evaluator.Evaluator
+import fieldml.evaluator.AbstractEvaluator
 
 import value.Value
 import value.ContinuousValue
@@ -45,7 +47,7 @@ class EvaluationState
     }
     
     
-    def get( obj : ContinuousDomain ) : Option[ContinuousValue] =
+    def get( obj : ContinuousType ) : Option[ContinuousValue] =
     {
         getValue( obj ) match
         {
@@ -55,7 +57,7 @@ class EvaluationState
     }
     
     
-    def get( obj : EnsembleDomain ) : Option[EnsembleValue] =
+    def get( obj : EnsembleType ) : Option[EnsembleValue] =
     {
         getValue( obj ) match
         {
@@ -65,12 +67,25 @@ class EvaluationState
     }
     
     
-    def getOrElse( obj : EnsembleDomain, default : Int ) : Int =
+    def getOrElse( evaluator : Evaluator, default : Int ) : Int =
     {
-        getValue( obj ) match
+        getValue( evaluator ) match
         {
             case v : Some[EnsembleValue] => return v.get.value
             case _ => return default
         }
     }
+    
+    
+    def getBind( evaluator : AbstractEvaluator ) : Evaluator =
+    {
+         for( context <- stack;
+            source <- context.getBind( evaluator )
+            )
+        {
+            return source
+        }
+        
+        return null
+   }
 }

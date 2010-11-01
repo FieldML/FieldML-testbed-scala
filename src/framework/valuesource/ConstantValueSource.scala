@@ -1,17 +1,17 @@
 package framework.valuesource
 
-import fieldml.domain._
+import fieldml.valueType._
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class ConstantValueSource( domain : Domain, _value : Value )
-    extends ValueSource( domain )
+class ConstantValueSource( valueType : ValueType, _value : Value )
+    extends ValueSource( valueType )
 {
     override def toString() : String =
     {
-        return "(" + domain + " = " + _value + ")[ConstantValueSource]"
+        return "(" + valueType + " = " + _value + ")[ConstantValueSource]"
     }
     
     

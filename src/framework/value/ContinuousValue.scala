@@ -1,14 +1,17 @@
 package framework.value
 
-import fieldml.domain.ContinuousDomain
+import fieldml.valueType.ContinuousType
 
-class ContinuousValue( val value : Array[Double] )
-    extends Value()
+class ContinuousValue( valueType : ContinuousType, val value : Array[Double] )
+    extends Value( valueType )
 {
-    def this( values : Double* ) =
+    def this( valueType : ContinuousType, values : Double* ) =
     {
-        this( values.toArray )
+        this( valueType, values.toArray )
     }
+    
+    
+    override def cValue = value
 
 
     override def toString() : String =

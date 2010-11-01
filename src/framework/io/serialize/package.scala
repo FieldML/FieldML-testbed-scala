@@ -1,8 +1,8 @@
 package framework.io
 
-import fieldml.domain.ContinuousDomain
-import fieldml.domain.EnsembleDomain
-import fieldml.domain.MeshDomain
+import fieldml.valueType.ContinuousType
+import fieldml.valueType.EnsembleType
+import fieldml.valueType.MeshType
 import fieldml.evaluator.PiecewiseEvaluator
 import fieldml.evaluator.ParameterEvaluator
 import fieldml.evaluator.ReferenceEvaluator
@@ -26,9 +26,9 @@ package object serialize
         return objectHandle
     }
     
-    implicit def continuousDomainSerializer( domain : ContinuousDomain ) = new ContinuousDomainSerializer( domain )
-    implicit def ensembleDomainSerializer( domain : EnsembleDomain ) = new EnsembleDomainSerializer( domain )
-    implicit def meshDomainSerializer( domain : MeshDomain ) = new MeshDomainSerializer( domain )
+    implicit def continuousTypeSerializer( valueType : ContinuousType ) = new ContinuousTypeSerializer( valueType )
+    implicit def ensembleTypeSerializer( valueType : EnsembleType ) = new EnsembleTypeSerializer( valueType )
+    implicit def meshTypeSerializer( valueType : MeshType ) = new MeshTypeSerializer( valueType )
     implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = new PiecewiseEvaluatorSerializer( evaluator )
     implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = new ParameterEvaluatorSerializer( evaluator )
     implicit def referenceEvaluatorSerializer( evaluator : ReferenceEvaluator ) = new ReferenceEvaluatorSerializer( evaluator )

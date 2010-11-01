@@ -3,8 +3,8 @@ package framework.region
 import scala.collection.mutable.Map
 
 import fieldml.FieldmlObject
-import fieldml.domain._
-import fieldml.domain.bounds._
+import fieldml.valueType._
+import fieldml.valueType.bounds._
 
 import util.exception._
 
@@ -53,7 +53,7 @@ abstract class Region( val name : String )
     }
     
     
-    def getValue( obj : ContinuousDomain ) : Option[ContinuousValue] =
+    def getValue( obj : ContinuousType ) : Option[ContinuousValue] =
     {
         evaluate( obj ) match
         {
@@ -63,7 +63,7 @@ abstract class Region( val name : String )
     }
     
     
-    def getValue( obj : EnsembleDomain ) : Option[EnsembleValue] =
+    def getValue( obj : EnsembleType ) : Option[EnsembleValue] =
     {
         evaluate( obj ) match
         {
@@ -73,7 +73,7 @@ abstract class Region( val name : String )
     }
     
     
-    def getValue( obj : MeshDomain ) : Option[MeshValue] =
+    def getValue( obj : MeshType ) : Option[MeshValue] =
     {
         evaluate( obj ) match
         {

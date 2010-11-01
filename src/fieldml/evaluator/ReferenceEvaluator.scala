@@ -2,16 +2,19 @@ package fieldml.evaluator
 
 import scala.collection.mutable.Map
 
-import fieldml.domain.Domain
+import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
 
-class ReferenceEvaluator( name : String, valueDomain : Domain, val refEvaluator : Evaluator ) 
+class ReferenceEvaluator( name : String, valueDomain : ValueType, val refEvaluator : Evaluator ) 
     extends Evaluator( name, valueDomain )
 {
-    val aliases = Map[ Domain, FieldmlObject ]()
+    val aliases = Map[ ValueType, FieldmlObject ]()
     
 
-    def alias( alias : Tuple2[ Domain, FieldmlObject ] )
+    def variables = refEvaluator.variables
+
+    
+    def alias( alias : Tuple2[ ValueType, FieldmlObject ] )
     {
         aliases( alias._1 ) = alias._2
     }

@@ -3,7 +3,7 @@ package util.library
 import scala.collection.mutable.Map
 
 import fieldml.evaluator._
-import fieldml.domain._
+import fieldml.valueType._
 
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
@@ -34,14 +34,14 @@ object RemoteEvaluatorGenerator
             }
         }
 
-        val scalarRealDomain : ContinuousDomain = region.getObject( "library.real.1d" )
-        val xiDomains = Array[ContinuousDomain](
+        val scalarRealType : ContinuousType = region.getObject( "library.real.1d" )
+        val xiTypes = Array[ContinuousType](
             null,
             region.getObject( "library.xi.1d" ),
             region.getObject( "library.xi.2d" ),
             region.getObject( "library.xi.3d" )
             )
-        val paramDomains = Array[ContinuousDomain](
+        val paramTypes = Array[ContinuousType](
             null,
             region.getObject( "library.parameters.linear_lagrange" ),
             region.getObject( "library.parameters.bilinear_lagrange" ),
@@ -59,7 +59,10 @@ object RemoteEvaluatorGenerator
         
         val function =  new LinearLagrange( d )
         val foo = function.evaluate _
+        
+        val arg1 = region.getCompanionVariable( xiTypes( d ) )
+        val arg2 = region.getCompanionVariable( paramTypes( d ) )
 
-        return region.createFunctionEvaluator( name, foo, xiDomains( d ), paramDomains( d ), scalarRealDomain )
+        return region.createFunctionEvaluator( name, foo, arg1, arg2, scalarRealType )
     }
 }

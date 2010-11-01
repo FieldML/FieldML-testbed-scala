@@ -6,7 +6,7 @@ import framework.value.ContinuousValue
 import framework.value.Value
 
 import fieldml.evaluator.Evaluator
-import fieldml.domain.MeshDomain
+import fieldml.valueType.MeshType
 
 /**
  * Very very simplistic FieldML-java to Collada converter.
@@ -242,9 +242,9 @@ polygonBlock
 
     def exportFromFieldML( region : UserRegion, discretisation : Int, meshName : String, fieldName : String ) : String =
     {
-        val meshDomain : MeshDomain = region.getObject( meshName )
+        val meshType : MeshType = region.getObject( meshName )
         val mesh : Evaluator = region.getObject( fieldName )
-        val elementCount = meshDomain.elementDomain.bounds.elementCount
+        val elementCount = meshType.elementType.bounds.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -257,7 +257,7 @@ polygonBlock
                     val xi1 : Double = i / discretisation
                     val xi2 : Double = j / discretisation
                     
-                    region.set( meshDomain, elementNumber, xi1, xi2 )
+                    region.set( meshType, elementNumber, xi1, xi2 )
                     
                     val value = region.getValue( mesh )
                     appendTriple( value, xyzArray )
@@ -297,11 +297,11 @@ polygonBlock
     def exportFromFieldML( region : UserRegion, discretisation : Int, fieldName : String, mesh1Name : String,
         mesh2Name : String ) : String =
     {
-        val mesh1Domain : MeshDomain = region.getObject( mesh1Name )
-        val mesh2Domain : MeshDomain = region.getObject( mesh2Name )
+        val mesh1Type : MeshType = region.getObject( mesh1Name )
+        val mesh2Type : MeshType = region.getObject( mesh2Name )
         val mesh : Evaluator = region.getObject( fieldName )
-        val element1Count = mesh1Domain.elementDomain.bounds.elementCount
-        val element2Count = mesh2Domain.elementDomain.bounds.elementCount
+        val element1Count = mesh1Type.elementType.bounds.elementCount
+        val element2Count = mesh2Type.elementType.bounds.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -317,8 +317,8 @@ polygonBlock
                         val xi1 : Double = i / discretisation
                         val xi2 : Double = j / discretisation
 
-                        region.set( mesh1Domain, element1Number, xi1 )
-                        region.set( mesh2Domain, element2Number, xi2 )
+                        region.set( mesh1Type, element1Number, xi1 )
+                        region.set( mesh2Type, element2Number, xi2 )
 
                         val value = region.getValue( mesh )
                         appendTriple( value, xyzArray )
@@ -360,9 +360,9 @@ polygonBlock
 
     def export1DFromFieldML( region : UserRegion, meshName : String, fieldName : String, discretisation : Int ) : String =
     {
-        val meshDomain : MeshDomain = region.getObject( meshName )
+        val meshType : MeshType = region.getObject( meshName )
         val mesh : Evaluator = region.getObject( fieldName )
-        val elementCount = meshDomain.elementDomain.bounds.elementCount
+        val elementCount = meshType.elementType.bounds.elementCount
         val deltaX = 1.0 / discretisation
         var x = deltaX
 
@@ -375,7 +375,7 @@ polygonBlock
             {
                 val xi1 : Double = j / discretisation
 
-                region.set( meshDomain, elementNumber, xi1 )
+                region.set( meshType, elementNumber, xi1 )
                 
                 val value = region.getValue( mesh )
                 appendSingle( value, x, 0.0, xyzArray )

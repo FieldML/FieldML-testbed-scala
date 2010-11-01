@@ -4,33 +4,34 @@ import scala.collection.mutable.Map
 
 import util.DefaultingHashMap
 
-import fieldml.domain.EnsembleDomain
-import fieldml.domain.Domain
+import fieldml.valueType.EnsembleType
+import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
 
 import framework.value.EnsembleValue
 
-class PiecewiseEvaluator( name : String, valueDomain : Domain, val index : EnsembleDomain )
-    extends Evaluator( name, valueDomain )
+class PiecewiseEvaluator( name : String, valueType : ValueType, val index : EnsembleType )
+    extends Evaluator( name, valueType )
 {
-    val delegations = new DefaultingHashMap[Int, FieldmlObject]()
+    val delegations = new DefaultingHashMap[Int, Evaluator]()
     
-    val aliases = Map[ Domain, FieldmlObject ]()
+    val aliases = Map[ ValueType, FieldmlObject ]()
     
+    def variables = delegations.values.flatMap( _.variables )
 
-    def alias( alias : Tuple2[ Domain, FieldmlObject ] )
+    def alias( alias : Tuple2[ ValueType, FieldmlObject ] )
     {
         aliases( alias._1 ) = alias._2
     }
 
     
-    def map( pair : Tuple2[ Int, FieldmlObject] )
+    def map( pair : Tuple2[ Int, Evaluator] )
     {
         delegations( pair._1 ) = pair._2
     }
     
     
-    def setDefault( default : FieldmlObject )
+    def setDefault( default : Evaluator )
     {
         delegations.default = default
     }

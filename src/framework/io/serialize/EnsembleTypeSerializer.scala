@@ -1,8 +1,8 @@
 package framework.io.serialize
 
-import fieldml.domain.EnsembleDomain
-import fieldml.domain.bounds.EnsembleBounds
-import fieldml.domain.bounds.ContiguousEnsembleBounds
+import fieldml.valueType.EnsembleType
+import fieldml.valueType.bounds.EnsembleBounds
+import fieldml.valueType.bounds.ContiguousEnsembleBounds
 
 import util.exception._
 
@@ -13,13 +13,13 @@ import fieldml.jni.FieldmlApiConstants._
 
 import framework.region.UserRegion
 
-class EnsembleDomainSerializer( val domain : EnsembleDomain )
+class EnsembleTypeSerializer( val valueType : EnsembleType )
 {
     def insert( handle : Long ) : Unit =
     {
-        val objectHandle = Fieldml_CreateEnsembleDomain( handle, domain.name, FML_INVALID_HANDLE )
+        val objectHandle = Fieldml_CreateEnsembleDomain( handle, valueType.name, FML_INVALID_HANDLE )
         
-        domain.bounds match
+        valueType.bounds match
         {
             case c : ContiguousEnsembleBounds => Fieldml_SetContiguousBoundsCount( handle, objectHandle, c.count )
             case unknown => println( "Cannot yet serialize EnsembleBounds " + unknown ) 
@@ -28,12 +28,12 @@ class EnsembleDomainSerializer( val domain : EnsembleDomain )
 }
 
 
-object EnsembleDomainSerializer
+object EnsembleTypeSerializer
 {
     def extract( fmlHandle : Long, objectHandle : Int, region : UserRegion ) :
-        Option[EnsembleDomain] = 
+        Option[EnsembleType] = 
     {
-        var ensembleDomain : EnsembleDomain = null
+        var ensembleType : EnsembleType = null
         
         val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
         val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
@@ -57,11 +57,11 @@ object EnsembleDomainSerializer
         
         Fieldml_IsEnsembleComponentDomain( fmlHandle, objectHandle ) match
         {
-            case 1 => ensembleDomain = region.createEnsembleDomain( name, bounds, true )
-            case 0 => ensembleDomain = region.createEnsembleDomain( name, bounds, false )
-            case err => println( "Fieldml_IsEnsembleComponentDomain failure: " + err )
+            case 1 => ensembleType = region.createEnsembleType( name, bounds, true )
+            case 0 => ensembleType = region.createEnsembleType( name, bounds, false )
+            case err => println( "Fieldml_IsEnsembleComponentType failure: " + err )
         }
         
-        return Some( ensembleDomain )
+        return Some( ensembleType )
     }
 }

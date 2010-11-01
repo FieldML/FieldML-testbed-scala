@@ -4,7 +4,7 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.Stack
 
 import fieldml._
-import fieldml.domain._
+import fieldml.valueType._
 import fieldml.evaluator._
 
 import value._
@@ -16,6 +16,8 @@ class Context( val name : String )
 {
     private val values = Map[FieldmlObject, ValueSource]()
     
+    private val binds = Map[AbstractEvaluator, Evaluator]()
+    
     
     override def toString() : String =
     {
@@ -23,90 +25,90 @@ class Context( val name : String )
     }
     
 
-    def update( domain : Domain, value : Value )
+    def update( valueType : ValueType, value : Value )
     {
-        values.get( domain ) match
+        values.get( valueType ) match
         {
-            case v : Some[ConstantValueSource] => add( new ConstantValueSource( domain, value ) )
-            case None => add( new ConstantValueSource( domain, value ) )
-            case _ => throw new FmlException( domain + " already has a value definition at this scope: " + values.get( domain ) )
+            case v : Some[ConstantValueSource] => add( new ConstantValueSource( valueType, value ) )
+            case None => add( new ConstantValueSource( valueType, value ) )
+            case _ => throw new FmlException( valueType + " already has a value definition at this scope: " + values.get( valueType ) )
         }
     }
     
     
     def add( valueSource : ValueSource )
     {
-        values( valueSource.domain ) = valueSource
+        values( valueSource.valueType ) = valueSource
     }
     
     
-    private def aliasEnsembleDomain( domain : EnsembleDomain, obj : FieldmlObject ) =
+    private def aliasEnsembleType( valueType : EnsembleType, obj : FieldmlObject ) =
     {
-        var domain2 : Domain = null
+        var valueType2 : ValueType = null
         
         obj match
         {
-            case d : EnsembleDomain => domain2 = d
-            case e : Evaluator => domain2 = e.valueDomain
+            case d : EnsembleType => valueType2 = d
+            case e : Evaluator => valueType2 = e.valueType
         }
         
-        if( domain2 == domain )
+        if( valueType2 == valueType )
         {
-            values( domain ) = new AliasValueSource( domain, obj )
+            values( valueType ) = new AliasValueSource( valueType, obj )
         }
         else
         {
-            throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+            throw new FmlInvalidObjectException( "Alias conflict: " + valueType + " " + valueType2 )
         }
     }
 
     
-    private def aliasContinuousDomain( domain : ContinuousDomain, obj : FieldmlObject ) : Unit =
+    private def aliasContinuousType( valueType : ContinuousType, obj : FieldmlObject ) : Unit =
     {
-        var domain2 : Domain = null
+        var valueType2 : ValueType = null
         
         obj match
         {
-            case d : ContinuousDomain => domain2 = d
-            case e : Evaluator => domain2 = e.valueDomain
+            case d : ContinuousType => valueType2 = d
+            case e : Evaluator => valueType2 = e.valueType
         }
         
-        if( domain2 == domain )
+        if( valueType2 == valueType )
         {
-            values( domain ) = new AliasValueSource( domain, obj )
+            values( valueType ) = new AliasValueSource( valueType, obj )
             return
         }
         
-        val componentDomain : EnsembleDomain = domain.componentDomain
-        var componentDomain2 : EnsembleDomain = null
+        val componentType : EnsembleType = valueType.componentType
+        var componentType2 : EnsembleType = null
         
-        domain2 match
+        valueType2 match
         {
-            case d: ContinuousDomain => componentDomain2 = d.componentDomain
-            case e : EnsembleDomain => throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+            case d: ContinuousType => componentType2 = d.componentType
+            case e : EnsembleType => throw new FmlInvalidObjectException( "Alias conflict: " + valueType + " " + valueType2 )
         }
         
-        if( componentDomain == componentDomain2 )
+        if( componentType == componentType2 )
         {
-            values( domain ) = new AliasValueSource( domain, obj )
+            values( valueType ) = new AliasValueSource( valueType, obj )
         }
-        else if( ( componentDomain != null ) && ( componentDomain2 == null ) )
+        else if( ( componentType != null ) && ( componentType2 == null ) )
         {
-            values( domain ) = new VectorizedAliasValueSource( domain, componentDomain, obj )
+            values( valueType ) = new VectorizedAliasValueSource( valueType, componentType, obj )
         }
         else
         {
-            throw new FmlInvalidObjectException( "Alias conflict: " + domain + " " + domain2 )
+            throw new FmlInvalidObjectException( "Alias conflict: " + valueType + " " + valueType2 )
         }
     }
 
     
-    def alias( domain : Domain, obj : FieldmlObject ) =
+    def alias( valueType : ValueType, obj : FieldmlObject ) =
     {
-        domain match
+        valueType match
         {
-            case e : EnsembleDomain => aliasEnsembleDomain( e, obj )
-            case c : ContinuousDomain => aliasContinuousDomain( c, obj )
+            case e : EnsembleType => aliasEnsembleType( e, obj )
+            case c : ContinuousType => aliasContinuousType( c, obj )
         }
     }
 
@@ -114,5 +116,17 @@ class Context( val name : String )
     def apply( domain : FieldmlObject ) : Option[ValueSource] =
     {
         return values.get( domain )
+    }
+    
+    
+    def getBind( evaluator : AbstractEvaluator ) : Option[Evaluator] =
+    {
+        binds.get( evaluator )
+    }
+    
+    
+    def setBind( evaluator : AbstractEvaluator, source : Evaluator ) : Unit =
+    {
+        binds( evaluator ) = source
     }
 }

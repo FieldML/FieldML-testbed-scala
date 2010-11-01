@@ -1,4 +1,4 @@
-package fieldml.evaluator.datastore
+package framework.datastore
 
 object DataType
     extends Enumeration

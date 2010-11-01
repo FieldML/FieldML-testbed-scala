@@ -1,4 +1,4 @@
-package fieldml.domain.bounds
+package fieldml.valueType.bounds
 
 abstract class EnsembleBounds
 {

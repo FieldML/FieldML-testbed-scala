@@ -2,15 +2,15 @@ package framework.valuesource
 
 import scala.collection.mutable.Stack
 
-import fieldml.domain._
+import fieldml.valueType._
 import fieldml.FieldmlObject
 
 import framework.value._
 import framework.Context
 import framework.EvaluationState
 
-class VectorizedAliasValueSource( sourceDomain : ContinuousDomain, val componentDomain : EnsembleDomain, val target : FieldmlObject )
-    extends ValueSource( sourceDomain )
+class VectorizedAliasValueSource( sourceType : ContinuousType, val componentType : EnsembleType, val target : FieldmlObject )
+    extends ValueSource( sourceType )
 {
     override def getValue( state : EvaluationState ) : Option[Value] =
     {
@@ -18,22 +18,22 @@ class VectorizedAliasValueSource( sourceDomain : ContinuousDomain, val component
         
         state.push( localContext )
 
-        val value = new Array[Double]( componentDomain.bounds.elementCount )
-        for( e <- 1 to componentDomain.bounds.elementCount )
+        val value = new Array[Double]( componentType.bounds.elementCount )
+        for( e <- 1 to componentType.bounds.elementCount )
         {
-            localContext( componentDomain ) = new EnsembleValue( e )
+            localContext( componentType ) = Value( componentType, e )
             state.get( target ) match
             {
                 case c : Some[ContinuousValue] => value( e - 1 ) = c.get.value(0)
                 case _ => //Should never happen
             }
         }
-        return Some( new ContinuousValue( value ) )
+        return Some( Value( sourceType, value: _* ) )
     }
     
     
     override def toString() : String =
     {
-        return "(" + domain + " -> " + target + ")[Alias]"
+        return "(" + valueType + " -> " + target + ")[Alias]"
     }
 }

@@ -1,8 +1,8 @@
 package framework.io.serialize
 
 import framework.io.serialize._
-import fieldml.domain.ContinuousDomain
-import fieldml.domain.EnsembleDomain
+import fieldml.valueType.ContinuousType
+import fieldml.valueType.EnsembleType
 
 import util.exception._
 
@@ -12,28 +12,28 @@ import fieldml.jni.FieldmlHandleType._
 
 import framework.region.UserRegion
 
-class ContinuousDomainSerializer( val domain : ContinuousDomain )
+
+class ContinuousTypeSerializer( val valueType : ContinuousType )
 {
     def insert( handle : Long ) : Unit =
     {
         var componentHandle = FML_INVALID_HANDLE
         
-        if( domain.componentDomain != null )
+        if( valueType.componentType != null )
         {
-            componentHandle = GetNamedObject( handle, domain.componentDomain.name )
+            componentHandle = GetNamedObject( handle, valueType.componentType.name )
         }
         
-        val objectHandle = Fieldml_CreateContinuousDomain( handle, domain.name, componentHandle )
+        val objectHandle = Fieldml_CreateContinuousDomain( handle, valueType.name, componentHandle )
     }
 }
 
-
-object ContinuousDomainSerializer
+object ContinuousTypeSerializer
 {
     def extract( fmlHandle : Long, objectHandle : Int, region : UserRegion ) : 
-        Option[ContinuousDomain] =
+        Option[ContinuousType] =
     {
-        var continuousDomain : ContinuousDomain = null
+        var continuousType : ContinuousType = null
         
         val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
         val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
@@ -48,15 +48,15 @@ object ContinuousDomainSerializer
         }
 
         val componentHandle = Fieldml_GetDomainComponentEnsemble( fmlHandle, objectHandle )
-        var componentDomain : EnsembleDomain = null
+        var componentType : EnsembleType = null
 
         if( componentHandle != FML_INVALID_HANDLE )
         {
             val componentName = Fieldml_GetObjectName( fmlHandle, componentHandle )
             
-            componentDomain = region.getObject( componentName )
+            componentType = region.getObject( componentName )
         }
         
-        return Some( region.createContinuousDomain( name, componentDomain ) )
+        return Some( region.createContinuousType( name, componentType ) )
     }
 }

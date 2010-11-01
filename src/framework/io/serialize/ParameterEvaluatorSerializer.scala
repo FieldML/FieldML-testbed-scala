@@ -1,9 +1,9 @@
 package framework.io.serialize
 
-import fieldml.domain.ContinuousDomain
-import fieldml.domain.EnsembleDomain
+import fieldml.valueType.ContinuousType
+import fieldml.valueType.EnsembleType
 
-import fieldml.evaluator.datastore._
+import framework.datastore._
 
 import fieldml.evaluator.ParameterEvaluator
 
@@ -52,23 +52,23 @@ class ParameterEvaluatorSerializer( val evaluator : ParameterEvaluator )
     
     def insert( handle : Long ) : Unit =
     {
-        val valueHandle = GetNamedObject( handle, evaluator.valueDomain.name )
+        val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
         var objectHandle = FML_INVALID_HANDLE
         
-        evaluator.valueDomain match
+        evaluator.valueType match
         {
-            case d : ContinuousDomain => objectHandle = Fieldml_CreateContinuousParameters( handle, evaluator.name, valueHandle )
-            case d : EnsembleDomain => objectHandle = Fieldml_CreateEnsembleParameters( handle, evaluator.name, valueHandle )
+            case d : ContinuousType => objectHandle = Fieldml_CreateContinuousParameters( handle, evaluator.name, valueHandle )
+            case d : EnsembleType => objectHandle = Fieldml_CreateEnsembleParameters( handle, evaluator.name, valueHandle )
         }
         
-        evaluator.description match
+        evaluator.dataStore.description match
         {
             case d : SemidenseDataDescription => insertSemidense( handle, objectHandle, d )
             case unknown => println( "Cannot yet serialize data description " + unknown ) 
         }
         
-        evaluator.location match
+        evaluator.dataStore.location match
         {
             case l : FileDataLocation => insertFileData( handle, objectHandle, l )
             case l : InlineDataLocation => insertInlineData( handle, objectHandle, l )

@@ -1,21 +1,23 @@
 package framework.region
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.Map
 
 import framework.io.serialize._
 
 import fieldml._
-import fieldml.domain._
-import fieldml.domain.bounds._
+import fieldml.valueType._
+import fieldml.valueType.bounds._
 import fieldml.evaluator._
-import fieldml.evaluator.datastore._
 
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 import fieldml.jni.FieldmlApi._
 
+import framework.datastore._
 import framework.valuesource._
 import framework.value._
+import framework.io
 import framework._
 
 import util._
@@ -27,6 +29,8 @@ class UserRegion( name : String )
 {
     //Used for serialization, which must be order-sensitive.
     private val objectList = ArrayBuffer[FieldmlObject]()
+    
+    private val companions = Map[ValueType, AbstractEvaluator]()
     
     private def put( obj : FieldmlObject ) : Unit =
     {
@@ -40,54 +44,51 @@ class UserRegion( name : String )
     }
     
     
-    def createEnsembleDomain( objectName : String, bounds : Int, isComponentEnsemble : Boolean ) : EnsembleDomain =
+    def createEnsembleType( objectName : String, bounds : Int, isComponentEnsemble : Boolean ) : EnsembleType =
     {
-        return createEnsembleDomain( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
+        return createEnsembleType( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
     }
     
     
-    def createEnsembleDomain( objectName : String, bounds : EnsembleBounds, isComponentEnsemble : Boolean ) : EnsembleDomain =
+    def createEnsembleType( objectName : String, bounds : EnsembleBounds, isComponentEnsemble : Boolean ) : EnsembleType =
     {
-        val domain = new EnsembleDomain( objectName, bounds, isComponentEnsemble )
+        val valueType = new EnsembleType( objectName, bounds, isComponentEnsemble )
 
-        put( domain )
+        put( valueType )
 
-        return domain
+        return valueType
     }
 
     
-    def createContinuousDomain( objectName : String, components : EnsembleDomain ) : ContinuousDomain =
+    def createContinuousType( objectName : String, components : EnsembleType ) : ContinuousType =
     {
-        val domain = new ContinuousDomain( objectName, components )
+        val valueType = new ContinuousType( objectName, components )
 
-        put( domain )
+        put( valueType )
 
-        return domain
+        return valueType
     }
 
     
-    def createMeshDomain( objectName : String, bounds : Int, xiComponents : EnsembleDomain ) : MeshDomain =
+    def createMeshType( objectName : String, bounds : Int, xiComponents : EnsembleType ) : MeshType =
     {
-        return createMeshDomain( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
+        return createMeshType( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
     }
 
 
-    def createMeshDomain( objectName : String, bounds : EnsembleBounds, xiComponents : EnsembleDomain ) : MeshDomain =
+    def createMeshType( objectName : String, bounds : EnsembleBounds, xiComponents : EnsembleType ) : MeshType =
     {
-        val domain = new MeshDomain( objectName, bounds, xiComponents )
+        val valueType = new MeshType( objectName, bounds, xiComponents )
 
-        put( domain )
-        
-        context.add( new SubdomainValueSource( domain.elementDomain, domain, "element" ) )
-        context.add( new SubdomainValueSource( domain.xiDomain, domain, "xi" ) )
+        put( valueType )
 
-        return domain
+        return valueType
     }
     
     
-    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], domain1 : ContinuousDomain, domain2 : ContinuousDomain, valueDomain : ContinuousDomain ) : Evaluator =
+    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], type1 : AbstractEvaluator, type2 : AbstractEvaluator, valueType : ContinuousType ) : Evaluator =
     {
-        val evaluator = new FunctionEvaluator( name, function, domain1, domain2, valueDomain ) 
+        val evaluator = new FunctionEvaluator( name, function, type1, type2, valueType ) 
 
         put( evaluator )
         
@@ -97,10 +98,10 @@ class UserRegion( name : String )
     }
     
     
-    def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region, valueDomain : Domain ) : ReferenceEvaluator =
+    def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region, valueType : ValueType ) : ReferenceEvaluator =
     {
         val refEvaluator : Evaluator = refRegion.getObject( refEvaluatorName )
-        val evaluator = new ReferenceEvaluator( name, valueDomain, refEvaluator )
+        val evaluator = new ReferenceEvaluator( name, valueType, refEvaluator )
         
         put( evaluator )
         
@@ -110,16 +111,16 @@ class UserRegion( name : String )
     }
     
     
-    def createPiecewiseEvaluator( name : String, index : EnsembleDomain, valueDomain : Domain ) : PiecewiseEvaluator =
+    def createPiecewiseEvaluator( name : String, index : EnsembleType, valueType : ValueType ) : PiecewiseEvaluator =
     {
-        val evaluator = new PiecewiseEvaluator( name, valueDomain, index )
+        val evaluator = new PiecewiseEvaluator( name, valueType, index )
         
         put( evaluator )
         
         var valueSource : ValueSource = null
-        valueDomain match
+        valueType match
         {
-            case c : ContinuousDomain => if( index == c.componentDomain ) valueSource = new VectorizedPiecewiseValueSource( evaluator ) else valueSource = new PiecewiseEvaluatorValueSource( evaluator )
+            case c : ContinuousType => if( index == c.componentType ) valueSource = new VectorizedPiecewiseValueSource( evaluator, c ) else valueSource = new PiecewiseEvaluatorValueSource( evaluator )
             case _ => valueSource = new PiecewiseEvaluatorValueSource( evaluator )
         }
         
@@ -129,9 +130,10 @@ class UserRegion( name : String )
     }
     
     
-    def createParameterEvaluator( name : String, valueDomain : Domain, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
+    def createParameterEvaluator( name : String, valueType : ValueType, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
     {
-        val evaluator = new ParameterEvaluator( name, valueDomain, location, description )
+        val store = new DataStore( location, description )
+        val evaluator = new ParameterEvaluator( name, valueType, store )
         
         put( evaluator )
         
@@ -141,21 +143,54 @@ class UserRegion( name : String )
     }
     
     
-    def set( domain : EnsembleDomain, value : Int )
+    def createAbstractEvaluator( name : String, valueType : ValueType ) : AbstractEvaluator =
     {
-        context( domain ) = new EnsembleValue( value )
+        val evaluator = new AbstractEvaluator( name, valueType )
+        
+        put( evaluator )
+        
+        context.add( new AbstractEvaluatorValueSource( evaluator ) )
+        
+        evaluator
     }
     
     
-    def set( domain : ContinuousDomain, values : Double* )
+    def createSubtypeEvaluator( baseEvaluator : Evaluator, subname : String ) : SubtypeEvaluator =
     {
-        context( domain ) = new ContinuousValue( values.toArray )
+        val subtype = baseEvaluator.valueType match
+        {
+            case s : StructuredType => s.subtype( subname ) match
+            {
+                case s : Some[ValueType] => s.get
+                case None => throw new FmlInvalidObjectException( "Type " + baseEvaluator.valueType + " for evaluator " + baseEvaluator + " does not have a subtype called " + subname )
+            }
+            case _ => throw new FmlInvalidObjectException( "Evaluator " + baseEvaluator + " does not have a structured value type" )
+        }
+        val evaluator = new SubtypeEvaluator( baseEvaluator, subtype, subname )
+        
+        put( evaluator )
+        
+        context.add( new SubtypeValueSource( evaluator ) )
+        
+        return evaluator
     }
     
     
-    def set( domain : MeshDomain, elementValue : Int, xiValues : Double* )
+    def set( valueType : EnsembleType, value : Int )
     {
-        context( domain ) = new MeshValue( elementValue, xiValues.toArray )
+        context( valueType ) = new EnsembleValue( valueType, value )
+    }
+    
+    
+    def set( valueType : ContinuousType, values : Double* )
+    {
+        context( valueType ) = new ContinuousValue( valueType, values.toArray )
+    }
+    
+    
+    def set( valueType : MeshType, elementValue : Int, xiValues : Double* )
+    {
+        context( valueType ) = new MeshValue( valueType, elementValue, xiValues.toArray )
     }
     
     
@@ -167,9 +202,9 @@ class UserRegion( name : String )
         {
             o match
             {
-            case d : EnsembleDomain => d.insert( handle )
-            case d : ContinuousDomain => d.insert( handle )
-            case d : MeshDomain => d.insert( handle )
+            case d : EnsembleType => d.insert( handle )
+            case d : ContinuousType => d.insert( handle )
+            case d : MeshType => d.insert( handle )
             case e : PiecewiseEvaluator => e.insert( handle )
             case e : ParameterEvaluator => e.insert( handle )
             case e : ReferenceEvaluator => e.insert( handle )
@@ -179,6 +214,16 @@ class UserRegion( name : String )
         
         Fieldml_WriteFile( handle, "test.xml" )
         Fieldml_Destroy( handle )
+    }
+    
+    
+    def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
+    {
+        companions.get( vType ) match
+        {
+            case s : Some[AbstractEvaluator] => s.get
+            case None => companions( vType ) = new AbstractEvaluator( vType.name + ".variable", vType ); companions( vType )
+        }
     }
 }
 
@@ -208,8 +253,8 @@ object UserRegion
         {
             fmlType match
             {
-                case FHT_ENSEMBLE_DOMAIN => EnsembleDomainSerializer.extract( fmlHandle, objectHandle, lib )
-                case FHT_CONTINUOUS_DOMAIN => ContinuousDomainSerializer.extract( fmlHandle, objectHandle, lib )
+                case FHT_ENSEMBLE_DOMAIN => EnsembleTypeSerializer.extract( fmlHandle, objectHandle, lib )
+                case FHT_CONTINUOUS_DOMAIN => ContinuousTypeSerializer.extract( fmlHandle, objectHandle, lib )
                 case FHT_REMOTE_CONTINUOUS_EVALUATOR => RemoteEvaluatorGenerator.generateContinuousEvaluator( fmlHandle, objectHandle, lib )
                 case _ => println( "Extracting object type " + fmlType + " not yet supported" )
             }
