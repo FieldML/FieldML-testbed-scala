@@ -1,29 +1,23 @@
 package framework.valuesource
 
 import fieldml.evaluator.ReferenceEvaluator
+import fieldml.evaluator.Evaluator
+import fieldml.valueType.ValueType
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class ReferenceEvaluatorValueSource( private val evaluator : ReferenceEvaluator, private val refContext : Context )
-    extends EvaluatorValueSource( evaluator )
+class ReferenceEvaluatorValueSource( name : String, valueDomain : ValueType, refEvaluator : Evaluator ) 
+    extends ReferenceEvaluator( name, valueDomain, refEvaluator )
+    with ValueSource
 {
-    override def getValue( state : EvaluationState ) : Option[Value] =
+    override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        val localContext = new Context( evaluator.name )
+        state.pushAndApply( binds.toSeq )
         
-        for( alias <- evaluator.aliases )
-        {
-            localContext.alias( alias._1, alias._2 )
-        }
-        
-        state.push( localContext )
-        state.push( refContext )
-        
-        val v = state.get( evaluator.refEvaluator )
-        
-        state.pop()
+        val v = refEvaluator.evaluate( state )
+
         state.pop()
         
         return v

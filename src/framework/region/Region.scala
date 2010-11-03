@@ -5,8 +5,13 @@ import scala.collection.mutable.Map
 import fieldml.FieldmlObject
 import fieldml.valueType._
 import fieldml.valueType.bounds._
+import fieldml.evaluator._
 
 import util.exception._
+
+import framework.valuesource.AbstractEvaluatorValueSource
+
+import framework.valuesource._
 
 import framework.Context
 import framework.EvaluationState
@@ -17,11 +22,11 @@ import framework.value.MeshValue
 
 abstract class Region( val name : String )
 {
-    val context = new Context( name )
-
-    
     protected val objects = Map[String, FieldmlObject]()
+
+    private val companions = Map[ValueType, AbstractEvaluatorValueSource]()
     
+    private val binds = Map[ AbstractEvaluator, Evaluator ]()
     
     //TODO Use region names
     def getObject[A <: FieldmlObject]( objectName : String ) : A =
@@ -37,48 +42,42 @@ abstract class Region( val name : String )
     }
     
     
-    private def evaluate( obj : FieldmlObject ) : Option[Value] =
+    
+    def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
+    {
+        companions.get( vType ) match
+        {
+            case s : Some[AbstractEvaluatorValueSource] => s.get
+            case None => companions( vType ) = new AbstractEvaluatorValueSource( vType.name + ".variable", vType ); companions( vType )
+        }
+    }
+    
+    def evaluate( evaluator : Evaluator ) : Option[Value] =
     {
         val state = new EvaluationState()
         
-        state.push( context )
+        state.pushAndApply( binds.toSeq )
         
-        return state.get( obj )
+        return evaluator.evaluate( state )
     }
     
     
-    def getValue( obj : FieldmlObject ) : Option[Value] =
+    def bind( variable : AbstractEvaluator, element : Int, xi : Double* ) =
     {
-        return evaluate( obj )
-    }
-    
-    
-    def getValue( obj : ContinuousType ) : Option[ContinuousValue] =
-    {
-        evaluate( obj ) match
+        variable.valueType match
         {
-            case v : Some[ContinuousValue] => return v
-            case _ => return None
+            case m : MeshType => binds( variable ) = new ConstantValueSource( new MeshValue( m, element, xi:_* ) )
+            case _ =>
         }
     }
     
     
-    def getValue( obj : EnsembleType ) : Option[EnsembleValue] =
+    def bind( variable : AbstractEvaluator, value : Int ) =
     {
-        evaluate( obj ) match
-        {
-            case v : Some[EnsembleValue] => return v
-            case _ => return None
-        }
     }
     
     
-    def getValue( obj : MeshType ) : Option[MeshValue] =
+    def bind( variable : AbstractEvaluator, value : Double* ) =
     {
-        evaluate( obj ) match
-        {
-            case v : Some[MeshValue] => return v
-            case _ => return None
-        }
     }
 }

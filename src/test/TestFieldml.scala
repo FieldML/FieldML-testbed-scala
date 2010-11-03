@@ -41,28 +41,30 @@ object TestFieldml
         val rc3Type2 = region.createContinuousType( "test.domain.rc3_2.type" , rc3ensemble )
         
         val xi2dType : ContinuousType = library.getObject( "library.xi.2d" )
+        val xi2dVar : AbstractEvaluator = library.getCompanionVariable( xi2dType )
 
         val meshType = region.createMeshType( "test.mesh.type", 2, xi2dType.componentType )
         val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
+        val elementVariable = region.createSubtypeEvaluator( meshVariable, "element" )
+        val xiVariable = region.createSubtypeEvaluator( meshVariable, "xi" )
 
         val nodes = region.createEnsembleType( "test.nodes.type", 6, false )
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
         val bilinearParametersType : ContinuousType = library.getObject( "library.parameters.bilinear_lagrange" )
+        val bilinearParametersVariable = library.getCompanionVariable( bilinearParametersType )
         //This should be in the library
         val bilinearIndexVariable = region.createAbstractEvaluator( "variables.bilinear.index", bilinearParametersType.componentType )
         
-        region.set( xi2dType, 0.2, 0.2 )
-
         val rawInterpolator = region.createReferenceEvaluator( "test.interpolator_v0", "library.fem.bilinear_lagrange", library, realType )
 
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library, realType )
-        firstInterpolator.alias( xi2dType -> meshType.xiType )
+        firstInterpolator.bind( xi2dVar -> xiVariable )
         
         val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library, realType )
-        secondInterpolator.alias( xi2dType -> meshType.xiType )
+        secondInterpolator.bind( xi2dVar -> xiVariable )
         
-        val parameterDescription = new SemidenseDataDescription( Array( nodesVariable, real3IndexVariable ), Array() )
+        val parameterDescription = new SemidenseDataDescription( realType, Array( nodesVariable, real3IndexVariable ), Array() )
         val parameterLocation = new InlineDataLocation()
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
         
@@ -87,13 +89,11 @@ object TestFieldml
         parameters( 5, 3 ) = 3.0
         parameters( 6, 3 ) = 3.5
         
-        println( parameters( 3, 1 ) )
-        println( parameters( 2 ) )
-        println( parameters( 1 ) )
-
-        val elementVariable = region.createSubtypeEvaluator( meshVariable, "element" )
+        println( "Parameters( 6, 2 ) = " + parameters( 6, 2 ) )
+        println( "Parameters( 2 ) = " + parameters( 2 ) )
+        println( "Parameters( 1 ) = " + parameters( 1 ) )
         
-        val connectivityDescription = new SemidenseDataDescription( Array( elementVariable, bilinearIndexVariable ), Array() )
+        val connectivityDescription = new SemidenseDataDescription( nodes, Array( elementVariable, bilinearIndexVariable ), Array() )
         val connectivityLocation = new InlineDataLocation()
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityLocation, connectivityDescription )
         
@@ -106,60 +106,60 @@ object TestFieldml
         connectivity( 2, 3 ) = 3
         connectivity( 2, 4 ) = 6
 
-        val piecewise = region.createPiecewiseEvaluator( "test.piecewise", meshType.elementType, realType )
+        val piecewise = region.createPiecewiseEvaluator( "test.piecewise", elementVariable, realType )
         piecewise.map( 1 -> firstInterpolator )
         piecewise.map( 2 -> secondInterpolator )
         
-        println( "*** piecewise(?) = " + region.getValue( piecewise ) )
+        println( "*** piecewise(?) = " + region.evaluate( piecewise ) )
         
         val bilinearParameters = region.createReferenceEvaluator( "test.bilinear_parameters", "test.parameters", region, realType ) 
-        bilinearParameters.alias( nodes -> connectivity )
+        bilinearParameters.bind( nodesVariable -> connectivity )
         
-        piecewise.alias( bilinearParametersType -> bilinearParameters )
+        piecewise.bind( bilinearParametersVariable -> bilinearParameters )
         
-        region.set( meshType, 2, 0, 0 )
+        region.bind( meshVariable, 2, 0, 0 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.getValue( piecewise ) )
-        println( "*****************************************************" )
-        
-        region.set( meshType, 2, 1, 0 )
-
-        println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.getValue( piecewise ) )
-        println( "*****************************************************" )
-
-        region.set( meshType, 2, 0, 1 )
-
-        println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.getValue( piecewise ) )
+        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
         
-        region.set( meshType, 2, 1, 1 )
+        region.bind( meshVariable, 2, 1, 0 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.getValue( piecewise ) )
+        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
 
-        val aggregate = region.createPiecewiseEvaluator( "test.aggregate", real3Type.componentType, real3Type )
+        region.bind( meshVariable, 2, 0, 1 )
+
+        println( "*****************************************************" )
+        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*****************************************************" )
+        
+        region.bind( meshVariable, 2, 1, 1 )
+
+        println( "*****************************************************" )
+        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*****************************************************" )
+
+        val aggregate = region.createPiecewiseEvaluator( "test.aggregate", real3IndexVariable, real3Type )
         aggregate.map( 1 -> piecewise )
         aggregate.map( 2 -> piecewise )
         aggregate.map( 3 -> piecewise )
         
-        region.set( meshType, 1, 0.5, 0.5 )
+        region.bind( meshVariable, 1, 0.5, 0.5 )
 
         println( "*****************************************************" )
-        println( "*** aggregate(1) = " + region.getValue( aggregate ) )
+        println( "*** aggregate(1) = " + region.evaluate( aggregate ) )
         println( "*****************************************************" )
         
         
         region.serialize()
         
-        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
-        
-        val f = new FileWriter( "collada two quads.xml" )
-        f.write( colladaXml )
-        f.close()
+//        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
+//        
+//        val f = new FileWriter( "collada two quads.xml" )
+//        f.write( colladaXml )
+//        f.close()
 
     }
 }

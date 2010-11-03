@@ -4,17 +4,29 @@ import scala.collection.mutable.Stack
 
 import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
+import fieldml.evaluator.Evaluator
 import fieldml.evaluator.AbstractEvaluator
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class AbstractEvaluatorValueSource( evaluator : AbstractEvaluator )
-    extends EvaluatorValueSource( evaluator )
+class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explicitVariables : AbstractEvaluator* )
+    extends AbstractEvaluator( name, valueType, explicitVariables:_* )
+    with ValueSource
 {
-    override def getValue( state : EvaluationState ) : Option[Value] =
+    override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        return state.get( state.getBind( evaluator ) )
+        state.pushAndApply( binds.toSeq )
+        
+        val value = state.getBind( this ) match
+        {
+            case s : Some[Evaluator] => s.get.evaluate( state )
+            case None => println( "Abstract evaluator " + name + " is not bound" ); None
+        }
+        
+        state.pop()
+        
+        return value
     }
 }

@@ -1,15 +1,14 @@
 package framework.valuesource
 
+import fieldml.evaluator.AbstractEvaluator
+import fieldml.valueType.ContinuousType
+
 import framework.value.Value
-import framework.Context
 import framework.FunctionEvaluator
 import framework.EvaluationState
 
-class FunctionEvaluatorValueSource( private val evaluator : FunctionEvaluator )
-    extends EvaluatorValueSource( evaluator )
+class FunctionEvaluatorValueSource( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : AbstractEvaluator, var2 : AbstractEvaluator, valueType : ContinuousType )
+    extends FunctionEvaluator( name, function, var1, var2, valueType )
+    with ValueSource
 {
-    override def getValue( state : EvaluationState ) : Option[Value] =
-    {
-        return Some( evaluator.evaluate( state ) )
-    }
 }

@@ -11,6 +11,7 @@ import fieldml.valueType.MeshType
 /**
  * Very very simplistic FieldML-java to Collada converter.
  */
+/*
 object ColladaExporter
 {
     private val rawXml = """<?xml version="1.0" encoding="utf-8"?>
@@ -242,7 +243,7 @@ polygonBlock
 
     def exportFromFieldML( region : UserRegion, discretisation : Int, meshName : String, fieldName : String ) : String =
     {
-        val meshType : MeshType = region.getObject( meshName )
+        val meshEvaluator : Evaluator = region.getObject( meshName )
         val mesh : Evaluator = region.getObject( fieldName )
         val elementCount = meshType.elementType.bounds.elementCount
 
@@ -259,7 +260,7 @@ polygonBlock
                     
                     region.set( meshType, elementNumber, xi1, xi2 )
                     
-                    val value = region.getValue( mesh )
+                    val value = region.evaluate( mesh )
                     appendTriple( value, xyzArray )
                 }
             }
@@ -411,3 +412,4 @@ polygonBlock
         return colladaString
     }
 }
+*/

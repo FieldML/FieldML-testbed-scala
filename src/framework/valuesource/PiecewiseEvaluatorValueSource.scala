@@ -1,29 +1,25 @@
 package framework.valuesource
 
 import fieldml.evaluator.PiecewiseEvaluator
+import fieldml.evaluator.Evaluator
+import fieldml.valueType.ValueType
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class PiecewiseEvaluatorValueSource( private val evaluator : PiecewiseEvaluator )
-    extends EvaluatorValueSource( evaluator )
+class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index : Evaluator )
+    extends PiecewiseEvaluator( name, valueType, index )
+    with ValueSource
 {
-    override def getValue( state : EvaluationState ) : Option[Value] =
+    override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        val localContext = new Context( evaluator.name )
-        
-        for( alias <- evaluator.aliases )
-        {
-            localContext.alias( alias._1, alias._2 )
-        }
-        
-        state.push( localContext )
+        state.pushAndApply( binds.toSeq )
         
         for(
-            key <- state.get( evaluator.index );
-            eval <- evaluator.delegations.get( key.value );
-            v <- state.get( eval )
+            key <- index.asInstanceOf[ValueSource].evaluate( state );
+            eval <- delegations.get( key.eValue );
+            v <- eval.evaluate( state )
             )
         {
             state.pop()

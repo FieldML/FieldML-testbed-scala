@@ -30,8 +30,6 @@ class UserRegion( name : String )
     //Used for serialization, which must be order-sensitive.
     private val objectList = ArrayBuffer[FieldmlObject]()
     
-    private val companions = Map[ValueType, AbstractEvaluator]()
-    
     private def put( obj : FieldmlObject ) : Unit =
     {
         objects.get( obj.name ) match
@@ -86,13 +84,11 @@ class UserRegion( name : String )
     }
     
     
-    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], type1 : AbstractEvaluator, type2 : AbstractEvaluator, valueType : ContinuousType ) : Evaluator =
+    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : AbstractEvaluator, var2 : AbstractEvaluator, valueType : ContinuousType ) : Evaluator =
     {
-        val evaluator = new FunctionEvaluator( name, function, type1, type2, valueType ) 
+        val evaluator = new FunctionEvaluatorValueSource( name, function, var1, var2, valueType ) 
 
         put( evaluator )
-        
-        context.add( new FunctionEvaluatorValueSource( evaluator ) )
         
         return evaluator
     }
@@ -101,30 +97,19 @@ class UserRegion( name : String )
     def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region, valueType : ValueType ) : ReferenceEvaluator =
     {
         val refEvaluator : Evaluator = refRegion.getObject( refEvaluatorName )
-        val evaluator = new ReferenceEvaluator( name, valueType, refEvaluator )
+        val evaluator = new ReferenceEvaluatorValueSource( name, valueType, refEvaluator )
         
         put( evaluator )
-        
-        context.add( new ReferenceEvaluatorValueSource( evaluator, refRegion.context ) )
         
         return evaluator
     }
     
     
-    def createPiecewiseEvaluator( name : String, index : EnsembleType, valueType : ValueType ) : PiecewiseEvaluator =
+    def createPiecewiseEvaluator( name : String, index : Evaluator, valueType : ValueType ) : PiecewiseEvaluator =
     {
-        val evaluator = new PiecewiseEvaluator( name, valueType, index )
+        val evaluator = new PiecewiseEvaluatorValueSource( name, valueType, index )
         
         put( evaluator )
-        
-        var valueSource : ValueSource = null
-        valueType match
-        {
-            case c : ContinuousType => if( index == c.componentType ) valueSource = new VectorizedPiecewiseValueSource( evaluator, c ) else valueSource = new PiecewiseEvaluatorValueSource( evaluator )
-            case _ => valueSource = new PiecewiseEvaluatorValueSource( evaluator )
-        }
-        
-        context.add( valueSource )
         
         return evaluator
     }
@@ -133,11 +118,9 @@ class UserRegion( name : String )
     def createParameterEvaluator( name : String, valueType : ValueType, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
     {
         val store = new DataStore( location, description )
-        val evaluator = new ParameterEvaluator( name, valueType, store )
+        val evaluator = new ParameterEvaluatorValueSource( name, valueType, store )
         
         put( evaluator )
-        
-        context.add( new ParameterEvaluatorValueSource( evaluator ) )
         
         return evaluator
     }
@@ -145,11 +128,9 @@ class UserRegion( name : String )
     
     def createAbstractEvaluator( name : String, valueType : ValueType ) : AbstractEvaluator =
     {
-        val evaluator = new AbstractEvaluator( name, valueType )
+        val evaluator = new AbstractEvaluatorValueSource( name, valueType )
         
         put( evaluator )
-        
-        context.add( new AbstractEvaluatorValueSource( evaluator ) )
         
         evaluator
     }
@@ -166,33 +147,13 @@ class UserRegion( name : String )
             }
             case _ => throw new FmlInvalidObjectException( "Evaluator " + baseEvaluator + " does not have a structured value type" )
         }
-        val evaluator = new SubtypeEvaluator( baseEvaluator, subtype, subname )
+        val evaluator = new SubtypeEvaluatorValueSource( baseEvaluator, subtype, subname )
         
         put( evaluator )
         
-        context.add( new SubtypeValueSource( evaluator ) )
-        
         return evaluator
     }
-    
-    
-    def set( valueType : EnsembleType, value : Int )
-    {
-        context( valueType ) = new EnsembleValue( valueType, value )
-    }
-    
-    
-    def set( valueType : ContinuousType, values : Double* )
-    {
-        context( valueType ) = new ContinuousValue( valueType, values.toArray )
-    }
-    
-    
-    def set( valueType : MeshType, elementValue : Int, xiValues : Double* )
-    {
-        context( valueType ) = new MeshValue( valueType, elementValue, xiValues.toArray )
-    }
-    
+
     
     def serialize() : Unit =
     {
@@ -214,16 +175,6 @@ class UserRegion( name : String )
         
         Fieldml_WriteFile( handle, "test.xml" )
         Fieldml_Destroy( handle )
-    }
-    
-    
-    def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
-    {
-        companions.get( vType ) match
-        {
-            case s : Some[AbstractEvaluator] => s.get
-            case None => companions( vType ) = new AbstractEvaluator( vType.name + ".variable", vType ); companions( vType )
-        }
     }
 }
 

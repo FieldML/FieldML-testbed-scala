@@ -22,7 +22,7 @@ class ReferenceEvaluatorSerializer( evaluator : ReferenceEvaluator )
             case _ => println( "Cannot yet serialize " + evaluator )
         }
         
-        for( pair <- evaluator.aliases )
+        for( pair <- evaluator.binds )
         {
             val valueTypeHandle = GetNamedObject( handle, pair._1.name )
             val sourceHandle = GetNamedObject( handle, pair._2.name )

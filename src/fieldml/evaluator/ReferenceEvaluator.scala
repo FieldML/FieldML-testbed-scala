@@ -5,17 +5,17 @@ import scala.collection.mutable.Map
 import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
 
-class ReferenceEvaluator( name : String, valueDomain : ValueType, val refEvaluator : Evaluator ) 
+abstract class ReferenceEvaluator( name : String, valueDomain : ValueType, val refEvaluator : Evaluator ) 
     extends Evaluator( name, valueDomain )
 {
-    val aliases = Map[ ValueType, FieldmlObject ]()
+    val binds = Map[ AbstractEvaluator, Evaluator ]()
     
 
     def variables = refEvaluator.variables
 
     
-    def alias( alias : Tuple2[ ValueType, FieldmlObject ] )
+    def bind( alias : Tuple2[ AbstractEvaluator, Evaluator ] )
     {
-        aliases( alias._1 ) = alias._2
+        binds( alias._1 ) = alias._2
     }
 }

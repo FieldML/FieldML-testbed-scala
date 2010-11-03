@@ -1,21 +1,26 @@
 package framework.valuesource
 
 import fieldml.valueType._
+import fieldml.evaluator.Evaluator
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class ConstantValueSource( valueType : ValueType, _value : Value )
-    extends ValueSource( valueType )
+class ConstantValueSource( val value : Value )
+    extends Evaluator( value.toString, value.vType )
+    with ValueSource
 {
+    override def variables = None
+    
+    
     override def toString() : String =
     {
-        return "(" + valueType + " = " + _value + ")[ConstantValueSource]"
+        return "(" + value + ")[ConstantValueSource]"
     }
     
     
-    private val value = Some( _value )
+    private val _value = Some( value )
     
-    override def getValue( state : EvaluationState ) : Option[Value] = value
+    override def evaluate( state : EvaluationState ) : Option[Value] = _value
 }

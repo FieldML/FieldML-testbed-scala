@@ -16,76 +16,29 @@ class EvaluationState
 {
     private val stack = Stack[Context]()
 
-    def push( context : Context )
-    {
-        stack.push( context )
-    }
-    
-    
     def pop()
     {
         stack.pop()
     }
     
     
-    private def getValue( obj : FieldmlObject ) : Option[Value] =
+    def pushAndApply( binds : Seq[Tuple2[AbstractEvaluator, Evaluator]] )
     {
-        for( context <- stack;
-            source <- context( obj )
-            )
+        stack.push( new Context() )
+        for( b <- binds )
         {
-            return source.getValue( this )
+            stack.top.setBind( b._1, b._2 )
+        }
+    }
+    
+    
+    def getBind( variable : AbstractEvaluator ) : Option[Evaluator] =
+    {
+        for( context <- stack; evaluator <- context.getBind( variable ) )
+        {
+            return Some( evaluator )
         }
         
         return None
     }
-    
-    
-    def get( obj : FieldmlObject ) : Option[Value] =
-    {
-        return getValue( obj )
-    }
-    
-    
-    def get( obj : ContinuousType ) : Option[ContinuousValue] =
-    {
-        getValue( obj ) match
-        {
-            case v : Some[ContinuousValue] => return v
-            case _ => return None
-        }
-    }
-    
-    
-    def get( obj : EnsembleType ) : Option[EnsembleValue] =
-    {
-        getValue( obj ) match
-        {
-            case v : Some[EnsembleValue] => return v
-            case _ => return None
-        }
-    }
-    
-    
-    def getOrElse( evaluator : Evaluator, default : Int ) : Int =
-    {
-        getValue( evaluator ) match
-        {
-            case v : Some[EnsembleValue] => return v.get.value
-            case _ => return default
-        }
-    }
-    
-    
-    def getBind( evaluator : AbstractEvaluator ) : Evaluator =
-    {
-         for( context <- stack;
-            source <- context.getBind( evaluator )
-            )
-        {
-            return source
-        }
-        
-        return null
-   }
 }

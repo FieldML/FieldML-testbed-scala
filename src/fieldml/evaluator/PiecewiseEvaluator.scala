@@ -10,18 +10,18 @@ import fieldml.FieldmlObject
 
 import framework.value.EnsembleValue
 
-class PiecewiseEvaluator( name : String, valueType : ValueType, val index : EnsembleType )
+abstract class PiecewiseEvaluator( name : String, valueType : ValueType, val index : Evaluator )
     extends Evaluator( name, valueType )
 {
     val delegations = new DefaultingHashMap[Int, Evaluator]()
     
-    val aliases = Map[ ValueType, FieldmlObject ]()
+    val binds = Map[ AbstractEvaluator, Evaluator ]()
     
     def variables = delegations.values.flatMap( _.variables )
 
-    def alias( alias : Tuple2[ ValueType, FieldmlObject ] )
+    def bind( alias : Tuple2[ AbstractEvaluator, Evaluator ] )
     {
-        aliases( alias._1 ) = alias._2
+        binds( alias._1 ) = alias._2
     }
 
     

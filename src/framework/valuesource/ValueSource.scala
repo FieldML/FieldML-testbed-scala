@@ -1,15 +1,15 @@
 package framework.valuesource
 
-import fieldml.FieldmlObject
+import fieldml.evaluator.Evaluator
 
 import framework.value.Value
-import framework.Context
-
 import framework.EvaluationState
 
-import scala.collection.mutable.Stack
-
-abstract class ValueSource( val valueType : FieldmlObject )
+trait ValueSource
+    extends Evaluator
 {
-    def getValue( state : EvaluationState ) : Option[Value]
+    def evaluate( state : EvaluationState ) : Option[Value]
+    
+    
+    def evaluateOrElse( state : EvaluationState, value : Value ) : Option[Value] = evaluate( state ) match{ case s : Some[Value] => s; case None => Some( value ) }
 }
