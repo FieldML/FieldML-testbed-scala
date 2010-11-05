@@ -19,9 +19,9 @@ abstract class PiecewiseEvaluator( name : String, valueType : ValueType, val ind
     
     def variables = delegations.values.flatMap( _.variables )
 
-    def bind( alias : Tuple2[ AbstractEvaluator, Evaluator ] )
+    def bind( _bind : Tuple2[ AbstractEvaluator, Evaluator ] )
     {
-        binds( alias._1 ) = alias._2
+        binds( _bind._1 ) = _bind._2
     }
 
     

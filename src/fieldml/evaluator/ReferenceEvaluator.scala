@@ -14,8 +14,8 @@ abstract class ReferenceEvaluator( name : String, valueDomain : ValueType, val r
     def variables = refEvaluator.variables
 
     
-    def bind( alias : Tuple2[ AbstractEvaluator, Evaluator ] )
+    def bind( _bind : Tuple2[ AbstractEvaluator, Evaluator ] )
     {
-        binds( alias._1 ) = alias._2
+        binds( _bind._1 ) = _bind._2
     }
 }

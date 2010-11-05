@@ -115,6 +115,16 @@ class UserRegion( name : String )
     }
     
     
+    def createAggregateEvaluator( name : String, valueType : ContinuousType ) : AggregateEvaluator =
+    {
+        val evaluator = new AggregateEvaluatorValueSource( name, valueType )
+        
+        put( evaluator )
+        
+        return evaluator
+    }
+    
+    
     def createParameterEvaluator( name : String, valueType : ValueType, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
     {
         val store = new DataStore( location, description )

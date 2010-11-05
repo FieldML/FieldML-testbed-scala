@@ -112,44 +112,48 @@ object TestFieldml
         
         println( "*** piecewise(?) = " + region.evaluate( piecewise ) )
         
-        val bilinearParameters = region.createReferenceEvaluator( "test.bilinear_parameters", "test.parameters", region, realType ) 
+        val bilinearParameters = region.createAggregateEvaluator( "test.bilinear_parameters", bilinearParametersType ) 
+        bilinearParameters.bind_index( 1 -> bilinearIndexVariable )
         bilinearParameters.bind( nodesVariable -> connectivity )
-        
+        bilinearParameters.setDefault( parameters )
+
         piecewise.bind( bilinearParametersVariable -> bilinearParameters )
         
         region.bind( meshVariable, 2, 0, 0 )
+        region.bind( real3IndexVariable, 3 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*** piecewise(2, 0, 0) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
         
         region.bind( meshVariable, 2, 1, 0 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*** piecewise(2, 1, 0) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
 
         region.bind( meshVariable, 2, 0, 1 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*** piecewise(2, 0, 1) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
         
         region.bind( meshVariable, 2, 1, 1 )
 
         println( "*****************************************************" )
-        println( "*** piecewise(2) = " + region.evaluate( piecewise ) )
+        println( "*** piecewise(2, 1, 1) = " + region.evaluate( piecewise ) )
         println( "*****************************************************" )
 
-        val aggregate = region.createPiecewiseEvaluator( "test.aggregate", real3IndexVariable, real3Type )
+        val aggregate = region.createAggregateEvaluator( "test.aggregate", real3Type )
+        aggregate.bind_index( 1 -> real3IndexVariable )
         aggregate.map( 1 -> piecewise )
         aggregate.map( 2 -> piecewise )
         aggregate.map( 3 -> piecewise )
         
-        region.bind( meshVariable, 1, 0.5, 0.5 )
+        region.bind( meshVariable, 2, 0.5, 0.5 )
 
         println( "*****************************************************" )
-        println( "*** aggregate(1) = " + region.evaluate( aggregate ) )
+        println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( aggregate ) )
         println( "*****************************************************" )
         
         

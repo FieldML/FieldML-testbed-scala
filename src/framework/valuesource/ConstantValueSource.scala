@@ -8,7 +8,7 @@ import framework.Context
 import framework.EvaluationState
 
 class ConstantValueSource( val value : Value )
-    extends Evaluator( value.toString, value.vType )
+    extends Evaluator( "Constant(" + value.toString + ")", value.vType )
     with ValueSource
 {
     override def variables = None

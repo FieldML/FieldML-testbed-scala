@@ -14,7 +14,7 @@ class ParameterEvaluatorValueSource( name : String, valueType : ValueType, dataS
     extends ParameterEvaluator( name, valueType, dataStore )
     with ValueSource
 {
-    private val indexes = Array[Int]( dataStore.description.indexEvaluators.size )
+    private val indexes = new Array[Int]( dataStore.description.indexEvaluators.size )
 
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
@@ -23,7 +23,7 @@ class ParameterEvaluatorValueSource( name : String, valueType : ValueType, dataS
             dataStore.description.indexEvaluators( i ).evaluate( state ) match
             {
                 case s : Some[Value] => indexes( i ) = s.get.eValue
-                case None => println( "Abstract evaluator " + name + " is not bound" ); return None
+                case None => return None
             }
         }
         

@@ -58,7 +58,11 @@ abstract class Region( val name : String )
         
         state.pushAndApply( binds.toSeq )
         
-        return evaluator.evaluate( state )
+        val v =  evaluator.evaluate( state )
+        
+        state.pop();
+        
+        return v
     }
     
     
@@ -74,10 +78,20 @@ abstract class Region( val name : String )
     
     def bind( variable : AbstractEvaluator, value : Int ) =
     {
+        variable.valueType match
+        {
+            case e : EnsembleType => binds( variable ) = new ConstantValueSource( new EnsembleValue( e, value ) )
+            case _ =>
+        }
     }
     
     
     def bind( variable : AbstractEvaluator, value : Double* ) =
     {
+        variable.valueType match
+        {
+            case c : ContinuousType => binds( variable ) = new ConstantValueSource( new ContinuousValue( c, value:_* ) )
+            case _ =>
+        }
     }
 }

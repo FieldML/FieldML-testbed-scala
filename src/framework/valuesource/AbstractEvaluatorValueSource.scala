@@ -22,7 +22,7 @@ class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explic
         val value = state.getBind( this ) match
         {
             case s : Some[Evaluator] => s.get.evaluate( state )
-            case None => println( "Abstract evaluator " + name + " is not bound" ); None
+            case None => None
         }
         
         state.pop()
