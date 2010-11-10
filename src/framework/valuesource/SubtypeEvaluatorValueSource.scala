@@ -19,7 +19,7 @@ class SubtypeEvaluatorValueSource( baseEvaluator : Evaluator, valueType : ValueT
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        baseEvaluator.asInstanceOf[ValueSource].evaluate( state ) match
+        baseEvaluator.evaluate( state ) match
         {
             case m : Some[StructuredValue] => Some( m.get.subvalue( subname ) ) 
             case _ => return None

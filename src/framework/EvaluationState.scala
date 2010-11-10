@@ -3,14 +3,8 @@ package framework
 import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
-import fieldml.valueType.ContinuousType
-import fieldml.valueType.EnsembleType
 import fieldml.evaluator.Evaluator
 import fieldml.evaluator.AbstractEvaluator
-
-import value.Value
-import value.ContinuousValue
-import value.EnsembleValue
 
 class EvaluationState
 {

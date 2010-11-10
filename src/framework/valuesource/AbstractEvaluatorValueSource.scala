@@ -19,11 +19,7 @@ class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explic
     {
         state.pushAndApply( binds.toSeq )
         
-        val value = state.getBind( this ) match
-        {
-            case s : Some[Evaluator] => s.get.evaluate( state )
-            case None => None
-        }
+        val value = state.getBind( this ).flatMap( _.evaluate( state ) )
         
         state.pop()
         

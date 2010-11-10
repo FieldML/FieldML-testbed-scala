@@ -2,6 +2,8 @@ package test
 
 import scala.collection.mutable.ArrayBuffer
 
+import java.io.FileWriter
+
 import fieldml._
 import fieldml.valueType._
 import fieldml.valueType.bounds._
@@ -14,10 +16,8 @@ import framework._
 
 import fieldml.jni.FieldmlApi._
 
-import util._
+import util.ColladaExporter
 import framework.region._
-
-import java.io.FileWriter
 
 object TestFieldml
 {
@@ -156,14 +156,12 @@ object TestFieldml
         println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( aggregate ) )
         println( "*****************************************************" )
         
+        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
         
-        region.serialize()
-        
-//        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
-//        
-//        val f = new FileWriter( "collada two quads.xml" )
-//        f.write( colladaXml )
-//        f.close()
+        val f = new FileWriter( "collada two quads.xml" )
+        f.write( colladaXml )
+        f.close()
 
+        region.serialize()
     }
 }

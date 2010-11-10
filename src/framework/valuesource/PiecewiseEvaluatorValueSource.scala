@@ -16,18 +16,14 @@ class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index
     {
         state.pushAndApply( binds.toSeq )
         
-        for(
-            key <- index.asInstanceOf[ValueSource].evaluate( state );
+        val value = for(
+            key <- index.evaluate( state );
             eval <- delegations.get( key.eValue );
             v <- eval.evaluate( state )
-            )
-        {
-            state.pop()
-            return Some(v)
-        }
+            ) yield v
 
         state.pop()
-        return None
+        return value
     }
 
 }

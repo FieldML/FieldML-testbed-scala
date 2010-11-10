@@ -18,15 +18,16 @@ class ParameterEvaluatorValueSource( name : String, valueType : ValueType, dataS
 
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        for( i <- 0 until indexes.size )
-        {
-            dataStore.description.indexEvaluators( i ).evaluate( state ) match
-            {
-                case s : Some[Value] => indexes( i ) = s.get.eValue
-                case None => return None
-            }
-        }
+        val indexes = for( 
+            eval <- dataStore.description.indexEvaluators;
+            value <- eval.evaluate( state ) ) 
+                yield value.eValue
         
+        if( dataStore.description.indexEvaluators.size != indexes.size )
+        {
+            return None
+        }
+
         return dataStore.description.apply( indexes )
     }
 }

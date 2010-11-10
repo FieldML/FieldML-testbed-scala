@@ -42,7 +42,6 @@ abstract class Region( val name : String )
     }
     
     
-    
     def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
     {
         companions.get( vType ) match
@@ -52,6 +51,7 @@ abstract class Region( val name : String )
         }
     }
     
+
     def evaluate( evaluator : Evaluator ) : Option[Value] =
     {
         val state = new EvaluationState()
@@ -66,31 +66,37 @@ abstract class Region( val name : String )
     }
     
     
-    def bind( variable : AbstractEvaluator, element : Int, xi : Double* ) =
+    def bind( variable : AbstractEvaluator, value : Value ) : Unit =
+    {
+        binds( variable ) = new ConstantValueSource( value )
+    }
+    
+    
+    def bind( variable : AbstractEvaluator, element : Int, xi : Double* ) : Unit =
     {
         variable.valueType match
         {
-            case m : MeshType => binds( variable ) = new ConstantValueSource( new MeshValue( m, element, xi:_* ) )
+            case m : MeshType => bind( variable, new MeshValue( m, element, xi:_* ) )
             case _ =>
         }
     }
     
     
-    def bind( variable : AbstractEvaluator, value : Int ) =
+    def bind( variable : AbstractEvaluator, value : Int ) : Unit =
     {
         variable.valueType match
         {
-            case e : EnsembleType => binds( variable ) = new ConstantValueSource( new EnsembleValue( e, value ) )
+            case e : EnsembleType => bind( variable, new EnsembleValue( e, value ) )
             case _ =>
         }
     }
     
     
-    def bind( variable : AbstractEvaluator, value : Double* ) =
+    def bind( variable : AbstractEvaluator, value : Double* ) : Unit =
     {
         variable.valueType match
         {
-            case c : ContinuousType => binds( variable ) = new ConstantValueSource( new ContinuousValue( c, value:_* ) )
+            case c : ContinuousType => bind( variable, new ContinuousValue( c, value:_* ) )
             case _ =>
         }
     }

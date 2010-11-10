@@ -15,9 +15,7 @@ class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Do
     
     def evaluate( state : EvaluationState ) : Option[ContinuousValue] =
     {
-        val arg1 = var1.evaluate( state ) match { case s : Some[ContinuousValue] => s.get.cValue; case _ => return None }
-        val arg2 = var2.evaluate( state ) match { case s : Some[ContinuousValue] => s.get.cValue; case _ => return None }
-
-        return Some( new ContinuousValue( valueType, function( arg1, arg2 ) ) )
+        for( arg1 <- var1.evaluate( state ); arg2 <- var2.evaluate( state ); v = function( arg1.cValue, arg2.cValue ) )
+            yield new ContinuousValue( valueType, v )
     }
 }
