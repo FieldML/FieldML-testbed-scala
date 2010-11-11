@@ -256,8 +256,8 @@ polygonBlock
             {
                 for( j <- 0 to discretisation )
                 {
-                    val xi1 : Double = i / discretisation
-                    val xi2 : Double = j / discretisation
+                    val xi1 : Double = i * 1.0 / discretisation
+                    val xi2 : Double = j * 1.0 / discretisation
                     
                     region.bind( meshVariable, elementNumber, xi1, xi2 )
                     
@@ -318,8 +318,8 @@ polygonBlock
                 {
                     for( j <- 0 to discretisation )
                     {
-                        val xi1 : Double = i / discretisation
-                        val xi2 : Double = j / discretisation
+                        val xi1 : Double = i * 1.0 / discretisation
+                        val xi2 : Double = j * 1.0 / discretisation
 
                         region.bind( mesh1Variable, element1Number, xi1 )
                         region.bind( mesh2Variable, element2Number, xi2 )
@@ -378,7 +378,7 @@ polygonBlock
             x -= deltaX
             for( j <- 0 to discretisation )
             {
-                val xi1 : Double = j / discretisation
+                val xi1 : Double = j * 1.0 / discretisation
 
                 region.bind( meshVariable, elementNumber, xi1 )
                 

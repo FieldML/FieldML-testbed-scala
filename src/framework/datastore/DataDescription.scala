@@ -5,6 +5,10 @@ import fieldml.valueType.ValueType
 
 import framework.value.Value
 
+import util.exception.FmlException
+
+import util.TupleToArray
+
 abstract class DataDescription( valueType : ValueType )
 {
     def indexEvaluators : Array[Evaluator]
@@ -40,6 +44,30 @@ abstract class DataDescription( valueType : ValueType )
     def update( index1 : Int, values : Double* )
     {
         update( Array[Int]( index1 ), Value( valueType, values: _* ) )
+    }
+    
+    
+    def update( index1 : Int, values : Product )
+    {
+        if( indexEvaluators.length == 1 )
+        {
+            if( TupleToArray.tupleIsDoubles( values ) )
+            {
+                for( a <- TupleToArray.tupleToDoubleArray( values ) ) update( index1, a:_* )
+            }
+            //Ensemble tuples not yet supported
+        }
+        else
+        {
+            if( TupleToArray.tupleIsDoubles( values ) )
+            {
+                for( a <- TupleToArray.tupleToDoubleArray( values ); i <- 0 until a.length ) update( index1, i + 1, a( i ) )
+            }
+            else if( TupleToArray.tupleIsInts( values ) )
+            {
+                for( a <- TupleToArray.tupleToIntArray( values ); i <- 0 until a.length ) update( index1, i + 1, a( i ) )
+            }
+        }
     }
     
     

@@ -31,15 +31,8 @@ object TestFieldml
         val real3Type : ContinuousType = library.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleType = library.getObject( "library.ensemble.rc.3d" )
-        //This should be in the library
-        val real3IndexVariable = region.createAbstractEvaluator( "library.ensemble.rc.3d", rc3ensemble )
+        val real3IndexVariable : AbstractEvaluator = library.getCompanionVariable( rc3ensemble )
        
-        val rc3Type = region.createContinuousType( "test.domain.rc3" , rc3ensemble )
-
-        val rc3ensemble2 : EnsembleType = library.getObject( "library.ensemble.rc.3d" )
-
-        val rc3Type2 = region.createContinuousType( "test.domain.rc3_2.type" , rc3ensemble )
-        
         val xi2dType : ContinuousType = library.getObject( "library.xi.2d" )
         val xi2dVar : AbstractEvaluator = library.getCompanionVariable( xi2dType )
 
@@ -53,11 +46,8 @@ object TestFieldml
         
         val bilinearParametersType : ContinuousType = library.getObject( "library.parameters.bilinear_lagrange" )
         val bilinearParametersVariable = library.getCompanionVariable( bilinearParametersType )
-        //This should be in the library
-        val bilinearIndexVariable = region.createAbstractEvaluator( "variables.bilinear.index", bilinearParametersType.componentType )
+        val bilinearIndexVariable = library.getCompanionVariable( bilinearParametersType.componentType )
         
-        val rawInterpolator = region.createReferenceEvaluator( "test.interpolator_v0", "library.fem.bilinear_lagrange", library, realType )
-
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library, realType )
         firstInterpolator.bind( xi2dVar -> xiVariable )
         
@@ -68,26 +58,12 @@ object TestFieldml
         val parameterLocation = new InlineDataLocation()
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
         
-        parameters( 1, 1 ) = 0.0
-        parameters( 2, 1 ) = 0.0
-        parameters( 3, 1 ) = 0.0
-        parameters( 4, 1 ) = 1.0
-        parameters( 5, 1 ) = 1.0
-        parameters( 6, 1 ) = 1.0
-        
-        parameters( 1, 2 ) = 0.0
-        parameters( 2, 2 ) = 1.0
-        parameters( 3, 2 ) = 2.0
-        parameters( 4, 2 ) = 0.0
-        parameters( 5, 2 ) = 1.0
-        parameters( 6, 2 ) = 2.0
-
-        parameters( 1, 3 ) = 1.0
-        parameters( 2, 3 ) = 1.5
-        parameters( 3, 3 ) = 2.0
-        parameters( 4, 3 ) = 2.5
-        parameters( 5, 3 ) = 3.0
-        parameters( 6, 3 ) = 3.5
+        parameters( 1 ) = ( 0.0, 0.0, 1.0 )
+        parameters( 2 ) = ( 0.0, 1.0, 1.5 )
+        parameters( 3 ) = ( 0.0, 2.0, 2.0 )
+        parameters( 4 ) = ( 1.0, 0.0, 2.5 )
+        parameters( 5 ) = ( 1.0, 1.0, 3.0 )
+        parameters( 6 ) = ( 1.0, 2.0, 3.5 )
         
         println( "Parameters( 6, 2 ) = " + parameters( 6, 2 ) )
         println( "Parameters( 2 ) = " + parameters( 2 ) )
@@ -97,14 +73,8 @@ object TestFieldml
         val connectivityLocation = new InlineDataLocation()
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityLocation, connectivityDescription )
         
-        connectivity( 1, 1 ) = 1
-        connectivity( 1, 2 ) = 4
-        connectivity( 1, 3 ) = 2
-        connectivity( 1, 4 ) = 5
-        connectivity( 2, 1 ) = 2
-        connectivity( 2, 2 ) = 5
-        connectivity( 2, 3 ) = 3
-        connectivity( 2, 4 ) = 6
+        connectivity( 1 ) = ( 1, 4, 2, 5 )
+        connectivity( 2 ) = ( 2, 5, 3, 6 )
 
         val piecewise = region.createPiecewiseEvaluator( "test.piecewise", elementVariable, realType )
         piecewise.map( 1 -> firstInterpolator )
@@ -122,27 +92,19 @@ object TestFieldml
         region.bind( meshVariable, 2, 0, 0 )
         region.bind( real3IndexVariable, 3 )
 
-        println( "*****************************************************" )
         println( "*** piecewise(2, 0, 0) = " + region.evaluate( piecewise ) )
-        println( "*****************************************************" )
         
         region.bind( meshVariable, 2, 1, 0 )
 
-        println( "*****************************************************" )
         println( "*** piecewise(2, 1, 0) = " + region.evaluate( piecewise ) )
-        println( "*****************************************************" )
 
         region.bind( meshVariable, 2, 0, 1 )
 
-        println( "*****************************************************" )
         println( "*** piecewise(2, 0, 1) = " + region.evaluate( piecewise ) )
-        println( "*****************************************************" )
         
         region.bind( meshVariable, 2, 1, 1 )
 
-        println( "*****************************************************" )
         println( "*** piecewise(2, 1, 1) = " + region.evaluate( piecewise ) )
-        println( "*****************************************************" )
 
         val aggregate = region.createAggregateEvaluator( "test.aggregate", real3Type )
         aggregate.bind_index( 1 -> real3IndexVariable )
@@ -152,9 +114,7 @@ object TestFieldml
         
         region.bind( meshVariable, 2, 0.5, 0.5 )
 
-        println( "*****************************************************" )
         println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( aggregate ) )
-        println( "*****************************************************" )
         
         val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
         
