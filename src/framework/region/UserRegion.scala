@@ -44,7 +44,7 @@ class UserRegion( name : String )
     
     def createEnsembleType( objectName : String, bounds : Int, isComponentEnsemble : Boolean ) : EnsembleType =
     {
-        return createEnsembleType( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
+        createEnsembleType( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
     }
     
     
@@ -54,7 +54,7 @@ class UserRegion( name : String )
 
         put( valueType )
 
-        return valueType
+        valueType
     }
 
     
@@ -64,13 +64,13 @@ class UserRegion( name : String )
 
         put( valueType )
 
-        return valueType
+        valueType
     }
 
     
     def createMeshType( objectName : String, bounds : Int, xiComponents : EnsembleType ) : MeshType =
     {
-        return createMeshType( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
+        createMeshType( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
     }
 
 
@@ -80,7 +80,7 @@ class UserRegion( name : String )
 
         put( valueType )
 
-        return valueType
+        valueType
     }
     
     
@@ -90,7 +90,7 @@ class UserRegion( name : String )
 
         put( evaluator )
         
-        return evaluator
+        evaluator
     }
     
     
@@ -101,7 +101,7 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        return evaluator
+        evaluator
     }
     
     
@@ -111,7 +111,7 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        return evaluator
+        evaluator
     }
     
     
@@ -121,7 +121,7 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        return evaluator
+        evaluator
     }
     
     
@@ -132,7 +132,17 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        return evaluator
+        evaluator
+    }
+    
+    
+    def createElementSet( name : String, valueType : ValueType, elements : Int* ) : ElementSet =
+    {
+        val set = new ElementSet( name, valueType, elements:_* )
+        
+        put( set )
+        
+        set
     }
     
     
@@ -161,7 +171,7 @@ class UserRegion( name : String )
         
         put( evaluator )
         
-        return evaluator
+        evaluator
     }
 
     
@@ -223,6 +233,6 @@ object UserRegion
         
         Fieldml_Destroy( fmlHandle )
         
-        return lib
+        lib
     }
 }

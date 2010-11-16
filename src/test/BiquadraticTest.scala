@@ -79,14 +79,19 @@ object BiquadraticTest
         parameters( 43 ) = ( 2.0, 2.5, 0.25 ); parameters( 44 ) = ( 2.5, 2.5, 0.5 ); parameters( 45 ) = ( 3.0, 2.5, 1.0 )
         parameters( 46 ) = ( 0.5, 3.0, 1.0 ); parameters( 47 ) = ( 1.5, 3.0, 1.0 ); parameters( 48 ) = ( 2.5, 3.0, 1.0 )
         
-        val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( elementVariable, bilinearIndexVariable ), Array() )
+        val bilinearElementSet = region.createElementSet( "test.bilinear_elements", elementVariable.valueType, 5 )
+        val bilinearParameterSet = bilinearParametersType.componentType.elementSet
+        
+        val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearElementSet, bilinearParameterSet ), Array( elementVariable, bilinearIndexVariable ), Array() )
         val bilinearConnectivityLoc = new InlineDataLocation()
         val bilinearConnectivity = region.createParameterEvaluator( "test.bilinear_connectivity", nodes, bilinearConnectivityLoc, bilinearConnectivityDesc )
         
-        bilinearConnectivity( 1 ) = ( 1, 2, 5, 6 ) 
         bilinearConnectivity( 5 ) = ( 6, 7, 10, 11 ) 
 
-        val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( elementVariable, biquadraticIndexVariable ), Array() )
+        val biquadraticElementSet = region.createElementSet( "test.biquadratic_elements", elementVariable.valueType, 1, 2, 3, 4, 6, 7, 8, 9 )
+        val biquadraticParameterSet = biquadraticParametersType.componentType.elementSet
+        
+        val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticElementSet, biquadraticParameterSet ), Array( elementVariable, biquadraticIndexVariable ), Array() )
         val biquadraticConnectivityLoc = new InlineDataLocation()
         val biquadraticConnectivity = region.createParameterEvaluator( "test.biquadratic_connectivity", nodes, biquadraticConnectivityLoc, biquadraticConnectivityDesc )
         
@@ -155,7 +160,7 @@ object BiquadraticTest
         
         val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
         
-        val f = new FileWriter( "collada eight quads.xml" )
+        val f = new FileWriter( "collada nine quads.xml" )
         f.write( colladaXml )
         f.close()
 

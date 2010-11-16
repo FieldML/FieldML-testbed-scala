@@ -3,13 +3,21 @@ package framework.datastore
 import scala.collection.mutable.Map
 
 import fieldml.evaluator.Evaluator
+import fieldml.ElementSet
 import fieldml.valueType.ValueType
+import fieldml.valueType.EnsembleType
 
 import framework.value.Value
 
-class SemidenseDataDescription( valueType : ValueType, val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
+class SemidenseDataDescription( valueType : ValueType, val denseSets : Array[ElementSet], val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
     extends DataDescription( valueType )
 {
+    def this( valueType : ValueType, denseIndexes : Array[Evaluator], sparseIndexes : Array[Evaluator] ) =
+    {
+        this( valueType, denseIndexes.map( _.valueType.asInstanceOf[EnsembleType].elementSet ), denseIndexes, sparseIndexes )
+    }
+    
+
     override def indexEvaluators : Array[Evaluator] = Array.concat( denseIndexes, sparseIndexes )
 
 
