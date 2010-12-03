@@ -1,43 +1,43 @@
 package framework.io.serialize
 
-import fieldml.evaluator.PiecewiseEvaluator
+import fieldml.evaluator.AggregateEvaluator
 
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
 
-import framework.valuesource.PiecewiseEvaluatorValueSource
+import framework.valuesource.AggregateEvaluatorValueSource
 
-object PiecewiseEvaluatorSerializer
+object AggregateEvaluatorSerializer
 {
-    def insert( handle : Long, evaluator : PiecewiseEvaluator ) : Unit =
+    def insert( handle : Long, evaluator : AggregateEvaluator ) : Unit =
     {
-        val indexHandle = GetNamedObject( handle, evaluator.index.name )
+        val indexHandle = GetNamedObject( handle, evaluator.indexBinds( 1 ).name )
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
-        val objectHandle = Fieldml_CreatePiecewiseEvaluator( handle, evaluator.name, valueHandle )
+        val objectHandle = Fieldml_CreateAggregateEvaluator( handle, evaluator.name, valueHandle )
         
         Fieldml_SetIndexEvaluator( handle, objectHandle, 1, indexHandle )
     }
 
     
-    def extract( source : Deserializer, objectHandle : Int ) : PiecewiseEvaluator =
+    def extract( source : Deserializer, objectHandle : Int ) : AggregateEvaluator =
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
 
         val typeHandle = Fieldml_GetValueType( source.fmlHandle, objectHandle )
         val valueType = source.getContinuousType( typeHandle )
         
-        val indexEvalHandle = Fieldml_GetIndexEvaluator( source.fmlHandle, objectHandle, 1 )
-        val indexEval = source.getEvaluator( indexEvalHandle )
-
-        val piecewiseEval = new PiecewiseEvaluatorValueSource( name, valueType, indexEval )
+        val aggEval = new AggregateEvaluatorValueSource( name, valueType )
+        
+        val indexEval = Fieldml_GetIndexEvaluator( source.fmlHandle, objectHandle, 1 )
+        aggEval.bind_index( 1 -> source.getAbstractEvaluator( indexEval ) )
         
         val defaultEval = Fieldml_GetDefaultEvaluator( source.fmlHandle, objectHandle )
         if( defaultEval != FML_INVALID_HANDLE )
         {
-            piecewiseEval.setDefault( source.getEvaluator( defaultEval ) )
+            aggEval.setDefault( source.getEvaluator( defaultEval ) )
         }
         
         val evalCount = Fieldml_GetEvaluatorCount( source.fmlHandle, objectHandle )
@@ -47,12 +47,12 @@ object PiecewiseEvaluatorSerializer
             val evaluator = Fieldml_GetEvaluator( source.fmlHandle, objectHandle, i )
             if( ( element > 0 ) && ( evaluator != FML_INVALID_HANDLE ) )
             {
-                piecewiseEval.map( element -> source.getEvaluator( evaluator ) )
+                aggEval.map( element -> source.getEvaluator( evaluator ) )
             }
         }
         
-        for( b <- GetBinds( source, objectHandle ) ) piecewiseEval.bind( b )
+        for( b <- GetBinds( source, objectHandle ) ) aggEval.bind( b )
         
-        piecewiseEval
+        aggEval
     }
 }

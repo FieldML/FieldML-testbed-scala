@@ -7,17 +7,17 @@ import fieldml.valueType.bounds.ContiguousEnsembleBounds
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.DomainBoundsType
+import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
 import framework.region.UserRegion
 
-class EnsembleTypeSerializer( val valueType : EnsembleType )
+object EnsembleTypeSerializer
 {
-    def insert( handle : Long ) : Unit =
+    def insert( handle : Long, valueType : EnsembleType ) : Unit =
     {
-        val objectHandle = Fieldml_CreateEnsembleDomain( handle, valueType.name, FML_INVALID_HANDLE )
+        val objectHandle = Fieldml_CreateEnsembleType( handle, valueType.name, FML_INVALID_HANDLE )
         
         valueType.bounds match
         {
@@ -25,43 +25,23 @@ class EnsembleTypeSerializer( val valueType : EnsembleType )
             case unknown => println( "Cannot yet serialize EnsembleBounds " + unknown ) 
         }
     }
-}
 
-
-object EnsembleTypeSerializer
-{
-    def extract( fmlHandle : Long, objectHandle : Int, region : UserRegion ) :
-        Option[EnsembleType] = 
+    
+    def extract( source : Deserializer, objectHandle : Int ) : EnsembleType = 
     {
-        var ensembleType : EnsembleType = null
+        val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
         
-        val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
-        val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
-        
-        if( objectType != FHT_ENSEMBLE_DOMAIN )
+        val bounds = Fieldml_GetBoundsType( source.fmlHandle, objectHandle ) match
         {
-            Fieldml_GetLastError( fmlHandle ) match
-            {
-                case FML_ERR_UNKNOWN_OBJECT => throw new FmlUnknownObjectException( objectHandle )
-                case _ => throw new FmlTypeException( name, objectType, FHT_ENSEMBLE_DOMAIN )
-            }
+            case TypeBoundsType.BOUNDS_DISCRETE_CONTIGUOUS => new ContiguousEnsembleBounds( Fieldml_GetContiguousBoundsCount( source.fmlHandle, objectHandle ) )
+            case unknown => throw new FmlException( "Cannot yet extract bounds type " + unknown + " for " + name )
         }
         
-        var bounds : EnsembleBounds = null
-        
-        Fieldml_GetDomainBoundsType( fmlHandle, objectHandle ) match
+        Fieldml_IsEnsembleComponentType( source.fmlHandle, objectHandle ) match
         {
-            case DomainBoundsType.BOUNDS_DISCRETE_CONTIGUOUS => bounds = new ContiguousEnsembleBounds( Fieldml_GetContiguousBoundsCount( fmlHandle, objectHandle ) )
-            case unknown => println( "Cannot yet extract bounds type " + unknown )
+            case 1 => new EnsembleType( name, bounds, true )
+            case 0 => new EnsembleType( name, bounds, false )
+            case err => throw new FmlException( "Fieldml_IsEnsembleComponentType failure: " + err )
         }
-        
-        Fieldml_IsEnsembleComponentDomain( fmlHandle, objectHandle ) match
-        {
-            case 1 => ensembleType = region.createEnsembleType( name, bounds, true )
-            case 0 => ensembleType = region.createEnsembleType( name, bounds, false )
-            case err => println( "Fieldml_IsEnsembleComponentType failure: " + err )
-        }
-        
-        return Some( ensembleType )
     }
 }

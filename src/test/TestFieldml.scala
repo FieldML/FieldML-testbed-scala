@@ -48,10 +48,10 @@ object TestFieldml
         val bilinearParametersVariable = library.getCompanionVariable( bilinearParametersType )
         val bilinearIndexVariable = library.getCompanionVariable( bilinearParametersType.componentType )
         
-        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library, realType )
+        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library )
         firstInterpolator.bind( xi2dVar -> xiVariable )
         
-        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library, realType )
+        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library )
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( nodesVariable, real3IndexVariable ), Array() )

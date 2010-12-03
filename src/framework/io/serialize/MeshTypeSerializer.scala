@@ -1,21 +1,25 @@
 package framework.io.serialize
 
+import fieldml.valueType.EnsembleType
 import fieldml.valueType.MeshType
+import fieldml.valueType.bounds.EnsembleBounds
+import fieldml.valueType.bounds.ContiguousEnsembleBounds
 
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.FieldmlApiConstants._
+import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
+import fieldml.jni.FieldmlApiConstants._
 
-import fieldml.valueType.bounds.ContiguousEnsembleBounds
+import framework.region.UserRegion
 
-class MeshTypeSerializer( val valueType : MeshType )
+object MeshTypeSerializer
 {
-    def insert( handle : Long ) : Unit =
+    def insert( handle : Long, valueType : MeshType ) : Unit =
     {
         val componentHandle = GetNamedObject( handle, valueType.xiType.componentType.name )
-        val objectHandle = Fieldml_CreateMeshDomain( handle, valueType.name, componentHandle )
+        val objectHandle = Fieldml_CreateMeshType( handle, valueType.name, componentHandle )
 
         valueType.elementType.bounds match
         {
@@ -42,4 +46,21 @@ class MeshTypeSerializer( val valueType : MeshType )
 //        }
     }
 
+    
+    def extract( source : Deserializer, objectHandle : Int ) : MeshType =
+    {
+        val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
+        val xiComponentHandle = Fieldml_GetMeshXiComponentType( source.fmlHandle, objectHandle )
+        val xiComponentType = source.getEnsembleType( xiComponentHandle )
+        
+        val elementHandle = Fieldml_GetMeshElementType( source.fmlHandle, objectHandle )
+        
+        val bounds = Fieldml_GetBoundsType( source.fmlHandle, elementHandle ) match
+        {
+            case TypeBoundsType.BOUNDS_DISCRETE_CONTIGUOUS => new ContiguousEnsembleBounds( Fieldml_GetContiguousBoundsCount( source.fmlHandle, elementHandle ) )
+            case unknown => throw new FmlException( "Cannot yet extract bounds type " + unknown )
+        }
+        
+        return new MeshType( name, bounds, xiComponentType )
+    }
 }

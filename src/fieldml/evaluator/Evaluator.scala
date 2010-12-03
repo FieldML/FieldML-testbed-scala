@@ -13,6 +13,6 @@ abstract class Evaluator( name : String, val valueType : ValueType )
     
     override def toString() : String =
     {
-        return name + "[Evaluator]"
+        return name + "[" + getClass.getSimpleName + "]"
     }
 }

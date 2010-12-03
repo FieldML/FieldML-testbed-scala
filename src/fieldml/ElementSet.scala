@@ -20,4 +20,7 @@ class ElementSet private( name : String, val ensemble : ValueType, private val s
     
     
     def apply( e : Int ) = set.contains( e )
+    
+    
+    def size = set.size
 }

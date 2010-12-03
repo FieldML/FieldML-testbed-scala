@@ -13,9 +13,9 @@ import fieldml.jni.FieldmlHandleType._
 import framework.region.UserRegion
 
 
-class ContinuousTypeSerializer( val valueType : ContinuousType )
+object ContinuousTypeSerializer
 {
-    def insert( handle : Long ) : Unit =
+    def insert( handle : Long, valueType : ContinuousType ) : Unit =
     {
         var componentHandle = FML_INVALID_HANDLE
         
@@ -24,39 +24,22 @@ class ContinuousTypeSerializer( val valueType : ContinuousType )
             componentHandle = GetNamedObject( handle, valueType.componentType.name )
         }
         
-        val objectHandle = Fieldml_CreateContinuousDomain( handle, valueType.name, componentHandle )
+        val objectHandle = Fieldml_CreateContinuousType( handle, valueType.name, componentHandle )
     }
-}
 
-object ContinuousTypeSerializer
-{
-    def extract( fmlHandle : Long, objectHandle : Int, region : UserRegion ) : 
-        Option[ContinuousType] =
+
+    def extract( source : Deserializer, objectHandle : Int ) : ContinuousType =
     {
-        var continuousType : ContinuousType = null
+        val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
         
-        val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
-        val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
+        val componentHandle = Fieldml_GetTypeComponentEnsemble( source.fmlHandle, objectHandle )
         
-        if( objectType != FHT_CONTINUOUS_DOMAIN )
+        val componentType = componentHandle match
         {
-            Fieldml_GetLastError( fmlHandle ) match
-            {
-                case FML_ERR_UNKNOWN_OBJECT => throw new FmlUnknownObjectException( "Object handle " + objectHandle + " is invalid" )
-                case _ => throw new FmlTypeException( name, objectType, FHT_CONTINUOUS_DOMAIN )
-            }
-        }
-
-        val componentHandle = Fieldml_GetDomainComponentEnsemble( fmlHandle, objectHandle )
-        var componentType : EnsembleType = null
-
-        if( componentHandle != FML_INVALID_HANDLE )
-        {
-            val componentName = Fieldml_GetObjectName( fmlHandle, componentHandle )
-            
-            componentType = region.getObject( componentName )
+            case FML_INVALID_HANDLE => null
+            case _ => source.getEnsembleType( componentHandle )
         }
         
-        return Some( region.createContinuousType( name, componentType ) )
+        return new ContinuousType( name, componentType )
     }
 }

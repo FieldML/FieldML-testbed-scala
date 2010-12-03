@@ -13,6 +13,7 @@ import fieldml.evaluator._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 import fieldml.jni.FieldmlApi._
+import fieldml.jni.FieldmlApiConstants._
 
 import framework.datastore._
 import framework.valuesource._
@@ -94,10 +95,10 @@ class UserRegion( name : String )
     }
     
     
-    def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region, valueType : ValueType ) : ReferenceEvaluator =
+    def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region ) : ReferenceEvaluator =
     {
         val refEvaluator : Evaluator = refRegion.getObject( refEvaluatorName )
-        val evaluator = new ReferenceEvaluatorValueSource( name, valueType, refEvaluator )
+        val evaluator = new ReferenceEvaluatorValueSource( name, refEvaluator )
         
         put( evaluator )
         
@@ -183,13 +184,15 @@ class UserRegion( name : String )
         {
             o match
             {
-            case d : EnsembleType => d.insert( handle )
-            case d : ContinuousType => d.insert( handle )
-            case d : MeshType => d.insert( handle )
-            case e : PiecewiseEvaluator => e.insert( handle )
-            case e : ParameterEvaluator => e.insert( handle )
-            case e : ReferenceEvaluator => e.insert( handle )
-            case unknown => println( "Cannot yet serialize " + unknown ) 
+            case d : EnsembleType => d.insert( handle, d )
+            case d : ContinuousType => d.insert( handle, d )
+            case d : MeshType => d.insert( handle, d )
+            case e : AbstractEvaluator => e.insert( handle, e )
+            case e : PiecewiseEvaluator => e.insert( handle, e )
+            case e : ParameterEvaluator => e.insert( handle, e )
+            case e : ReferenceEvaluator => e.insert( handle, e )
+            case e : AggregateEvaluator => e.insert( handle, e )
+            case unknown => println( "Cannot yet serialize " + unknown )
             }
         }
         
@@ -215,24 +218,45 @@ object UserRegion
     {
         val lib = new UserRegion( "library" )
         
+        //TODO Icky. Currently, a 'blank' region has the libray auto-imported, so the library can be deduced by interrogating it.
         val fmlHandle = Fieldml_Create( "", "" )
         
+        importObjects( fmlHandle, lib )
+        
+        Fieldml_Destroy( fmlHandle )
+        
+        lib
+    }
+    
+    
+    private def importObjects( fmlHandle : Long, region : UserRegion ) : Unit =
+    {
+        val source = new Deserializer( fmlHandle )
         for(
             fmlType <- FieldmlHandleType.values;
             objectHandle <- getTypeHandles( fmlHandle, fmlType )
             )
         {
-            fmlType match
+            val obj = source.get( objectHandle )
+            //NOTE This check is only needed because RemoteEvaluatorGenerator returns null for unsupported evaluators.  
+            if( obj != null )
             {
-                case FHT_ENSEMBLE_DOMAIN => EnsembleTypeSerializer.extract( fmlHandle, objectHandle, lib )
-                case FHT_CONTINUOUS_DOMAIN => ContinuousTypeSerializer.extract( fmlHandle, objectHandle, lib )
-                case FHT_REMOTE_CONTINUOUS_EVALUATOR => RemoteEvaluatorGenerator.generateContinuousEvaluator( fmlHandle, objectHandle, lib )
-                case _ => println( "Extracting object type " + fmlType + " not yet supported" )
+                region.put( obj )
             }
         }
+    }
+    
+    
+    def fromFile( name : String, filename : String ) : Region =
+    {
+        val region = new UserRegion( name )
+        
+        val fmlHandle = Fieldml_CreateFromFile( filename )
+        
+        importObjects( fmlHandle, region )
         
         Fieldml_Destroy( fmlHandle )
         
-        lib
+        region
     }
 }

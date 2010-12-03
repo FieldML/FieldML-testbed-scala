@@ -52,10 +52,10 @@ object BiquadraticTest
         val biquadraticParametersVariable = library.getCompanionVariable( biquadraticParametersType )
         val biquadraticIndexVariable = library.getCompanionVariable( biquadraticParametersType.componentType )
         
-        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.fem.bilinear_lagrange", library, realType )
+        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.fem.bilinear_lagrange", library )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )
         
-        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", library, realType )
+        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", library )
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( nodesVariable, real3IndexVariable ), Array() )

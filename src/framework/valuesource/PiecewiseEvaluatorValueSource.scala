@@ -23,6 +23,7 @@ class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index
             ) yield v
 
         state.pop()
+        
         return value
     }
 

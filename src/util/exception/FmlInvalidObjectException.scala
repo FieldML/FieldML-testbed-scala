@@ -14,7 +14,7 @@ class FmlInvalidObjectException( message : String )
 
 object FmlInvalidObjectException
 {
-    def message( obj : FieldmlObject, purpose : String ) : String =
+    private def message( obj : FieldmlObject, purpose : String ) : String =
     {
         return obj.name + " cannot be used to " + purpose
     }

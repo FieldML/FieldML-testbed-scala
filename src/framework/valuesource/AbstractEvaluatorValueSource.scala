@@ -17,11 +17,9 @@ class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explic
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        state.pushAndApply( binds.toSeq )
-        
+        if( state.getBind( this ) == None )
+            println( name + " is unbound" )
         val value = state.getBind( this ).flatMap( _.evaluate( state ) )
-        
-        state.pop()
         
         return value
     }

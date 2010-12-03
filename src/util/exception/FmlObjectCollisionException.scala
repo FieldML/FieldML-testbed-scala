@@ -14,7 +14,7 @@ class FmlObjectCollisionException( message : String )
 
 object FmlObjectCollisionException
 {
-    def generateMessage( object1 : FieldmlObject, object2 : FieldmlObject ) : String =
+    private def generateMessage( object1 : FieldmlObject, object2 : FieldmlObject ) : String =
     {
         return "Object collision betweem " + object1.name + " and " + object2.name
     }

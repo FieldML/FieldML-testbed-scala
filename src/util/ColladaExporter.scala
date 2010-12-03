@@ -241,7 +241,7 @@ polygonBlock
         }
     }
 
-    def exportFromFieldML( region : UserRegion, discretisation : Int, meshName : String, evaluatorName : String ) : String =
+    def exportFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
@@ -296,7 +296,7 @@ polygonBlock
     }
 
 
-    def exportFromFieldML( region : UserRegion, discretisation : Int, evaluatorName : String, mesh1Name : String,
+    def exportFromFieldML( region : Region, discretisation : Int, evaluatorName : String, mesh1Name : String,
         mesh2Name : String ) : String =
     {
         val mesh1Variable : AbstractEvaluator = region.getObject( mesh1Name )
@@ -362,7 +362,7 @@ polygonBlock
     }
 
 
-    def export1DFromFieldML( region : UserRegion, meshName : String, evaluatorName : String, discretisation : Int ) : String =
+    def export1DFromFieldML( region : Region, meshName : String, evaluatorName : String, discretisation : Int ) : String =
     {
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]

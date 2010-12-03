@@ -8,8 +8,8 @@ import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class ReferenceEvaluatorValueSource( name : String, valueDomain : ValueType, refEvaluator : Evaluator ) 
-    extends ReferenceEvaluator( name, valueDomain, refEvaluator )
+class ReferenceEvaluatorValueSource( name : String, refEvaluator : Evaluator ) 
+    extends ReferenceEvaluator( name, refEvaluator )
     with ValueSource
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
@@ -17,7 +17,7 @@ class ReferenceEvaluatorValueSource( name : String, valueDomain : ValueType, ref
         state.pushAndApply( binds.toSeq )
         
         val v = refEvaluator.evaluate( state )
-
+        
         state.pop()
         
         return v

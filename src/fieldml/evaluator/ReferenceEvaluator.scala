@@ -5,8 +5,8 @@ import scala.collection.mutable.Map
 import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
 
-abstract class ReferenceEvaluator( name : String, valueDomain : ValueType, val refEvaluator : Evaluator ) 
-    extends Evaluator( name, valueDomain )
+class ReferenceEvaluator( name : String, val refEvaluator : Evaluator ) 
+    extends Evaluator( name, refEvaluator.valueType )
 {
     val binds = Map[ AbstractEvaluator, Evaluator ]()
     

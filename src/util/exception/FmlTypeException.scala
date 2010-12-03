@@ -22,12 +22,12 @@ class FmlTypeException( message : String )
 
 object FmlTypeException
 {
-    def message( name : String, actualType : FieldmlHandleType, expectedType : FieldmlHandleType ) : String =
+    private def message( name : String, actualType : FieldmlHandleType, expectedType : FieldmlHandleType ) : String =
     {
         return "Incorrect type for " + name + ": expected " + expectedType + ", got " + actualType
     }
 
-    def message( obj : FieldmlObject, expectedType : FieldmlHandleType ) : String =
+    private def message( obj : FieldmlObject, expectedType : FieldmlHandleType ) : String =
     {
         return "Incorrect type for " + obj.name + ": expected " + expectedType + ", got " + obj
     }

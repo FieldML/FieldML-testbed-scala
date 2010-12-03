@@ -18,13 +18,13 @@ class FmlUnknownObjectException( message : String )
 
 object FmlUnknownObjectException
 {
-    def message( objectHandle : Int ) : String =
+    private def message( objectHandle : Int ) : String =
     {
         return "Object handle " + objectHandle + " is invalid"    
     }
     
     
-    def message( objectName : String, regionName : String ) : String =
+    private def message( objectName : String, regionName : String ) : String =
     {
         return "Object named " + objectName + " cannot be found in region " + regionName    
     }

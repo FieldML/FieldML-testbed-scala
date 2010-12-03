@@ -1,6 +1,8 @@
 package framework.datastore
 
-class FileDataLocation( val filename : String, val offset : Int, val dataType : DataType.Value )
+import fieldml.jni.DataFileType
+
+class FileDataLocation( val filename : String, val offset : Int, val dataType : DataFileType )
     extends DataLocation
 {
 }

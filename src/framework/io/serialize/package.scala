@@ -3,6 +3,9 @@ package framework.io
 import fieldml.valueType.ContinuousType
 import fieldml.valueType.EnsembleType
 import fieldml.valueType.MeshType
+import fieldml.evaluator.Evaluator
+import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.AggregateEvaluator
 import fieldml.evaluator.PiecewiseEvaluator
 import fieldml.evaluator.ParameterEvaluator
 import fieldml.evaluator.ReferenceEvaluator
@@ -16,7 +19,7 @@ package object serialize
 {
     def GetNamedObject( handle : Long, name : String ) : Int =
     {
-        val objectHandle = Fieldml_GetNamedObject( handle, name )
+        val objectHandle = Fieldml_GetObjectByName( handle, name )
         if( objectHandle == FML_INVALID_HANDLE )
         {
             //TODO Use the right region name.
@@ -26,10 +29,25 @@ package object serialize
         return objectHandle
     }
     
-    implicit def continuousTypeSerializer( valueType : ContinuousType ) = new ContinuousTypeSerializer( valueType )
-    implicit def ensembleTypeSerializer( valueType : EnsembleType ) = new EnsembleTypeSerializer( valueType )
-    implicit def meshTypeSerializer( valueType : MeshType ) = new MeshTypeSerializer( valueType )
-    implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = new PiecewiseEvaluatorSerializer( evaluator )
-    implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = new ParameterEvaluatorSerializer( evaluator )
-    implicit def referenceEvaluatorSerializer( evaluator : ReferenceEvaluator ) = new ReferenceEvaluatorSerializer( evaluator )
+    
+    def GetBinds( source : Deserializer, objectHandle : Int ) : Seq[Tuple2[AbstractEvaluator, Evaluator]] =
+    {
+        val bindCount = Fieldml_GetBindCount( source.fmlHandle, objectHandle )
+        
+        for( i <- 1 to bindCount;
+            variable = source.getAbstractEvaluator( Fieldml_GetBindVariable( source.fmlHandle, objectHandle, i ) );
+            evaluator = source.getEvaluator( Fieldml_GetBindEvaluator( source.fmlHandle, objectHandle, i ) )
+            )
+            yield Tuple2( variable, evaluator )
+    }
+    
+
+    implicit def continuousTypeSerializer( valueType : ContinuousType ) = ContinuousTypeSerializer
+    implicit def ensembleTypeSerializer( valueType : EnsembleType ) = EnsembleTypeSerializer
+    implicit def meshTypeSerializer( valueType : MeshType ) = MeshTypeSerializer
+    implicit def abstractEvaluatorSerializer( evaluator : AbstractEvaluator ) = AbstractEvaluatorSerializer
+    implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = PiecewiseEvaluatorSerializer
+    implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = ParameterEvaluatorSerializer
+    implicit def aggregateEvaluatorSerializer( evaluator : AggregateEvaluator ) = AggregateEvaluatorSerializer
+    implicit def referenceEvaluatorSerializer( evaluator : ReferenceEvaluator ) = ReferenceEvaluatorSerializer
 }

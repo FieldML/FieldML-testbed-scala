@@ -44,6 +44,12 @@ abstract class Region( val name : String )
     
     def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
     {
+        val eval = objects.get( vType.name + ".variable" ).get
+        if( eval != null )
+        {
+            return eval.asInstanceOf[AbstractEvaluator]
+        }
+        
         companions.get( vType ) match
         {
             case s : Some[AbstractEvaluatorValueSource] => s.get
