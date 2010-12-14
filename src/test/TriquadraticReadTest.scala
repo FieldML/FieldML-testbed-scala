@@ -27,27 +27,18 @@ object TriquadraticReadTest
         
         val region = UserRegion.fromFile( "heart", "D:\\Data\\Workspace\\FieldML Mockups\\FieldML 0.3 - Evaluator pipelines\\triquadratic heart test.xml" )
 
-        val realType : ContinuousType = library.getObject( "library.real.1d" )
-        val real3Type : ContinuousType = library.getObject( "library.real.3d" )
-    
-        val rc3ensemble : EnsembleType = library.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = library.getCompanionVariable( rc3ensemble )
-       
-        val xi2dType : ContinuousType = library.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = library.getCompanionVariable( xi2dType )
+        val meshType : MeshType = region.getObject( "heart.mesh.type" )
+        val meshVariable : AbstractEvaluator = region.getObject( "heart.mesh.variable" )
 
-        val meshType : MeshType = region.getObject( "test.mesh.type" )
-        val meshVariable : AbstractEvaluator = region.getObject( "test.mesh" )
+        val coordinates : Evaluator = region.getObject( "heart.coordinates" )
+        
+        region.bind( meshVariable, 2, 0.5, 0.5, 0.5 )
 
-        val coordinates : Evaluator = region.getObject( "heart.coordinates.template" )
+        println( "*** aggregate(2, 0.5, 0.5, 0.5) = " + region.evaluate( coordinates ) )
         
-        region.bind( meshVariable, 2, 0.5, 0.5 )
-
-        println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( coordinates ) )
+        val colladaXml = ColladaExporter.exportFromFieldML( region, 4, "heart.mesh.variable", "heart.coordinates" )
         
-        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
-        
-        val f = new FileWriter( "collada two quads.xml" )
+        val f = new FileWriter( "collada heart.xml" )
         f.write( colladaXml )
         f.close()
     }

@@ -13,8 +13,8 @@ import framework.value.StructuredValue
 import framework.Context
 import framework.EvaluationState
 
-class SubtypeEvaluatorValueSource( baseEvaluator : Evaluator, valueType : ValueType, subname : String )
-    extends SubtypeEvaluator( baseEvaluator, valueType, subname )
+class SubtypeEvaluatorValueSource( baseEvaluator : Evaluator, subname : String )
+    extends SubtypeEvaluator( baseEvaluator, subname )
     with ValueSource
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =

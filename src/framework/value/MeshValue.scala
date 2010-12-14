@@ -11,7 +11,7 @@ class MeshValue( vType : MeshType, val elementValue : Int, val xiValue : Double*
     override def toString() : String =
     {
         val string = new StringBuilder
-        string.append( "[ " )
+        string.append( "[" + vType.name + ": " )
         string.append( elementValue )
         string.append( " " )
         for( v <- xiValue )

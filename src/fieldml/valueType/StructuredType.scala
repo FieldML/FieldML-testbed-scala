@@ -9,5 +9,7 @@ class StructuredType( name : String, _subtypes : Tuple2[String, ValueType]* )
 {
     private val subtypes = Map[String, ValueType]( _subtypes: _* )
     
-    def subtype( subname : String ) = subtypes.get( subname )
+    def subtype( subname : String ) = subtypes( subname )
+    
+    def subNames = subtypes.keys
 }

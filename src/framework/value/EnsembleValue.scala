@@ -11,7 +11,7 @@ class EnsembleValue( valueType : EnsembleType, val value : Int )
     override def toString() : String =
     {
         val string = new StringBuilder
-        string.append( "[ " )
+        string.append( "[" + vType.name + ": " )
         string.append( value )
         string.append( "]" )
         

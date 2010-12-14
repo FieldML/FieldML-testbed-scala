@@ -22,6 +22,47 @@ import util.exception._
 
 object ParameterEvaluatorSerializer
 {
+    private class IndexIterator( private val ensembles : Array[EnsembleType] )
+    {
+        private val indexes = for( e <- ensembles ) yield 1
+        
+        private var _hasNext = true
+        
+        def hasNext = _hasNext
+        
+        def next() : Array[Int] =
+        {
+            if( !hasNext )
+            {
+                throw new FmlException( "IndexIterator overrun" )
+            }
+            
+            val next = indexes.clone
+
+            var incIdx = 0
+            while( ( incIdx < indexes.length ) && ( indexes( incIdx ) == ensembles( incIdx ).bounds.elementCount ) )
+            {
+                incIdx += 1
+            }
+            
+            if( incIdx == indexes.length )
+            {
+                _hasNext = false
+            }
+            else
+            {
+                for( i <- 0 until incIdx )
+                {
+                    indexes( i ) = 1
+                }
+                indexes( incIdx ) += 1
+            }
+         
+            return next
+        }
+    }
+    
+    
     private def insertSemidense( handle : Long, objectHandle : Int, description : SemidenseDataDescription ) : Unit =
     {
         Fieldml_SetParameterDataDescription( handle, objectHandle, DataDescriptionType.DESCRIPTION_SEMIDENSE )
@@ -83,6 +124,110 @@ object ParameterEvaluatorSerializer
     }
     
     
+    private def getMinCount( semidense : SemidenseDataDescription ) : Int =
+    {
+        if( semidense.denseIndexes.length == 0 )
+        {
+            return 1
+        }
+        
+        val indexType = semidense.denseIndexes( 0 ).valueType.asInstanceOf[EnsembleType]
+        
+        if( !indexType.isComponent )
+        {
+            return 1
+        }
+        
+        return indexType.bounds.elementCount
+    }
+
+    
+    private def initializeSemidenseIntValues( source : Deserializer, reader : Long, semidense : SemidenseDataDescription ) : Unit =
+    {
+        val minCount = getMinCount( semidense )
+        val slices = 20
+        
+        val buffer = new Array[Int]( minCount * slices )
+        val indexes = new Array[Int]( semidense.sparseIndexes.length )
+        
+        var err = 0
+        var total = 0
+        
+        while( Fieldml_ReadIndexSet( source.fmlHandle, reader, indexes ) == FML_ERR_NO_ERROR )
+        {
+            val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
+
+            while( iterator.hasNext )
+            {
+                val count = Fieldml_ReadIntValues( source.fmlHandle, reader, buffer, minCount * slices )
+                if( count < 0 )
+                {
+                    throw new FmlException( "Read error in semidense data after " + total )
+                }
+                if( ( count == 0 ) && ( iterator.hasNext ) )
+                {
+                    throw new FmlException( "Ran out of dense data after " + total )
+                }
+                
+                total += count
+                
+                if( count % minCount != 0 )
+                {
+                    throw new FmlException( "API failure: Invalid read count." )
+                }
+                
+                for( i <- 0 until count )
+                {
+                    semidense( iterator.next ) = buffer( i )
+                }
+            }
+        }
+    }
+
+    
+    private def initializeSemidenseDoubleValues( source : Deserializer, reader : Long, semidense : SemidenseDataDescription ) : Unit =
+    {
+        val minCount = getMinCount( semidense )
+        val slices = 20
+        
+        val buffer = new Array[Double]( minCount * slices )
+        val indexes = new Array[Int]( semidense.sparseIndexes.length )
+        
+        var err = 0
+        var total = 0
+        
+        while( Fieldml_ReadIndexSet( source.fmlHandle, reader, indexes ) == FML_ERR_NO_ERROR )
+        {
+            val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
+
+            while( iterator.hasNext )
+            {
+                val count = Fieldml_ReadDoubleValues( source.fmlHandle, reader, buffer, minCount * slices )
+                if( count < 0 )
+                {
+                    throw new FmlException( "Read error in semidense data after " + total )
+                }
+                if( ( count == 0 ) && ( iterator.hasNext ) )
+                {
+                    throw new FmlException( "Ran out of dense data after " + total )
+                }
+                
+                total += count
+                
+                if( count % minCount != 0 )
+                {
+                    throw new FmlException( "API failure: Invalid read count." )
+                }
+                
+                for( i <- 0 until count )
+                {
+                    semidense( iterator.next ) = buffer( i )
+                }
+            }
+        }
+    }
+    
+    
     private def extractSemidense( source : Deserializer, objectHandle : Int, valueType : ValueType ) : SemidenseDataDescription =
     {
         val sparseCount = Fieldml_GetSemidenseIndexCount( source.fmlHandle, objectHandle, 1 )
@@ -90,20 +235,24 @@ object ParameterEvaluatorSerializer
         
         for( i <- 1 to sparseCount )
         {
-            sparseIndexes( i ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 1 ) )
+            sparseIndexes( i - 1 ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 1 ) )
         }
         
-        val denseCount = Fieldml_GetSemidenseIndexCount( source.fmlHandle, objectHandle, 1 )
+        val denseCount = Fieldml_GetSemidenseIndexCount( source.fmlHandle, objectHandle, 0 )
         val denseIndexes = new Array[Evaluator]( denseCount )
         
         for( i <- 1 to denseCount )
         {
-            denseIndexes( i ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 1 ) )
+            denseIndexes( i - 1 ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 0 ) )
         }
         
         val semidense = new SemidenseDataDescription( valueType, denseIndexes, sparseIndexes )
         
         val reader = Fieldml_OpenReader( source.fmlHandle, objectHandle )
+        if( reader == 0 )
+        {
+            throw new FmlException( "Cannot create semidense reader"  )
+        }
         
         if( valueType.isInstanceOf[EnsembleType] )
         {
@@ -145,7 +294,7 @@ object ParameterEvaluatorSerializer
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
 
         val typeHandle = Fieldml_GetValueType( source.fmlHandle, objectHandle )
-        val valueType = source.getContinuousType( typeHandle )
+        val valueType = source.getType( typeHandle )
 
         val dataDescription = Fieldml_GetParameterDataDescription( source.fmlHandle, objectHandle ) match
         {

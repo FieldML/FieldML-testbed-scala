@@ -64,7 +64,7 @@ abstract class Region( val name : String )
         
         state.pushAndApply( binds.toSeq )
         
-        val v =  evaluator.evaluate( state )
+        val v = evaluator.evaluate( state )
         
         state.pop();
         

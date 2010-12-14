@@ -13,6 +13,7 @@ import fieldml.jni.FieldmlHandleType
 import fieldml.jni.FieldmlApiConstants._
 
 import framework.region.UserRegion
+import framework.valuesource.SubtypeEvaluatorValueSource
 
 import util.library.RemoteEvaluatorGenerator
 import util.exception._
@@ -31,9 +32,12 @@ class Deserializer( val fmlHandle : Long )
             case FHT_ENSEMBLE_TYPE => getEnsembleType( objectHandle )
             case FHT_CONTINUOUS_TYPE => getContinuousType( objectHandle )
             case FHT_MESH_TYPE => getMeshType( objectHandle )
+            case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
+            case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
+            case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
+            case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
+            case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
             case FHT_REMOTE_EVALUATOR => getRemoteEvaluator( objectHandle )
-            case FHT_ABSTRACT_EVALUATOR => getAbstractEvaluator( objectHandle )
-            case FHT_REFERENCE_EVALUATOR => getReferenceEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }
     }
@@ -101,13 +105,65 @@ class Deserializer( val fmlHandle : Long )
         }
     }
     
+
+    private def getSubtypeEvaluator( objectHandle : Int ) : Option[Evaluator] =
+    {
+        val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
+        
+        val lastDot = name.lastIndexOf( '.' )
+        if( lastDot == -1 )
+        {
+            return None
+        }
+        
+        val subName = name.substring( 0, lastDot )
+        
+        val superHandle = Fieldml_GetObjectByName( fmlHandle, subName )
+        if( superHandle == FML_INVALID_HANDLE )
+        {
+            return None
+        }
+        
+        //At the moment, the only structured types out there are one-deep, and must be forward declared, which means
+        //the object should already be in the cache
+        
+        val superObject = objects( superHandle )
+        if( superObject == null )
+        {
+            return None
+        }
+        
+        if( !superObject.isInstanceOf[Evaluator] )
+        {
+            return None
+        }
+        
+        val superEval = superObject.asInstanceOf[Evaluator]
+        val vType = superEval.valueType
+        if( !vType.isInstanceOf[StructuredType] )
+        {
+            return None
+        }
+        
+        return Some( new SubtypeEvaluatorValueSource( superEval, name.substring( lastDot + 1 ) ) )
+    }
+    
+    
+    private def generateRemoteEvaluator( objectHandle : Int ) : Evaluator =
+    {
+        getSubtypeEvaluator( objectHandle ) match
+        {
+            case s : Some[Evaluator] => s.get
+            case None => RemoteEvaluatorGenerator.generateContinuousEvaluator( this, objectHandle )
+        }
+    }
     
     def getRemoteEvaluator( objectHandle : Int ) : Evaluator =
     {
         getTypedObject( objectHandle, FHT_REMOTE_EVALUATOR, classOf[Evaluator] ) match
         {
             case s : Some[Evaluator] => s.get
-            case None => objects( objectHandle ) = RemoteEvaluatorGenerator.generateContinuousEvaluator( this, objectHandle ); objects( objectHandle ).asInstanceOf[Evaluator]
+            case None => objects( objectHandle ) = generateRemoteEvaluator( objectHandle ); objects( objectHandle ).asInstanceOf[Evaluator]
         }
     }
     
@@ -151,13 +207,27 @@ class Deserializer( val fmlHandle : Long )
         }
     }
     
+
+    private def addEvaluator( objectHandle : Int, eval : Evaluator ) : Unit =
+    {
+        objects( objectHandle ) = eval
+        
+        if( !eval.valueType.isInstanceOf[StructuredType] )
+        {
+            return
+        }
+        
+        val sType = eval.valueType.asInstanceOf[StructuredType]
+        
+        for( n <- sType.subNames ) yield n
+    }
     
     def getAbstractEvaluator( objectHandle : Int ) : AbstractEvaluator =
     {
         getTypedObject( objectHandle, FHT_ABSTRACT_EVALUATOR, classOf[AbstractEvaluator] ) match
         {
             case s : Some[AbstractEvaluator] => s.get
-            case None => objects( objectHandle ) = AbstractEvaluatorSerializer.extract( this, objectHandle ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
+            case None => addEvaluator( objectHandle, AbstractEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
         }
     }
     

@@ -13,7 +13,7 @@ class MeshType( name : String, elementBounds : EnsembleBounds, xiComponents : En
 {
     val shapes = new DefaultingHashMap[Int, String]()
     
-    val elementType = subtype( "element" ).get.asInstanceOf[EnsembleType]
+    val elementType = subtype( "element" ).asInstanceOf[EnsembleType]
     
-    val xiType = subtype( "xi" ).get.asInstanceOf[ContinuousType]
+    val xiType = subtype( "xi" ).asInstanceOf[ContinuousType]
 }

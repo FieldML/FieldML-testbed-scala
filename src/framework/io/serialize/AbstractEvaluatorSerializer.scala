@@ -32,7 +32,7 @@ object AbstractEvaluatorSerializer
         
         if( typeHandle < 0 ) println( name + " has no type" )
         
-        val valueType : ValueType = source.getType( typeHandle )
+        val valueType = source.getType( typeHandle )
         
         new AbstractEvaluatorValueSource( name, valueType )
     }

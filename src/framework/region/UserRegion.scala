@@ -163,12 +163,12 @@ class UserRegion( name : String )
         {
             case s : StructuredType => s.subtype( subname ) match
             {
-                case s : Some[ValueType] => s.get
-                case None => throw new FmlInvalidObjectException( "Type " + baseEvaluator.valueType + " for evaluator " + baseEvaluator + " does not have a subtype called " + subname )
+                case null => throw new FmlInvalidObjectException( "Type " + baseEvaluator.valueType + " for evaluator " + baseEvaluator + " does not have a subtype called " + subname )
+                case s => s 
             }
             case _ => throw new FmlInvalidObjectException( "Evaluator " + baseEvaluator + " does not have a structured value type" )
         }
-        val evaluator = new SubtypeEvaluatorValueSource( baseEvaluator, subtype, subname )
+        val evaluator = new SubtypeEvaluatorValueSource( baseEvaluator, subname )
         
         put( evaluator )
         

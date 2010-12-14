@@ -17,7 +17,7 @@ class ContinuousValue( valueType : ContinuousType, val value : Array[Double] )
     override def toString() : String =
     {
         val string = new StringBuilder
-        string.append( "[ " )
+        string.append( "[" + vType.name + ": " )
         for( v <- value )
         {
             string.append( v )
