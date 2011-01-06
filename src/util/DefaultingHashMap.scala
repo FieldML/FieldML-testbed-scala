@@ -22,6 +22,9 @@ class DefaultingHashMap[A,B <: AnyRef]
     
     
     def default : Option[B] = _default
+    
+    
+    def hasDefault = default.isInstanceOf[Some[_]]
 
 
     override def get( key : A ) : Option[B] =
@@ -31,6 +34,12 @@ class DefaultingHashMap[A,B <: AnyRef]
             case s : Some[B] => return s
             case None => return _default
         }
+    }
+    
+    
+    def getNoDefault( key : A ) : Option[B] =
+    {
+        return super.get( key )
     }
     
     

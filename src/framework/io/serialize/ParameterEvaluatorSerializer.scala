@@ -96,30 +96,117 @@ object ParameterEvaluatorSerializer
     {
         Fieldml_SetParameterDataLocation( handle, objectHandle, DataLocationType.LOCATION_INLINE )
     }
+    
+    
+    private def writeIntDataStore( handle : Long, objectHandle : Int, dataStore : DataStore ) : Unit =
+    {
+        val semidense = dataStore.description.asInstanceOf[SemidenseDataDescription]
+        val writer = Fieldml_OpenWriter( handle, objectHandle, 0 )
+        val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
+
+        val minCount = getMinCount( semidense )
+        val slices = 20
+        
+        val buffer = new Array[Int]( minCount * slices )
+        
+        var sliceCount = 0
+        var count = 0
+        var total = 0
+        
+        while( iterator.hasNext )
+        {
+            sliceCount = 0
+            while( iterator.hasNext && ( sliceCount < slices ) )
+            {
+                for( i <- 0 until minCount )
+                {
+                    buffer( i + (sliceCount * minCount) ) = semidense( iterator.next ).get.eValue
+                }
+                sliceCount += 1
+            }
+            
+            val count = Fieldml_WriteIntValues( handle, writer, buffer, minCount * sliceCount )
+            if( count != minCount * sliceCount )
+            {
+                throw new FmlException( "Write error in semidense data after " + total )
+            }
+            
+            total += count
+        }
+        
+        Fieldml_CloseWriter( handle, writer )
+    }
+    
+    
+    private def writeDoubleDataStore( handle : Long, objectHandle : Int, dataStore : DataStore ) : Unit =
+    {
+        val semidense = dataStore.description.asInstanceOf[SemidenseDataDescription]
+        val writer = Fieldml_OpenWriter( handle, objectHandle, 0 )
+        val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
+
+        val minCount = getMinCount( semidense )
+        val slices = 20
+        
+        val buffer = new Array[Double]( minCount * slices )
+        
+        var sliceCount = 0
+        var count = 0
+        var total = 0
+        
+        while( iterator.hasNext )
+        {
+            sliceCount = 0
+            while( iterator.hasNext && ( sliceCount < slices ) )
+            {
+                for( i <- 0 until minCount )
+                {
+                    buffer( i + (sliceCount * minCount) ) = semidense( iterator.next ).get.cValue( 0 )
+                }
+                sliceCount += 1
+            }
+            
+            val count = Fieldml_WriteDoubleValues( handle, writer, buffer, minCount * sliceCount )
+            if( count != minCount * sliceCount )
+            {
+                throw new FmlException( "Write error in semidense data after " + total + ": " + writer + " ... " + count + " != " + ( minCount * sliceCount ) )
+            }
+            
+            total += count
+        }
+        
+        Fieldml_CloseWriter( handle, writer )
+    }
 
     
     def insert( handle : Long, evaluator : ParameterEvaluator  ) : Unit =
     {
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
-        var objectHandle = FML_INVALID_HANDLE
-        
-        evaluator.valueType match
-        {
-            case d : ContinuousType => objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
-            case d : EnsembleType => objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
-        }
-        
+        var objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
+
         evaluator.dataStore.description match
         {
             case d : SemidenseDataDescription => insertSemidense( handle, objectHandle, d )
-            case unknown => println( "Cannot yet serialize data description " + unknown ) 
+            case unknown => println( "Cannot yet serialize data description " + unknown ); return 
+        }
+        
+        val semidense = evaluator.dataStore.description.asInstanceOf[SemidenseDataDescription]
+        if( semidense.sparseIndexes.length > 0 )
+        {
+            println( "Cannot yet serialize semidata with sparse indexes" )
+            return
         }
         
         evaluator.dataStore.location match
         {
             case l : FileDataLocation => insertFileData( handle, objectHandle, l )
             case l : InlineDataLocation => insertInlineData( handle, objectHandle, l )
+        }
+        
+        evaluator.valueType match
+        {
+            case d : ContinuousType => writeDoubleDataStore( handle, objectHandle, evaluator.dataStore )
+            case d : EnsembleType => writeIntDataStore( handle, objectHandle, evaluator.dataStore )
         }
     }
     
@@ -132,6 +219,8 @@ object ParameterEvaluatorSerializer
         }
         
         val indexType = semidense.denseIndexes( 0 ).valueType.asInstanceOf[EnsembleType]
+        
+        println( "SD " + semidense.denseIndexes( 0 ).name + " " + indexType.isComponent )
         
         if( !indexType.isComponent )
         {

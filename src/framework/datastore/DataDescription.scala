@@ -61,11 +61,11 @@ abstract class DataDescription( valueType : ValueType )
         {
             if( TupleToArray.tupleIsDoubles( values ) )
             {
-                for( a <- TupleToArray.tupleToDoubleArray( values ); i <- 0 until a.length ) update( index1, i + 1, a( i ) )
+                for( a <- TupleToArray.tupleToDoubleArray( values ); i <- 0 until a.length ) update( i + 1, index1, a( i ) )
             }
             else if( TupleToArray.tupleIsInts( values ) )
             {
-                for( a <- TupleToArray.tupleToIntArray( values ); i <- 0 until a.length ) update( index1, i + 1, a( i ) )
+                for( a <- TupleToArray.tupleToIntArray( values ); i <- 0 until a.length ) update( i + 1, index1, a( i ) )
             }
         }
     }

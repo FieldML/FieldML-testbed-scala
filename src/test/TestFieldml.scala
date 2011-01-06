@@ -15,6 +15,7 @@ import framework.value._
 import framework._
 
 import fieldml.jni.FieldmlApi._
+import fieldml.jni.DataFileType
 
 import util.ColladaExporter
 import framework.region._
@@ -54,8 +55,8 @@ object TestFieldml
         val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library )
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
-        val parameterDescription = new SemidenseDataDescription( realType, Array( nodesVariable, real3IndexVariable ), Array() )
-        val parameterLocation = new InlineDataLocation()
+        val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
+        val parameterLocation = new FileDataLocation( "test_fieldml_nodal_params", 0, DataFileType.TYPE_LINES )
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
         
         parameters( 1 ) = ( 0.0, 0.0, 1.0 )
@@ -69,8 +70,8 @@ object TestFieldml
         println( "Parameters( 2 ) = " + parameters( 2 ) )
         println( "Parameters( 1 ) = " + parameters( 1 ) )
         
-        val connectivityDescription = new SemidenseDataDescription( nodes, Array( elementVariable, bilinearIndexVariable ), Array() )
-        val connectivityLocation = new InlineDataLocation()
+        val connectivityDescription = new SemidenseDataDescription( nodes, Array( bilinearIndexVariable, elementVariable ), Array() )
+        val connectivityLocation = new FileDataLocation( "test_fieldml_connectivity", 0, DataFileType.TYPE_LINES )
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityLocation, connectivityDescription )
         
         connectivity( 1 ) = ( 1, 4, 2, 5 )

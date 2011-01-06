@@ -19,6 +19,19 @@ object AggregateEvaluatorSerializer
         val objectHandle = Fieldml_CreateAggregateEvaluator( handle, evaluator.name, valueHandle )
         
         Fieldml_SetIndexEvaluator( handle, objectHandle, 1, indexHandle )
+        
+        if( evaluator.componentEvaluators.hasDefault )
+        {
+            val defaultEval = evaluator.componentEvaluators.default.get
+            val defaultHandle = GetNamedObject( handle, defaultEval.name )
+            Fieldml_SetDefaultEvaluator( handle, objectHandle, defaultHandle )
+        }
+        
+        for( pair <- evaluator.componentEvaluators )
+        {
+            val evalHandle = GetNamedObject( handle, pair._2.name )
+            Fieldml_SetEvaluator( handle, objectHandle, pair._1, evalHandle )
+        }
     }
 
     

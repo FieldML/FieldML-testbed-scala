@@ -259,10 +259,15 @@ polygonBlock
                     val xi1 : Double = i * 1.0 / discretisation
                     val xi2 : Double = j * 1.0 / discretisation
                     
-                    region.bind( meshVariable, elementNumber, xi1, xi2 )
+                    region.bind( meshVariable, elementNumber, xi1, xi2, 0 )
                     
                     val value = region.evaluate( meshEvaluator )
                     appendTriple( value, xyzArray )
+
+                    region.bind( meshVariable, elementNumber, xi1, xi2, 1 )
+                    
+                    val value2 = region.evaluate( meshEvaluator )
+                    appendTriple( value2, xyzArray )
                 }
             }
             xyzArray.append( "\n" )
@@ -277,10 +282,16 @@ polygonBlock
                     val nodeAtUpperXi1UpperXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 1 )
                     val nodeAtUpperXi1LowerXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 0 )
                     polygonBlock.append( "<p>" )
-                    polygonBlock.append( " " + nodeAtLowerXi1LowerXi2 )
-                    polygonBlock.append( " " + nodeAtLowerXi1UpperXi2 )
-                    polygonBlock.append( " " + nodeAtUpperXi1UpperXi2 )
-                    polygonBlock.append( " " + nodeAtUpperXi1LowerXi2 )
+                    polygonBlock.append( " " + (nodeAtLowerXi1LowerXi2*2 ))
+                    polygonBlock.append( " " + (nodeAtLowerXi1UpperXi2*2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1UpperXi2*2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1LowerXi2*2 ))
+                    polygonBlock.append( "</p>\n" )
+                    polygonBlock.append( "<p>" )
+                    polygonBlock.append( " " + (nodeAtLowerXi1LowerXi2*2 + 1 ))
+                    polygonBlock.append( " " + (nodeAtLowerXi1UpperXi2*2 + 1 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1UpperXi2*2 + 1 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1LowerXi2*2 + 1))
                     polygonBlock.append( "</p>\n" )
                 }
             }
@@ -290,7 +301,7 @@ polygonBlock
         val vertexCount = ( discretisation + 1 ) * ( discretisation + 1 ) * elementCount
         val xyzArrayCount = vertexCount * 3
 
-        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount, vertexCount, xyzArrayCount )
+        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount*2, vertexCount*2, xyzArrayCount*2 )
 
         return colladaString
     }

@@ -19,6 +19,19 @@ object PiecewiseEvaluatorSerializer
         val objectHandle = Fieldml_CreatePiecewiseEvaluator( handle, evaluator.name, valueHandle )
         
         Fieldml_SetIndexEvaluator( handle, objectHandle, 1, indexHandle )
+        
+        if( evaluator.delegations.hasDefault )
+        {
+            val defaultEval = evaluator.delegations.default.get
+            val defaultHandle = GetNamedObject( handle, defaultEval.name )
+            Fieldml_SetDefaultEvaluator( handle, objectHandle, defaultHandle )
+        }
+        
+        for( pair <- evaluator.delegations )
+        {
+            val evalHandle = GetNamedObject( handle, pair._2.name )
+            Fieldml_SetEvaluator( handle, objectHandle, pair._1, evalHandle )
+        }
     }
 
     

@@ -22,7 +22,7 @@ object ReferenceEvaluatorSerializer
         val remoteHandle = GetNamedObject( handle, evaluator.refEvaluator.name )
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
-        var objectHandle = 0
+        var objectHandle = Fieldml_CreateReferenceEvaluator( handle, evaluator.name, remoteHandle );
         
         for( pair <- evaluator.binds )
         {
