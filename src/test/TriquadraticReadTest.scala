@@ -25,7 +25,7 @@ object TriquadraticReadTest
     {
         val library = UserRegion.library
         
-        val region = UserRegion.fromFile( "heart", "D:\\Data\\Workspace\\FieldML Mockups\\FieldML 0.3 - Evaluator pipelines\\triquadratic heart test.xml" )
+        val region = UserRegion.fromFile( "heart", "input\\triquadratic heart test.xml" )
 
         val meshType : MeshType = region.getObject( "heart.mesh.type" )
         val meshVariable : AbstractEvaluator = region.getObject( "heart.mesh.variable" )
