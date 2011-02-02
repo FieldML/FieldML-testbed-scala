@@ -70,12 +70,12 @@ object ParameterEvaluatorSerializer
         for( index <- description.sparseIndexes )
         {
             val indexHandle = GetNamedObject( handle, index.name )
-            Fieldml_AddSemidenseIndexEvaluator( handle, objectHandle, indexHandle, 1 )
+            Fieldml_AddSparseIndexEvaluator( handle, objectHandle, indexHandle )
         }
         for( index <- description.denseIndexes )
         {
             val indexHandle = GetNamedObject( handle, index.name )
-            Fieldml_AddSemidenseIndexEvaluator( handle, objectHandle, indexHandle, 0 )
+            Fieldml_AddDenseIndexEvaluator( handle, objectHandle, indexHandle, FML_INVALID_HANDLE )
         }
     }
     
@@ -219,8 +219,6 @@ object ParameterEvaluatorSerializer
         }
         
         val indexType = semidense.denseIndexes( 0 ).valueType.asInstanceOf[EnsembleType]
-        
-        println( "SD " + semidense.denseIndexes( 0 ).name + " " + indexType.isComponent )
         
         if( !indexType.isComponent )
         {

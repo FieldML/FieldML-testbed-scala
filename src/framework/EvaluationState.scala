@@ -18,7 +18,15 @@ class EvaluationState
     
     def pushAndApply( binds : Seq[Tuple2[AbstractEvaluator, Evaluator]] )
     {
-        stack.push( new Context() )
+        if( stack.size > 0 )
+        {
+            stack.push( new Context( stack( 0 ) ) )
+        }
+        else
+        {
+            stack.push( new Context() )
+        }
+        
         for( b <- binds )
         {
             stack.top.setBind( b._1, b._2 )
@@ -28,11 +36,6 @@ class EvaluationState
     
     def getBind( variable : AbstractEvaluator ) : Option[Evaluator] =
     {
-        for( context <- stack; evaluator <- context.getBind( variable ) )
-        {
-            return Some( evaluator )
-        }
-        
-        return None
+        return stack( 0 ).getBind( variable )
     }
 }

@@ -36,7 +36,7 @@ object TriquadraticReadTest
 
         println( "*** aggregate(2, 0.5, 0.5, 0.5) = " + region.evaluate( coordinates ) )
         
-        val colladaXml = ColladaExporter.exportFromFieldML( region, 4, "heart.mesh.variable", "heart.coordinates" )
+        val colladaXml = ColladaExporter.export3DFromFieldML( region, 4, "heart.mesh.variable", "heart.coordinates" )
         
         val f = new FileWriter( "collada heart.xml" )
         f.write( colladaXml )

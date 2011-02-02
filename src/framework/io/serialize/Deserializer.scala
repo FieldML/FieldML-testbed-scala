@@ -37,6 +37,7 @@ class Deserializer( val fmlHandle : Long )
             case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
+            case FHT_ELEMENT_SET => return null
             case FHT_REMOTE_EVALUATOR => getRemoteEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }
@@ -222,6 +223,7 @@ class Deserializer( val fmlHandle : Long )
         for( n <- sType.subNames ) yield n
     }
     
+
     def getAbstractEvaluator( objectHandle : Int ) : AbstractEvaluator =
     {
         getTypedObject( objectHandle, FHT_ABSTRACT_EVALUATOR, classOf[AbstractEvaluator] ) match
@@ -234,8 +236,17 @@ class Deserializer( val fmlHandle : Long )
     
     private def getTypedObject[A <: FieldmlObject]( objectHandle : Int, objectType : FieldmlHandleType, clazz : Class[A] ) : Option[A] =
     {
-        val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
+        val actualObjectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
         val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
+        
+        if( actualObjectType != objectType )
+        {
+            Fieldml_GetLastError( fmlHandle ) match
+            {
+                case FML_ERR_UNKNOWN_OBJECT => throw new FmlUnknownObjectException( objectHandle )
+                case _ => throw new FmlTypeException( name, actualObjectType, objectType )
+            }
+        }
         
         try
         {
@@ -251,16 +262,7 @@ class Deserializer( val fmlHandle : Long )
         }
         catch
         {
-            case ex : ClassCastException => throw new FmlTypeException( name, objectType, objectType )
-        }
-        
-        if( objectType != objectType )
-        {
-            Fieldml_GetLastError( fmlHandle ) match
-            {
-                case FML_ERR_UNKNOWN_OBJECT => throw new FmlUnknownObjectException( objectHandle )
-                case _ => throw new FmlTypeException( name, objectType, objectType )
-            }
+            case ex : ClassCastException => throw new FmlTypeException( name, actualObjectType, objectType )
         }
         
         return None

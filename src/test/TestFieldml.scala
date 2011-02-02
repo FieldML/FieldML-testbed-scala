@@ -117,7 +117,7 @@ object TestFieldml
 
         println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( aggregate ) )
         
-        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
+        val colladaXml = ColladaExporter.export2DFromFieldML( region, 8, "test.mesh", "test.aggregate" )
         
         val f = new FileWriter( "collada two quads.xml" )
         f.write( colladaXml )

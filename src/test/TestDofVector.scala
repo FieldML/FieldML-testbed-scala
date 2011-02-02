@@ -28,8 +28,8 @@ object TestDofVector
         val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, bilinearNodes, 0 )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, elementsType, 0 )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodes, FML_INVALID_HANDLE )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
         Fieldml_SetParameterDataLocation( fml, connectivity, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, connectivity, "\n", 1 )
@@ -42,7 +42,7 @@ object TestDofVector
         val fieldValue = Fieldml_GetObjectByName( fml, "library.real.1d" )
         val nodalParams = Fieldml_CreateParametersEvaluator( fml, "test.nodal_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, nodalParams, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, nodalParams, nodesType, 1 )
+        Fieldml_AddSparseIndexEvaluator( fml, nodalParams, nodesType )
         Fieldml_SetParameterDataLocation( fml, nodalParams, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, nodalParams, "1 0.0 ", 6 )
         Fieldml_AddParameterInlineData( fml, nodalParams, "2 0.5 ", 6 )
@@ -51,7 +51,7 @@ object TestDofVector
         
         val elementParams = Fieldml_CreateParametersEvaluator( fml, "test.element_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, elementParams, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, elementParams, elementsType, 1 )
+        Fieldml_AddSparseIndexEvaluator( fml, elementParams, elementsType )
         Fieldml_SetParameterDataLocation( fml, elementParams, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, elementParams, "2 2.0 ", 6 )
 
@@ -102,8 +102,8 @@ object TestDofVector
         val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, bilinearNodes, 0 )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, elementsType, 0 )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodes, FML_INVALID_HANDLE )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
         Fieldml_SetParameterDataLocation( fml, connectivity, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, connectivity, "\n", 1 )
@@ -120,13 +120,13 @@ object TestDofVector
 
         val dofParams = Fieldml_CreateParametersEvaluator( fml, "test.dof_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, dofParams, dofIndexType, 0 )
+        Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         Fieldml_SetParameterDataLocation( fml, dofParams, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, dofParams, "0.0 0.5 1.0 1.5 2.0 3.0 ", 24 )
         
         val nodalIndexes = Fieldml_CreateParametersEvaluator( fml, "test.nodal_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, nodalIndexes, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, nodalIndexes, nodesType, 1 )
+        Fieldml_AddSparseIndexEvaluator( fml, nodalIndexes, nodesType )
         Fieldml_SetParameterDataLocation( fml, nodalIndexes, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, nodalIndexes, "1 2 ", 4 )
         Fieldml_AddParameterInlineData( fml, nodalIndexes, "2 3 ", 4 )
@@ -135,7 +135,7 @@ object TestDofVector
         
         val elementIndexes = Fieldml_CreateParametersEvaluator( fml, "test.element_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, elementIndexes, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, elementIndexes, elementsType, 1 )
+        Fieldml_AddSparseIndexEvaluator( fml, elementIndexes, elementsType )
         Fieldml_SetParameterDataLocation( fml, elementIndexes, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, elementIndexes, "2 6 ", 4 )
 
@@ -195,8 +195,8 @@ object TestDofVector
         val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, bilinearNodes, 0 )
-        Fieldml_AddSemidenseIndexEvaluator( fml, connectivity, elementsType, 0 )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodes, FML_INVALID_HANDLE )
+        Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
         Fieldml_SetParameterDataLocation( fml, connectivity, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, connectivity, "\n", 1 )
@@ -213,7 +213,7 @@ object TestDofVector
 
         val dofParams = Fieldml_CreateParametersEvaluator( fml, "test.dof_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, dofParams, dofIndexType, 0 )
+        Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         Fieldml_SetParameterDataLocation( fml, dofParams, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, dofParams, "0.0 0.5 1.0 1.5 2.0 3.0 ", 24 )
 
@@ -222,9 +222,9 @@ object TestDofVector
         
         val dofIndexes = Fieldml_CreateParametersEvaluator( fml, "test.dof_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, dofIndexes, DESCRIPTION_SEMIDENSE )
-        Fieldml_AddSemidenseIndexEvaluator( fml, dofIndexes, dofTypeType, 1 )
-        Fieldml_AddSemidenseIndexEvaluator( fml, dofIndexes, nodesType, 1 )
-        Fieldml_AddSemidenseIndexEvaluator( fml, dofIndexes, elementsType, 1 )
+        Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, dofTypeType )
+        Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, nodesType )
+        Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, elementsType )
         Fieldml_SetParameterDataLocation( fml, dofIndexes, LOCATION_INLINE )
         Fieldml_AddParameterInlineData( fml, dofIndexes, "\n", 1 )
         Fieldml_AddParameterInlineData( fml, dofIndexes, "1 1 1 2\n", 8 )

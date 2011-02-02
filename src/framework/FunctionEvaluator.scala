@@ -7,10 +7,12 @@ import framework.valuesource._
 
 import value.ContinuousValue
 
-class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val var1 : AbstractEvaluator, val var2 : AbstractEvaluator, valueType : ContinuousType )
+class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val var1 : Evaluator, val var2 : Evaluator, valueType : ContinuousType )
     extends Evaluator( name, valueType )
 {
-    val variables = Seq[AbstractEvaluator]( var1, var2 )
+    private val _variables = ( var1.variables ++ var2.variables ).toSeq.distinct
+    
+    def variables = _variables
 
     
     def evaluate( state : EvaluationState ) : Option[ContinuousValue] =

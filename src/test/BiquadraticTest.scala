@@ -58,7 +58,7 @@ object BiquadraticTest
         val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", library )
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
-        val parameterDescription = new SemidenseDataDescription( realType, Array( nodesVariable, real3IndexVariable ), Array() )
+        val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
         val parameterLocation = new InlineDataLocation()
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
         
@@ -82,7 +82,7 @@ object BiquadraticTest
         val bilinearElementSet = region.createElementSet( "test.bilinear_elements", elementVariable.valueType, 5 )
         val bilinearParameterSet = bilinearParametersType.componentType.elementSet
         
-        val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearElementSet, bilinearParameterSet ), Array( elementVariable, bilinearIndexVariable ), Array() )
+        val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearParameterSet, bilinearElementSet  ), Array( bilinearIndexVariable, elementVariable ), Array() )
         val bilinearConnectivityLoc = new InlineDataLocation()
         val bilinearConnectivity = region.createParameterEvaluator( "test.bilinear_connectivity", nodes, bilinearConnectivityLoc, bilinearConnectivityDesc )
         
@@ -91,7 +91,7 @@ object BiquadraticTest
         val biquadraticElementSet = region.createElementSet( "test.biquadratic_elements", elementVariable.valueType, 1, 2, 3, 4, 6, 7, 8, 9 )
         val biquadraticParameterSet = biquadraticParametersType.componentType.elementSet
         
-        val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticElementSet, biquadraticParameterSet ), Array( elementVariable, biquadraticIndexVariable ), Array() )
+        val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticParameterSet, biquadraticElementSet ), Array( biquadraticIndexVariable, elementVariable ), Array() )
         val biquadraticConnectivityLoc = new InlineDataLocation()
         val biquadraticConnectivity = region.createParameterEvaluator( "test.biquadratic_connectivity", nodes, biquadraticConnectivityLoc, biquadraticConnectivityDesc )
         
@@ -158,12 +158,12 @@ object BiquadraticTest
 
         println( "*** aggregate(2, 0.5, 0.5) = " + region.evaluate( aggregate ) )
         
-        val colladaXml = ColladaExporter.exportFromFieldML( region, 8, "test.mesh", "test.aggregate" )
+        val colladaXml = ColladaExporter.export2DFromFieldML( region, 8, "test.mesh", "test.aggregate" )
         
         val f = new FileWriter( "collada nine quads.xml" )
         f.write( colladaXml )
         f.close()
 
-        region.serialize()
+//        region.serialize()
     }
 }

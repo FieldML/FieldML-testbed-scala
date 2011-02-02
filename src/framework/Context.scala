@@ -12,9 +12,20 @@ import valuesource._
 
 import util.exception._
 
-class Context()
+class Context( initialBinds : Seq[Tuple2[AbstractEvaluator, Evaluator]] )
 {
-    private val binds = Map[AbstractEvaluator, Evaluator]()
+    def this()
+    {
+        this( Seq[Tuple2[AbstractEvaluator, Evaluator]]() )
+    }
+    
+    
+    def this( otherContext : Context )
+    {
+        this( otherContext.binds.toSeq )
+    }
+    
+    private val binds = Map[AbstractEvaluator, Evaluator]( initialBinds:_* )
     
     
     def getBind( evaluator : AbstractEvaluator ) : Option[Evaluator] =

@@ -232,6 +232,28 @@ polygonBlock
         }
     }
 
+    private def appendDouble( value : Option[Value], z : Double, xyzArray : StringBuilder ) : Unit =
+    {
+        value match
+        {
+            case c : Some[ContinuousValue] =>  xyzArray.append( "\n" ); xyzArray.append( " " + c.get.value(0) + " " + c.get.value(1) + " " + z );
+            case _ => xyzArray.append( "\n 0 0 0" )
+        }
+    }
+
+    private def appendDouble( value : Option[Value], zValue : Option[Value], xyzArray : StringBuilder ) : Unit =
+    {
+        value match
+        {
+            case c : Some[ContinuousValue] => zValue match
+            {
+                case d : Some[ContinuousValue] => xyzArray.append( "\n" ); xyzArray.append( " " + c.get.value(0) + " " + c.get.value(1) + " " + d.get.value(0) );
+                case _ => xyzArray.append( "\n 0 0 0" )
+            }
+            case _ => xyzArray.append( "\n 0 0 0" )
+        }
+    }
+
     private def appendSingle( value : Option[Value], y : Double, z : Double, xyzArray : StringBuilder ) : Unit =
     {
         value match
@@ -241,7 +263,7 @@ polygonBlock
         }
     }
 
-    def exportFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
+    def export3DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
@@ -302,6 +324,120 @@ polygonBlock
         val xyzArrayCount = vertexCount * 3
 
         val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount*2, vertexCount*2, xyzArrayCount*2 )
+
+        return colladaString
+    }
+
+
+    def export2DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
+    {
+        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshType = meshVariable.valueType.asInstanceOf[MeshType]
+        val meshEvaluator : Evaluator = region.getObject( evaluatorName )
+        val elementCount = meshType.elementType.bounds.elementCount
+
+        val xyzArray = new StringBuilder()
+        val polygonBlock = new StringBuilder()
+        for( elementNumber <- 1 to elementCount )
+        {
+            for( i <- 0 to discretisation )
+            {
+                for( j <- 0 to discretisation )
+                {
+                    val xi1 : Double = i * 1.0 / discretisation
+                    val xi2 : Double = j * 1.0 / discretisation
+                    
+                    region.bind( meshVariable, elementNumber, xi1, xi2, 0 )
+                    
+                    val value = region.evaluate( meshEvaluator )
+                    appendDouble( value, 0, xyzArray )
+                }
+            }
+            xyzArray.append( "\n" )
+
+            val nodeOffsetOfElement = ( elementNumber - 1 ) * ( discretisation + 1 ) * ( discretisation + 1 )
+            for( i <- 0 until discretisation )
+            {
+                for( j <- 0 until discretisation )
+                {
+                    val nodeAtLowerXi1LowerXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 0 ) + ( j + 0 )
+                    val nodeAtLowerXi1UpperXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 0 ) + ( j + 1 )
+                    val nodeAtUpperXi1UpperXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 1 )
+                    val nodeAtUpperXi1LowerXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 0 )
+                    polygonBlock.append( "<p>" )
+                    polygonBlock.append( " " + (nodeAtLowerXi1LowerXi2 ))
+                    polygonBlock.append( " " + (nodeAtLowerXi1UpperXi2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1UpperXi2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1LowerXi2 ))
+                    polygonBlock.append( "</p>\n" )
+                }
+            }
+        }
+
+        val polygonCount = discretisation * discretisation * elementCount
+        val vertexCount = ( discretisation + 1 ) * ( discretisation + 1 ) * elementCount
+        val xyzArrayCount = vertexCount * 3
+
+        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount, vertexCount, xyzArrayCount )
+
+        return colladaString
+    }
+
+
+    def export2DFromFieldML( region : Region, discretisation : Int, meshName : String, geometryName : String, valueName : String ) : String =
+    {
+        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshType = meshVariable.valueType.asInstanceOf[MeshType]
+        val meshEvaluator : Evaluator = region.getObject( geometryName )
+        val heightEvaluator : Evaluator = region.getObject( valueName )
+        val elementCount = meshType.elementType.bounds.elementCount
+
+        val xyzArray = new StringBuilder()
+        val polygonBlock = new StringBuilder()
+        for( elementNumber <- 1 to elementCount )
+        {
+            for( i <- 0 to discretisation )
+            {
+                for( j <- 0 to discretisation )
+                {
+                    val xi1 : Double = i * 1.0 / discretisation
+                    val xi2 : Double = j * 1.0 / discretisation
+                    
+                    region.bind( meshVariable, elementNumber, xi1, xi2, 0 )
+                    
+                    val value = region.evaluate( meshEvaluator )
+                    
+                    val zValue = region.evaluate( heightEvaluator )
+                    
+                    appendDouble( value, zValue, xyzArray )
+                }
+            }
+            xyzArray.append( "\n" )
+
+            val nodeOffsetOfElement = ( elementNumber - 1 ) * ( discretisation + 1 ) * ( discretisation + 1 )
+            for( i <- 0 until discretisation )
+            {
+                for( j <- 0 until discretisation )
+                {
+                    val nodeAtLowerXi1LowerXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 0 ) + ( j + 0 )
+                    val nodeAtLowerXi1UpperXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 0 ) + ( j + 1 )
+                    val nodeAtUpperXi1UpperXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 1 )
+                    val nodeAtUpperXi1LowerXi2 = nodeOffsetOfElement + ( discretisation + 1 ) * ( i + 1 ) + ( j + 0 )
+                    polygonBlock.append( "<p>" )
+                    polygonBlock.append( " " + (nodeAtLowerXi1LowerXi2 ))
+                    polygonBlock.append( " " + (nodeAtLowerXi1UpperXi2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1UpperXi2 ))
+                    polygonBlock.append( " " + (nodeAtUpperXi1LowerXi2 ))
+                    polygonBlock.append( "</p>\n" )
+                }
+            }
+        }
+
+        val polygonCount = discretisation * discretisation * elementCount
+        val vertexCount = ( discretisation + 1 ) * ( discretisation + 1 ) * elementCount
+        val xyzArrayCount = vertexCount * 3
+
+        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount, vertexCount, xyzArrayCount )
 
         return colladaString
     }
