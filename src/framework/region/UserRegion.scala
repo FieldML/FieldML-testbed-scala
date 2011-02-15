@@ -178,7 +178,7 @@ class UserRegion( name : String )
     
     def serialize() : Unit =
     {
-        val handle = Fieldml_Create( "", "test" )
+        val handle = Fieldml_Create( "", "test", "input/library_0.3.xml" )
         
         for( o <- objectList )
         {
@@ -219,7 +219,7 @@ object UserRegion
         val lib = new UserRegion( "library" )
         
         //TODO Icky. Currently, a 'blank' region has the libray auto-imported, so the library can be deduced by interrogating it.
-        val fmlHandle = Fieldml_Create( "", "" )
+        val fmlHandle = Fieldml_CreateFromFile( "input/library_0.3.xml" )
         
         importObjects( fmlHandle, lib )
         

@@ -9,7 +9,7 @@ object TestDofVector
 {
     private def exportExample1() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_1" )
+        val fml = Fieldml_Create( "", "dof_example_1", "library_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_SetContiguousBoundsCount( fml, nodesType, 8 )
@@ -36,8 +36,6 @@ object TestDofVector
         Fieldml_AddParameterInlineData( fml, connectivity, "1 2 5 6\n", 8 );
         Fieldml_AddParameterInlineData( fml, connectivity, "2 3 6 7\n", 8 );
         Fieldml_AddParameterInlineData( fml, connectivity, "3 4 7 8", 8 );
-        
-        Fieldml_SetMeshConnectivity( fml, meshType, connectivity, bilinearNodes )
         
         val fieldValue = Fieldml_GetObjectByName( fml, "library.real.1d" )
         val nodalParams = Fieldml_CreateParametersEvaluator( fml, "test.nodal_params", fieldValue )
@@ -83,7 +81,7 @@ object TestDofVector
     
     private def exportExample2() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_2" )
+        val fml = Fieldml_Create( "", "dof_example_2", "library_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_SetContiguousBoundsCount( fml, nodesType, 8 )
@@ -111,8 +109,6 @@ object TestDofVector
         Fieldml_AddParameterInlineData( fml, connectivity, "2 3 6 7\n", 8 );
         Fieldml_AddParameterInlineData( fml, connectivity, "3 4 7 8", 8 );
         
-        Fieldml_SetMeshConnectivity( fml, meshType, connectivity, bilinearNodes )
-
         val dofIndexType = Fieldml_CreateEnsembleType( fml, "test.dof_number", FML_INVALID_HANDLE )
         Fieldml_SetContiguousBoundsCount( fml, dofIndexType, 6 )
         
@@ -176,7 +172,7 @@ object TestDofVector
     
     private def exportExample3() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_3" )
+        val fml = Fieldml_Create( "", "dof_example_3", "fieldml_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_SetContiguousBoundsCount( fml, nodesType, 8 )
@@ -203,8 +199,6 @@ object TestDofVector
         Fieldml_AddParameterInlineData( fml, connectivity, "1 2 5 6\n", 8 );
         Fieldml_AddParameterInlineData( fml, connectivity, "2 3 6 7\n", 8 );
         Fieldml_AddParameterInlineData( fml, connectivity, "3 4 7 8", 8 );
-        
-        Fieldml_SetMeshConnectivity( fml, meshType, connectivity, bilinearNodes )
 
         val dofIndexType = Fieldml_CreateEnsembleType( fml, "test.dof_number", FML_INVALID_HANDLE )
         Fieldml_SetContiguousBoundsCount( fml, dofIndexType, 6 )

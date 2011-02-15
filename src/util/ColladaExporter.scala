@@ -347,10 +347,11 @@ polygonBlock
                     val xi1 : Double = i * 1.0 / discretisation
                     val xi2 : Double = j * 1.0 / discretisation
                     
-                    region.bind( meshVariable, elementNumber, xi1, xi2, 0 )
+                    region.bind( meshVariable, elementNumber, xi1, xi2 )
                     
                     val value = region.evaluate( meshEvaluator )
-                    appendDouble( value, 0, xyzArray )
+                    
+                    appendTriple( value, xyzArray )
                 }
             }
             xyzArray.append( "\n" )

@@ -20,7 +20,7 @@ import framework.io.serialize.Deserializer
 import util.exception._
 import util._
 
-object RemoteEvaluatorGenerator
+object ExternalEvaluatorGenerator
 {
     def generateContinuousEvaluator( source : Deserializer, objectHandle : Int ) :
         Evaluator =
@@ -28,12 +28,12 @@ object RemoteEvaluatorGenerator
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
         val objectType = Fieldml_GetObjectType( source.fmlHandle, objectHandle )
         
-        if( objectType != FHT_REMOTE_EVALUATOR )
+        if( objectType != FHT_EXTERNAL_EVALUATOR )
         {
             Fieldml_GetLastError( source.fmlHandle ) match
             {
                 case FML_ERR_UNKNOWN_OBJECT => throw new FmlUnknownObjectException( "Object handle " + objectHandle + " is invalid" )
-                case _ => throw new FmlTypeException( name, objectType, FHT_REMOTE_EVALUATOR )
+                case _ => throw new FmlTypeException( name, objectType, FHT_EXTERNAL_EVALUATOR )
             }
         }
 

@@ -15,7 +15,7 @@ import fieldml.jni.FieldmlApiConstants._
 import framework.region.UserRegion
 import framework.valuesource.SubtypeEvaluatorValueSource
 
-import util.library.RemoteEvaluatorGenerator
+import util.library.ExternalEvaluatorGenerator
 import util.exception._
 
 class Deserializer( val fmlHandle : Long )
@@ -38,7 +38,7 @@ class Deserializer( val fmlHandle : Long )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
             case FHT_ELEMENT_SET => return null
-            case FHT_REMOTE_EVALUATOR => getRemoteEvaluator( objectHandle )
+            case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }
     }
@@ -55,7 +55,7 @@ class Deserializer( val fmlHandle : Long )
             case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
-            case FHT_REMOTE_EVALUATOR => getRemoteEvaluator( objectHandle )
+            case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
             case FHT_UNKNOWN => throw new FmlUnknownObjectException( objectHandle )
             case _ => throw new FmlInvalidObjectException( Fieldml_GetObjectName( fmlHandle, objectHandle ) + " is not a known evaluator" )
         }
@@ -150,21 +150,21 @@ class Deserializer( val fmlHandle : Long )
     }
     
     
-    private def generateRemoteEvaluator( objectHandle : Int ) : Evaluator =
+    private def generateExternalEvaluator( objectHandle : Int ) : Evaluator =
     {
         getSubtypeEvaluator( objectHandle ) match
         {
             case s : Some[Evaluator] => s.get
-            case None => RemoteEvaluatorGenerator.generateContinuousEvaluator( this, objectHandle )
+            case None => ExternalEvaluatorGenerator.generateContinuousEvaluator( this, objectHandle )
         }
     }
     
-    def getRemoteEvaluator( objectHandle : Int ) : Evaluator =
+    def getExternalEvaluator( objectHandle : Int ) : Evaluator =
     {
-        getTypedObject( objectHandle, FHT_REMOTE_EVALUATOR, classOf[Evaluator] ) match
+        getTypedObject( objectHandle, FHT_EXTERNAL_EVALUATOR, classOf[Evaluator] ) match
         {
             case s : Some[Evaluator] => s.get
-            case None => objects( objectHandle ) = generateRemoteEvaluator( objectHandle ); objects( objectHandle ).asInstanceOf[Evaluator]
+            case None => objects( objectHandle ) = generateExternalEvaluator( objectHandle ); objects( objectHandle ).asInstanceOf[Evaluator]
         }
     }
     

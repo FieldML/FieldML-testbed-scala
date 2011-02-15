@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fieldml version="0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Fieldml.xsd">
- <Region name="heart">
+ <Region name="heart" library="library_0.3.xml">
 
   <EnsembleType name="heart.nodes.type">
    <bounds>
