@@ -24,18 +24,16 @@ object TestFieldml
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val library = UserRegion.library
-        
-        val region = new UserRegion( "test" )
+        val region = UserRegion.fromLibrary( "test", "input/library_0.3.xml" )
 
-        val realType : ContinuousType = library.getObject( "library.real.1d" )
-        val real3Type : ContinuousType = library.getObject( "library.real.3d" )
+        val realType : ContinuousType = region.getObject( "library.real.1d" )
+        val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
-        val rc3ensemble : EnsembleType = library.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = library.getCompanionVariable( rc3ensemble )
+        val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
+        val real3IndexVariable : AbstractEvaluator = region.getCompanionVariable( rc3ensemble )
        
-        val xi2dType : ContinuousType = library.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = library.getCompanionVariable( xi2dType )
+        val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
+        val xi2dVar : AbstractEvaluator = region.getCompanionVariable( xi2dType )
 
         val meshType = region.createMeshType( "test.mesh.type", 2, xi2dType.componentType )
         val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
@@ -45,14 +43,14 @@ object TestFieldml
         val nodes = region.createEnsembleType( "test.nodes.type", 6, false )
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
-        val bilinearParametersType : ContinuousType = library.getObject( "library.parameters.bilinear_lagrange" )
-        val bilinearParametersVariable = library.getCompanionVariable( bilinearParametersType )
-        val bilinearIndexVariable = library.getCompanionVariable( bilinearParametersType.componentType )
+        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.bilinear_lagrange" )
+        val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
+        val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
         
-        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", library )
+        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", region )
         firstInterpolator.bind( xi2dVar -> xiVariable )
         
-        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", library )
+        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", region )
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
@@ -123,6 +121,6 @@ object TestFieldml
         f.write( colladaXml )
         f.close()
 
-        region.serialize()
+        region.serialize( "input/library_0.3.xml" )
     }
 }

@@ -54,6 +54,17 @@
 
   <ExternalEvaluator name="library.fem.linear_lagrange" valueType="library.real.1d"/>
 
+  <EnsembleType name="library.parameters.cubic_hermite.ensemble" isComponentEnsemble="true">
+   <bounds>
+    <ContiguousEnsembleBounds valueCount="4"/>
+   </bounds>
+  </EnsembleType>
+  <AbstractEvaluator name="library.parameters.cubic_hermite.ensemble.variable" valueType="library.parameters.cubic_hermite.ensemble"/>
+  <ContinuousType name="library.parameters.cubic_hermite" componentEnsemble="library.parameters.cubic_hermite.ensemble"/>
+  <AbstractEvaluator name="library.parameters.cubic_hermite.variable" valueType="library.parameters.cubic_hermite"/>
+
+  <ExternalEvaluator name="library.fem.cubic_hermite" valueType="library.real.1d"/>
+
   <EnsembleType name="library.local_nodes.line.3" isComponentEnsemble="true">
    <bounds>
     <ContiguousEnsembleBounds valueCount="3"/>
@@ -625,5 +636,18 @@
   <AbstractEvaluator name="library.velocity.rc.3d.variable" valueType="library.velocity.rc.3d"/>
   <ContinuousType name="library.pressure"/>
   <AbstractEvaluator name="library.pressure.variable" valueType="library.pressure"/>
+
+<EnsembleType name="library.math.vector_4.ensemble" isComponentEnsemble="true">
+  <bounds>
+    <ContiguousEnsembleBounds valueCount="4"/>
+  </bounds>
+</EnsembleType>
+<ContinuousType name="library.math.vector_4" componentEnsemble="library.math.vector_4.ensemble"/>
+
+<AbstractEvaluator name="library.math.vector_4.variable" valueType="library.math.vector_4"/>
+<AbstractEvaluator name="library.math.vector_4.variable_2" valueType="library.math.vector_4"/>
+
+<ExternalEvaluator name="library.math.scale_vector_4" valueType="library.math.vector_4" />
+
  </Region>
 </fieldml>

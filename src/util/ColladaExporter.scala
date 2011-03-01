@@ -510,7 +510,7 @@ polygonBlock
     }
 
 
-    def export1DFromFieldML( region : Region, meshName : String, evaluatorName : String, discretisation : Int ) : String =
+    def export1DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
@@ -533,6 +533,61 @@ polygonBlock
                 val value = region.evaluate( meshEvaluator )
                 appendSingle( value, x, 0.0, xyzArray )
                 appendSingle( value, x, 1.0, xyzArray )
+                
+                x += deltaX
+            }
+            xyzArray.append( "\n" )
+
+            val nodeOffsetOfElement = ( elementNumber - 1 ) * ( discretisation + 1 ) * 2
+
+            for( j <- 0 until discretisation )
+            {
+                val nodeAtLowerXi1LowerXi2 = nodeOffsetOfElement + ( j * 2 ) + 0
+                val nodeAtLowerXi1UpperXi2 = nodeOffsetOfElement + ( j * 2 ) + 2
+                val nodeAtUpperXi1UpperXi2 = nodeOffsetOfElement + ( j * 2 ) + 3
+                val nodeAtUpperXi1LowerXi2 = nodeOffsetOfElement + ( j * 2 ) + 1
+                polygonBlock.append( "<p>" )
+                polygonBlock.append( " " + nodeAtLowerXi1LowerXi2 )
+                polygonBlock.append( " " + nodeAtLowerXi1UpperXi2 )
+                polygonBlock.append( " " + nodeAtUpperXi1UpperXi2 )
+                polygonBlock.append( " " + nodeAtUpperXi1LowerXi2 )
+                polygonBlock.append( "</p>\n" )
+            }
+        }
+
+        val polygonCount = discretisation * elementCount
+        val vertexCount = ( discretisation + 1 ) * 2 * elementCount
+        val xyzArrayCount = vertexCount * 3
+
+        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount, vertexCount, xyzArrayCount )
+
+        return colladaString
+    }
+
+
+    def export2Din1DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
+    {
+        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshType = meshVariable.valueType.asInstanceOf[MeshType]
+        val meshEvaluator : Evaluator = region.getObject( evaluatorName )
+        val elementCount = meshType.elementType.bounds.elementCount
+        val deltaX = 1.0 / discretisation
+        var x = deltaX
+
+        val xyzArray = new StringBuilder()
+        val polygonBlock = new StringBuilder()
+        for( elementNumber <- 1 to elementCount )
+        {
+            x -= deltaX
+            for( j <- 0 to discretisation )
+            {
+                val xi1 : Double = j * 1.0 / discretisation
+
+                region.bind( meshVariable, elementNumber, xi1 )
+                
+                val value = region.evaluate( meshEvaluator )
+                appendDouble( value, 0.0, xyzArray )
+                appendDouble( value, 0.1, xyzArray )
                 
                 x += deltaX
             }

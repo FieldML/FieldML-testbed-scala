@@ -59,13 +59,13 @@ abstract class DataDescription( valueType : ValueType )
         }
         else
         {
-            if( TupleToArray.tupleIsDoubles( values ) )
-            {
-                for( a <- TupleToArray.tupleToDoubleArray( values ); i <- 0 until a.length ) update( i + 1, index1, a( i ) )
-            }
-            else if( TupleToArray.tupleIsInts( values ) )
+            if( TupleToArray.tupleIsInts( values ) )
             {
                 for( a <- TupleToArray.tupleToIntArray( values ); i <- 0 until a.length ) update( i + 1, index1, a( i ) )
+            }
+            else if( TupleToArray.tupleIsDoubles( values ) )
+            {
+                for( a <- TupleToArray.tupleToDoubleArray( values ); i <- 0 until a.length ) update( i + 1, index1, a( i ) )
             }
         }
     }

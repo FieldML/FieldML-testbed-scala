@@ -25,7 +25,7 @@ import util._
 import util.library._
 import util.exception._
 
-class UserRegion( name : String )
+class UserRegion private( name : String )
     extends Region( name )
 {
     //Used for serialization, which must be order-sensitive.
@@ -176,23 +176,26 @@ class UserRegion( name : String )
     }
 
     
-    def serialize() : Unit =
+    def serialize( libraryName : String ) : Unit =
     {
-        val handle = Fieldml_Create( "", "test", "input/library_0.3.xml" )
+        val handle = Fieldml_Create( "", "test", libraryName )
         
         for( o <- objectList )
         {
-            o match
+            if( o.isLocal )
             {
-            case d : EnsembleType => d.insert( handle, d )
-            case d : ContinuousType => d.insert( handle, d )
-            case d : MeshType => d.insert( handle, d )
-            case e : AbstractEvaluator => e.insert( handle, e )
-            case e : PiecewiseEvaluator => e.insert( handle, e )
-            case e : ParameterEvaluator => e.insert( handle, e )
-            case e : ReferenceEvaluator => e.insert( handle, e )
-            case e : AggregateEvaluator => e.insert( handle, e )
-            case unknown => println( "Cannot yet serialize " + unknown )
+                o match
+                {
+                case d : EnsembleType => d.insert( handle, d )
+                case d : ContinuousType => d.insert( handle, d )
+                case d : MeshType => d.insert( handle, d )
+                case e : AbstractEvaluator => e.insert( handle, e )
+                case e : PiecewiseEvaluator => e.insert( handle, e )
+                case e : ParameterEvaluator => e.insert( handle, e )
+                case e : ReferenceEvaluator => e.insert( handle, e )
+                case e : AggregateEvaluator => e.insert( handle, e )
+                case unknown => println( "Cannot yet serialize " + unknown )
+                }
             }
         }
         
@@ -204,30 +207,12 @@ class UserRegion( name : String )
 
 object UserRegion
 {
-    val library = loadLibrary()
-    
-    
     private def getTypeHandles( fmlHandle : Long, handleType : FieldmlHandleType ) : Seq[Int] =
     {
         return for( index <- 1 until Fieldml_GetObjectCount( fmlHandle, handleType ) + 1 )
             yield Fieldml_GetObject( fmlHandle, handleType, index )
     }
 
-    
-    private def loadLibrary() : Region =
-    {
-        val lib = new UserRegion( "library" )
-        
-        //TODO Icky. Currently, a 'blank' region has the libray auto-imported, so the library can be deduced by interrogating it.
-        val fmlHandle = Fieldml_CreateFromFile( "input/library_0.3.xml" )
-        
-        importObjects( fmlHandle, lib )
-        
-        Fieldml_Destroy( fmlHandle )
-        
-        lib
-    }
-    
     
     private def importObjects( fmlHandle : Long, region : UserRegion ) : Unit =
     {
@@ -242,6 +227,10 @@ object UserRegion
             if( obj != null )
             {
                 region.put( obj )
+                if( Fieldml_IsObjectLocal( fmlHandle, objectHandle ) != 1 )
+                {
+                    obj.isLocal = false
+                }
             }
         }
     }
@@ -252,6 +241,20 @@ object UserRegion
         val region = new UserRegion( name )
         
         val fmlHandle = Fieldml_CreateFromFile( filename )
+        
+        importObjects( fmlHandle, region )
+        
+        Fieldml_Destroy( fmlHandle )
+        
+        region
+    }
+    
+    
+    def fromLibrary( name : String, libraryName : String ) : UserRegion =
+    {
+        val region = new UserRegion( name )
+        
+        val fmlHandle = Fieldml_Create( "", name, libraryName )
         
         importObjects( fmlHandle, region )
         

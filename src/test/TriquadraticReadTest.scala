@@ -23,8 +23,6 @@ object TriquadraticReadTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val library = UserRegion.library
-        
         val region = UserRegion.fromFile( "heart", "input\\triquadratic heart test.xml" )
 
         val meshType : MeshType = region.getObject( "heart.mesh.type" )
@@ -32,13 +30,13 @@ object TriquadraticReadTest
 
         val coordinates : Evaluator = region.getObject( "heart.coordinates" )
         
-        region.bind( meshVariable, 2, 0.5, 0.5, 0.5 )
+        region.bind( meshVariable, 1, 0.5, 0.5, 0.5 )
 
-        println( "*** aggregate(2, 0.5, 0.5, 0.5) = " + region.evaluate( coordinates ) )
+        println( "*** aggregate = " + region.evaluate( coordinates ) )
         
-        val colladaXml = ColladaExporter.export3DFromFieldML( region, 4, "heart.mesh.variable", "heart.coordinates" )
+        val colladaXml = ColladaExporter.export3DFromFieldML( region, 16, "heart.mesh.variable", "heart.coordinates" )
         
-        val f = new FileWriter( "collada heart.xml" )
+        val f = new FileWriter( "collada line.xml" )
         f.write( colladaXml )
         f.close()
     }

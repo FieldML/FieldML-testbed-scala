@@ -28,6 +28,6 @@ class ParameterEvaluatorValueSource( name : String, valueType : ValueType, dataS
             return None
         }
         
-        return dataStore.description.apply( indexes )
+        return dataStore.description( indexes )
     }
 }

@@ -102,6 +102,11 @@ object ParameterEvaluatorSerializer
     {
         val semidense = dataStore.description.asInstanceOf[SemidenseDataDescription]
         val writer = Fieldml_OpenWriter( handle, objectHandle, 0 )
+        if( writer == 0 )
+        {
+            //Writer error. Just skip it for now.
+            return;
+        }
         val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
 
         val minCount = getMinCount( semidense )
@@ -142,6 +147,11 @@ object ParameterEvaluatorSerializer
     {
         val semidense = dataStore.description.asInstanceOf[SemidenseDataDescription]
         val writer = Fieldml_OpenWriter( handle, objectHandle, 0 )
+        if( writer == 0 )
+        {
+            //Writer error. Just skip it for now.
+            return;
+        }
         val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
 
         val minCount = getMinCount( semidense )
@@ -249,7 +259,7 @@ object ParameterEvaluatorSerializer
                 val count = Fieldml_ReadIntValues( source.fmlHandle, reader, buffer, minCount * slices )
                 if( count < 0 )
                 {
-                    throw new FmlException( "Read error in semidense data after " + total )
+                    throw new FmlException( "Read error in semidense data from " + reader + " after " + total )
                 }
                 if( ( count == 0 ) && ( iterator.hasNext ) )
                 {

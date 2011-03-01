@@ -23,18 +23,16 @@ object BiquadraticTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val library = UserRegion.library
-        
-        val region = new UserRegion( "test" )
+        val region = UserRegion.fromLibrary( "test", "input/library_0.3.xml" )
 
-        val realType : ContinuousType = library.getObject( "library.real.1d" )
-        val real3Type : ContinuousType = library.getObject( "library.real.3d" )
+        val realType : ContinuousType = region.getObject( "library.real.1d" )
+        val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
-        val rc3ensemble : EnsembleType = library.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = library.getCompanionVariable( rc3ensemble )
+        val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
+        val real3IndexVariable : AbstractEvaluator = region.getCompanionVariable( rc3ensemble )
        
-        val xi2dType : ContinuousType = library.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = library.getCompanionVariable( xi2dType )
+        val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
+        val xi2dVar : AbstractEvaluator = region.getCompanionVariable( xi2dType )
 
         val meshType = region.createMeshType( "test.mesh.type", 9, xi2dType.componentType )
         val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
@@ -44,18 +42,18 @@ object BiquadraticTest
         val nodes = region.createEnsembleType( "test.nodes.type", 48, false )
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
-        val bilinearParametersType : ContinuousType = library.getObject( "library.parameters.bilinear_lagrange" )
-        val bilinearParametersVariable = library.getCompanionVariable( bilinearParametersType )
-        val bilinearIndexVariable = library.getCompanionVariable( bilinearParametersType.componentType )
+        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.bilinear_lagrange" )
+        val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
+        val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
         
-        val biquadraticParametersType : ContinuousType = library.getObject( "library.parameters.biquadratic_lagrange" )
-        val biquadraticParametersVariable = library.getCompanionVariable( biquadraticParametersType )
-        val biquadraticIndexVariable = library.getCompanionVariable( biquadraticParametersType.componentType )
+        val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.biquadratic_lagrange" )
+        val biquadraticParametersVariable = region.getCompanionVariable( biquadraticParametersType )
+        val biquadraticIndexVariable = region.getCompanionVariable( biquadraticParametersType.componentType )
         
-        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.fem.bilinear_lagrange", library )
+        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.fem.bilinear_lagrange", region )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )
         
-        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", library )
+        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", region )
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
