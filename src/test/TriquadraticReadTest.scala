@@ -23,13 +23,6 @@ object TriquadraticReadTest
     def main( argv : Array[String] ) : Unit =
     {
         val region = UserRegion.fromFile( "heart", "input\\triquadratic heart test.xml" )
-        
-        val ensemble : EnsembleType = region.getObject( "heart.ensemble" )
-        val count = ensemble.elementSet.size
-        for( i <- ensemble.elementSet.toArray )
-        {
-            print( i + " " )
-        }
 
         val meshType : MeshType = region.getObject( "heart.mesh.type" )
         val meshVariable : AbstractEvaluator = region.getObject( "heart.mesh.variable" )

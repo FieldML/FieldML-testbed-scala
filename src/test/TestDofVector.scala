@@ -9,7 +9,7 @@ object TestDofVector
 {
     private def exportExample1() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_1", "input\\library_0.3.xml" )
+        val fml = Fieldml_Create( "", "dof_example_1", "library_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_AddEnsembleElementRange( fml, nodesType, 1, 8, 1 )
@@ -90,7 +90,7 @@ object TestDofVector
     
     private def exportExample2() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_2", "input\\library_0.3.xml" )
+        val fml = Fieldml_Create( "", "dof_example_2", "library_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_AddEnsembleElementRange( fml, nodesType, 1, 8, 1 )
@@ -181,7 +181,7 @@ object TestDofVector
     
     private def exportExample3() : Unit =
     {
-        val fml = Fieldml_Create( "", "dof_example_3", "input\\library_0.3.xml" )
+        val fml = Fieldml_Create( "", "dof_example_3", "library_0.3.xml" )
         
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes", FML_INVALID_HANDLE )
         Fieldml_AddEnsembleElementRange( fml, nodesType, 1, 8, 1 )

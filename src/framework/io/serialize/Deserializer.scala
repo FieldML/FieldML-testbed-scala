@@ -45,6 +45,11 @@ class Deserializer( val fmlHandle : Int )
     
     def getEvaluator( objectHandle : Int ) : Evaluator =
     {
+        if( objects.getOrElse( objectHandle, null ).isInstanceOf[Evaluator] )
+        {
+            return objects( objectHandle ).asInstanceOf[Evaluator]
+        }
+        
         val objectType = Fieldml_GetObjectType( fmlHandle, objectHandle )
         
         objectType match
@@ -228,7 +233,13 @@ class Deserializer( val fmlHandle : Int )
         getTypedObject( objectHandle, FHT_ABSTRACT_EVALUATOR, classOf[AbstractEvaluator] ) match
         {
             case s : Some[AbstractEvaluator] => s.get
-            case None => addEvaluator( objectHandle, AbstractEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
+            case None => {
+                getSubtypeEvaluator( objectHandle ) match
+                {
+                    case s : Some[SubtypeEvaluator] => objects( objectHandle ) = s.get; null
+                    case None => addEvaluator( objectHandle, AbstractEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
+                }
+            }
         }
     }
     

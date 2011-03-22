@@ -23,7 +23,7 @@ object TestFieldml
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val region = UserRegion.fromLibrary( "test", "input\\library_0.3.xml" )
+        val region = UserRegion.fromLibrary( "test", "library_0.3.xml" )
 
         val realType : ContinuousType = region.getObject( "library.real.1d" )
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
@@ -120,6 +120,6 @@ object TestFieldml
         f.write( colladaXml )
         f.close()
 
-        region.serialize( "input/library_0.3.xml" )
+        region.serialize( "library_0.3.xml" )
     }
 }
