@@ -6,7 +6,6 @@ import java.io.FileWriter
 
 import fieldml._
 import fieldml.valueType._
-import fieldml.valueType.bounds._
 
 import fieldml.evaluator._
 
@@ -24,7 +23,7 @@ object TestFieldml
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val region = UserRegion.fromLibrary( "test", "input/library_0.3.xml" )
+        val region = UserRegion.fromLibrary( "test", "input\\library_0.3.xml" )
 
         val realType : ContinuousType = region.getObject( "library.real.1d" )
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
@@ -43,14 +42,14 @@ object TestFieldml
         val nodes = region.createEnsembleType( "test.nodes.type", 6, false )
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
-        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.bilinear_lagrange" )
+        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
         val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
         val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
         
-        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.fem.bilinear_lagrange", region )
+        val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.interpolator.2d.unit.bilinearLagrange", region )
         firstInterpolator.bind( xi2dVar -> xiVariable )
         
-        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.fem.bilinear_lagrange", region )
+        val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.interpolator.2d.unit.bilinearLagrange", region )
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )

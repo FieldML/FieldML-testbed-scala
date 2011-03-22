@@ -1,13 +1,10 @@
 package framework.io.serialize
 
 import fieldml.valueType.EnsembleType
-import fieldml.valueType.bounds.EnsembleBounds
-import fieldml.valueType.bounds.ContiguousEnsembleBounds
 
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
@@ -15,15 +12,13 @@ import framework.region.UserRegion
 
 object EnsembleTypeSerializer
 {
-    def insert( handle : Long, valueType : EnsembleType ) : Unit =
+    def insert( handle : Int, valueType : EnsembleType ) : Unit =
     {
         val objectHandle = Fieldml_CreateEnsembleType( handle, valueType.name, valueType.isComponent match { case true => 1; case false => 0} )
         
-        valueType.bounds match
-        {
-            case c : ContiguousEnsembleBounds => Fieldml_SetContiguousBoundsCount( handle, objectHandle, c.count )
-            case unknown => println( "Cannot yet serialize EnsembleBounds " + unknown ) 
-        }
+        val elementArray = valueType.elementSet.toArray
+        
+        Fieldml_AddEnsembleElements( handle, objectHandle, elementArray, elementArray.size ) 
     }
 
     
@@ -31,17 +26,23 @@ object EnsembleTypeSerializer
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
         
-        val bounds = Fieldml_GetBoundsType( source.fmlHandle, objectHandle ) match
+        val ensemble = Fieldml_IsEnsembleComponentType( source.fmlHandle, objectHandle ) match
         {
-            case TypeBoundsType.BOUNDS_DISCRETE_CONTIGUOUS => new ContiguousEnsembleBounds( Fieldml_GetContiguousBoundsCount( source.fmlHandle, objectHandle ) )
-            case unknown => throw new FmlException( "Cannot yet extract bounds type " + unknown + " for " + name )
-        }
-        
-        Fieldml_IsEnsembleComponentType( source.fmlHandle, objectHandle ) match
-        {
-            case 1 => new EnsembleType( name, bounds, true )
-            case 0 => new EnsembleType( name, bounds, false )
+            case 1 => new EnsembleType( name, true )
+            case 0 => new EnsembleType( name, false )
             case err => throw new FmlException( "Fieldml_IsEnsembleComponentType failure: " + err )
         }
+        
+        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
+        
+        val values = new Array[Int]( count )
+        Fieldml_GetElementEntries( source.fmlHandle, objectHandle, 1, values, count )
+        
+        for( i <- values )
+        {
+            ensemble.elementSet.add( i )
+        }
+        
+        ensemble
     }
 }

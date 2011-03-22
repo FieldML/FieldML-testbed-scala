@@ -11,7 +11,7 @@ import framework.valuesource.AggregateEvaluatorValueSource
 
 object AggregateEvaluatorSerializer
 {
-    def insert( handle : Long, evaluator : AggregateEvaluator ) : Unit =
+    def insert( handle : Int, evaluator : AggregateEvaluator ) : Unit =
     {
         val indexHandle = GetNamedObject( handle, evaluator.indexBinds( 1 ).name )
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )

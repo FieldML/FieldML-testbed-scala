@@ -7,7 +7,6 @@ import fieldml.valueType.ValueType
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
@@ -17,7 +16,7 @@ import framework.valuesource.ReferenceEvaluatorValueSource
 
 object ReferenceEvaluatorSerializer
 {
-    def insert( handle : Long, evaluator : ReferenceEvaluator ) : Unit =
+    def insert( handle : Int, evaluator : ReferenceEvaluator ) : Unit =
     {
         val remoteHandle = GetNamedObject( handle, evaluator.refEvaluator.name )
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )

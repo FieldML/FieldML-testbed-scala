@@ -17,7 +17,7 @@ import fieldml.jni.FieldmlApiConstants._
 
 package object serialize
 {
-    def GetNamedObject( handle : Long, name : String ) : Int =
+    def GetNamedObject( handle : Int, name : String ) : Int =
     {
         val objectHandle = Fieldml_GetObjectByName( handle, name )
         if( objectHandle == FML_INVALID_HANDLE )

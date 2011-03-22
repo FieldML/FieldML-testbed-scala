@@ -19,7 +19,7 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
     
     private val indexEvaluator = new VariableValueSource( name + ".index", indexType )
     
-    private val indexValues = ( for( i <- 1 to indexType.bounds.elementCount ) yield new EnsembleValue( indexType, i ) ).toArray
+    private val indexValues = ( for( i <- 1 to indexType.elementCount ) yield new EnsembleValue( indexType, i ) ).toArray
     
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {

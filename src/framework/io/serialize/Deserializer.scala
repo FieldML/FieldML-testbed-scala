@@ -7,7 +7,6 @@ import fieldml.valueType._
 import fieldml.FieldmlObject
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 import fieldml.jni.FieldmlApiConstants._
@@ -18,7 +17,7 @@ import framework.valuesource.SubtypeEvaluatorValueSource
 import util.library.ExternalEvaluatorGenerator
 import util.exception._
 
-class Deserializer( val fmlHandle : Long )
+class Deserializer( val fmlHandle : Int )
 {
     private val objects = Map[Int, FieldmlObject]()
     
@@ -37,7 +36,7 @@ class Deserializer( val fmlHandle : Long )
             case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
-            case FHT_ELEMENT_SET => return null
+            case FHT_ELEMENT_SEQUENCE => return null
             case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }

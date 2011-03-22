@@ -38,20 +38,6 @@ object ExternalEvaluatorGenerator
         }
 
         val scalarRealType : ContinuousType = source.getContinuousType( Fieldml_GetObjectByName( source.fmlHandle, "library.real.1d" ) )
-        val vectorVariables = Array[AbstractEvaluator](
-            null,
-            null,
-            null,
-            null,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.math.vector_4.variable" ) )
-            )
-        val vectorVariables2 = Array[AbstractEvaluator](
-            null,
-            null,
-            null,
-            null,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.math.vector_4.variable_2" ) )
-            )
         val xiVariables = Array[AbstractEvaluator](
             null,
             source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.xi.1d.variable" ) ),
@@ -60,47 +46,35 @@ object ExternalEvaluatorGenerator
             )
         val linearParamVariables = Array[AbstractEvaluator](
             null,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.linear_lagrange.variable" ) ),
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.bilinear_lagrange.variable" ) ),
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.trilinear_lagrange.variable" ) )
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.1d.linearLagrange.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.2d.bilinearLagrange.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.3d.trilinearLagrange.variable" ) )
             )
         val quadraticParamVariables = Array[Evaluator](
             null,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.quadratic_lagrange.variable" ) ),
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.biquadratic_lagrange.variable" ) ),
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.triquadratic_lagrange.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.1d.quadraticLagrange.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.2d.biquadraticLagrange.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.3d.triquadraticLagrange.variable" ) ),
             null
             )
         val cubicHermiteParamVariables = Array[Evaluator](
             null,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.cubic_hermite.variable" ) ),
+            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.1d.cubicHermite.variable" ) ),
             null,
             null,
             null
             )
             
-        val xi1C_xi20_xi3N_swizzle = new ParamSwizzleValueSource( "xi1C_xi20_xi3N_swizzle", quadraticParamVariables(3).valueType,
-            source.getAbstractEvaluator( Fieldml_GetObjectByName( source.fmlHandle, "library.parameters.triquadratic_lagrange_xi1C_xi20.variable" ) ),
-            Array[Int](
-                1, 1, 1, 2, 3, 4, 5, 6, 7,
-                8, 8, 8, 9, 10, 11, 12, 13, 14,
-                15, 15, 15, 16, 17, 18, 19, 20, 21
-                ) )
-        
-        quadraticParamVariables( 4 ) = xi1C_xi20_xi3N_swizzle
-        
         val fparams =
         name match
         {
-            case "library.fem.cubic_hermite" => ( new CubicHermite( 1 ).evaluate _, xiVariables( 1 ), cubicHermiteParamVariables( 1 ) )
-            case "library.fem.linear_lagrange" => ( new LinearLagrange( 1 ).evaluate _, xiVariables( 1 ), linearParamVariables( 1 ) )
-            case "library.fem.bilinear_lagrange" => ( new LinearLagrange( 2 ).evaluate _, xiVariables( 2 ), linearParamVariables( 2 ) )
-            case "library.fem.trilinear_lagrange" => ( new LinearLagrange( 3 ).evaluate _, xiVariables( 3 ), linearParamVariables( 3 ) )
-            case "library.fem.quadratic_lagrange" => ( new QuadraticLagrange( 1 ).evaluate _, xiVariables( 1 ), quadraticParamVariables( 1 ) )
-            case "library.fem.biquadratic_lagrange" => ( new QuadraticLagrange( 2 ).evaluate _, xiVariables( 2 ), quadraticParamVariables( 2 ) )
-            case "library.fem.triquadratic_lagrange" => ( new QuadraticLagrange( 3 ).evaluate _, xiVariables( 3 ), quadraticParamVariables( 3 ) )
-            case "library.fem.triquadratic_lagrange_xi1C_xi20" => ( new QuadraticLagrange( 3 ).evaluate _, xiVariables( 3 ), quadraticParamVariables( 4 ) )
-            case "library.math.scale_vector_4" => ( new VectorScale( 4 ).evaluate _, vectorVariables( 4 ), vectorVariables2( 4 ) )
+            case "library.interpolator.1d.unit.cubicHermite" => ( new CubicHermite( 1 ).evaluate _, xiVariables( 1 ), cubicHermiteParamVariables( 1 ) )
+            case "library.interpolator.1d.unit.linearLagrange" => ( new LinearLagrange( 1 ).evaluate _, xiVariables( 1 ), linearParamVariables( 1 ) )
+            case "library.interpolator.2d.unit.bilinearLagrange" => ( new LinearLagrange( 2 ).evaluate _, xiVariables( 2 ), linearParamVariables( 2 ) )
+            case "library.interpolator.3d.unit.trilinearLagrange" => ( new LinearLagrange( 3 ).evaluate _, xiVariables( 3 ), linearParamVariables( 3 ) )
+            case "library.interpolator.1d.unit.quadraticLagrange" => ( new QuadraticLagrange( 1 ).evaluate _, xiVariables( 1 ), quadraticParamVariables( 1 ) )
+            case "library.interpolator.2d.unit.biquadraticLagrange" => ( new QuadraticLagrange( 2 ).evaluate _, xiVariables( 2 ), quadraticParamVariables( 2 ) )
+            case "library.interpolator.3d.unit.triquadraticLagrange" => ( new QuadraticLagrange( 3 ).evaluate _, xiVariables( 3 ), quadraticParamVariables( 3 ) )
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
         

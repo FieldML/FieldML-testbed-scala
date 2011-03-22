@@ -6,7 +6,6 @@ import java.io.FileWriter
 
 import fieldml._
 import fieldml.valueType._
-import fieldml.valueType.bounds._
 
 import fieldml.evaluator._
 
@@ -42,18 +41,18 @@ object BiquadraticTest
         val nodes = region.createEnsembleType( "test.nodes.type", 48, false )
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
-        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.bilinear_lagrange" )
+        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
         val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
         val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
         
-        val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.biquadratic_lagrange" )
+        val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.2d.biquadraticLagrange" )
         val biquadraticParametersVariable = region.getCompanionVariable( biquadraticParametersType )
         val biquadraticIndexVariable = region.getCompanionVariable( biquadraticParametersType.componentType )
         
-        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.fem.bilinear_lagrange", region )
+        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.interpolator.2d.unit.bilinearLagrange", region )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )
         
-        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.fem.biquadratic_lagrange", region )
+        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.interpolator.2d.unit.biquadraticLagrange", region )
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )

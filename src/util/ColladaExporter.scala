@@ -268,7 +268,7 @@ polygonBlock
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
-        val elementCount = meshType.elementType.bounds.elementCount
+        val elementCount = meshType.elementType.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -334,7 +334,7 @@ polygonBlock
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
-        val elementCount = meshType.elementType.bounds.elementCount
+        val elementCount = meshType.elementType.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -391,7 +391,7 @@ polygonBlock
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( geometryName )
         val heightEvaluator : Evaluator = region.getObject( valueName )
-        val elementCount = meshType.elementType.bounds.elementCount
+        val elementCount = meshType.elementType.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -452,8 +452,8 @@ polygonBlock
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val mesh1Type = mesh1Variable.valueType.asInstanceOf[MeshType]
         val mesh2Type = mesh2Variable.valueType.asInstanceOf[MeshType]
-        val element1Count = mesh1Type.elementType.bounds.elementCount
-        val element2Count = mesh2Type.elementType.bounds.elementCount
+        val element1Count = mesh1Type.elementType.elementCount
+        val element2Count = mesh2Type.elementType.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()
@@ -515,7 +515,7 @@ polygonBlock
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
-        val elementCount = meshType.elementType.bounds.elementCount
+        val elementCount = meshType.elementType.elementCount
         val deltaX = 1.0 / discretisation
         var x = deltaX
 
@@ -570,7 +570,7 @@ polygonBlock
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
-        val elementCount = meshType.elementType.bounds.elementCount
+        val elementCount = meshType.elementType.elementCount
         val deltaX = 1.0 / discretisation
         var x = deltaX
 

@@ -1,13 +1,12 @@
 package fieldml.valueType
 
-import bounds._
 import fieldml.evaluator.Evaluator
 
 import util.DefaultingHashMap
 
-class MeshType( name : String, elementBounds : EnsembleBounds, xiComponents : EnsembleType )
+class MeshType( name : String, xiComponents : EnsembleType )
     extends StructuredType( name,
-        Tuple2( "element", new EnsembleType( name + ".element", elementBounds, false ) ),
+        Tuple2( "element", new EnsembleType( name + ".element", false ) ),
         Tuple2( "xi", new ContinuousType( name + ".xi", xiComponents ) )
         )
 {

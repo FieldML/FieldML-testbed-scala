@@ -4,7 +4,6 @@ import scala.collection.mutable.Map
 
 import fieldml.FieldmlObject
 import fieldml.valueType._
-import fieldml.valueType.bounds._
 import fieldml.evaluator._
 
 import util.exception._

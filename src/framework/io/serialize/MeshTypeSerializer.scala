@@ -2,13 +2,10 @@ package framework.io.serialize
 
 import fieldml.valueType.EnsembleType
 import fieldml.valueType.MeshType
-import fieldml.valueType.bounds.EnsembleBounds
-import fieldml.valueType.bounds.ContiguousEnsembleBounds
 
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.TypeBoundsType
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
@@ -16,16 +13,15 @@ import framework.region.UserRegion
 
 object MeshTypeSerializer
 {
-    def insert( handle : Long, valueType : MeshType ) : Unit =
+    def insert( handle : Int, valueType : MeshType ) : Unit =
     {
         val componentHandle = GetNamedObject( handle, valueType.xiType.componentType.name )
         val objectHandle = Fieldml_CreateMeshType( handle, valueType.name, componentHandle )
 
-        valueType.elementType.bounds match
-        {
-            case c : ContiguousEnsembleBounds => Fieldml_SetContiguousBoundsCount( handle, objectHandle, c.count )
-            case unknown => println( "Cannot yet serialize mesh element bounds " + unknown ) 
-        }
+        
+        val elementArray = valueType.elementType.elementSet.toArray
+        
+        Fieldml_AddEnsembleElements( handle, objectHandle, elementArray, elementArray.size ) 
         
         valueType.shapes.default match
         {
@@ -37,13 +33,6 @@ object MeshTypeSerializer
         {
             Fieldml_SetMeshElementShape( handle, objectHandle, pair._1, pair._2 )
         }
-        //TODO connectivity
-//        for( pair <- valueType.connectivity )
-//        {
-//            val valueType = GetNamedObject( handle, pair._2.name )
-//            val connectivity = GetNamedObject( handle, pair._1.name )
-//            Fieldml_SetMeshConnectivity( handle, objectHandle, connectivity, valueType )
-//        }
     }
 
     
@@ -54,13 +43,19 @@ object MeshTypeSerializer
         val xiComponentType = source.getEnsembleType( xiComponentHandle )
         
         val elementHandle = Fieldml_GetMeshElementType( source.fmlHandle, objectHandle )
+                
+        val mesh = new MeshType( name, xiComponentType )
+
+        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
         
-        val bounds = Fieldml_GetBoundsType( source.fmlHandle, elementHandle ) match
+        val values = new Array[Int]( count )
+        Fieldml_GetElementEntries( source.fmlHandle, objectHandle, 1, values, count )
+        
+        for( i <- values )
         {
-            case TypeBoundsType.BOUNDS_DISCRETE_CONTIGUOUS => new ContiguousEnsembleBounds( Fieldml_GetContiguousBoundsCount( source.fmlHandle, elementHandle ) )
-            case unknown => throw new FmlException( "Cannot yet extract bounds type " + unknown )
+            mesh.elementType.elementSet.add( i )
         }
         
-        return new MeshType( name, bounds, xiComponentType )
+        mesh
     }
 }

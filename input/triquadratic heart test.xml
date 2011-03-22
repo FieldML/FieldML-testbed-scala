@@ -3,18 +3,17 @@
  <Region name="heart" library="library_0.3.xml">
 
   <EnsembleType name="heart.nodes.type">
-   <bounds>
-    <ContiguousEnsembleBounds valueCount="633" />
-   </bounds>
+   <members>
+    <member_range min="1" max="633" />
+   </members>
   </EnsembleType>
-
 
   <AbstractEvaluator name="heart.nodes.variable" valueType="heart.nodes.type" />
 
   <MeshType name="heart.mesh.type" xi_component="library.ensemble.xi.3d">
-   <bounds>
-    <ContiguousEnsembleBounds valueCount="60"/>
-   </bounds>
+   <elements>
+    <member_range min="1" max="60"/>
+   </elements>
    <shapes default="library.shape.cube" />
   </MeshType>
   
@@ -23,12 +22,12 @@
 
   <ParametersEvaluator name="heart.cube.3x3x3_nodes" valueType="heart.nodes.type">
    <variables>
-     <variable name="library.local_nodes.cube.3x3x3.variable" />
+     <variable name="library.localNodes.3d.cube3x3x3.variable" />
      <variable name="heart.mesh.variable" />
    </variables>
    <SemidenseData>
     <denseIndexes>
-     <index evaluator="library.local_nodes.cube.3x3x3.variable" />
+     <index evaluator="library.localNodes.3d.cube3x3x3.variable" />
      <index evaluator="heart.mesh.variable.element" />
     </denseIndexes>
     <dataLocation>
@@ -45,27 +44,27 @@
   </AbstractEvaluator>
   
 
-  <AggregateEvaluator name="heart.element_params.triquadratic_lagrange" valueType="library.parameters.triquadratic_lagrange">
+  <AggregateEvaluator name="heart.element_params.triquadraticLagrange" valueType="library.parameters.3d.triquadraticLagrange">
    <variables>
      <variable name="heart.mesh.variable" />
      <variable name="heart.nodal_dofs" />
    </variables>
    <binds>
-     <bind_index variable="library.local_nodes.cube.3x3x3.variable" index_number="1"/>
+     <bind_index variable="library.localNodes.3d.cube3x3x3.variable" index_number="1"/>
      <bind variable="heart.nodes.variable" source="heart.cube.3x3x3_nodes"/>
    </binds>
    <componentEvaluators default="heart.nodal_dofs" />
   </AggregateEvaluator>
 
   
-  <ReferenceEvaluator name="heart.triquadratic_lagrange" evaluator="library.fem.triquadratic_lagrange"
+  <ReferenceEvaluator name="heart.triquadraticLagrange" evaluator="library.interpolator.3d.unit.triquadraticLagrange"
       valueType="library.real.1d">
    <variables>
      <variable name="heart.mesh.variable" />
      <variable name="heart.nodal_dofs" />
    </variables>
    <binds>
-    <bind variable="library.parameters.triquadratic_lagrange.variable" source="heart.element_params.triquadratic_lagrange" />
+    <bind variable="library.parameters.3d.triquadraticLagrange.variable" source="heart.element_params.triquadraticLagrange" />
     <bind variable="library.xi.3d.variable" source="heart.mesh.variable.xi" />
    </binds>
   </ReferenceEvaluator>
@@ -79,7 +78,7 @@
    <binds>
      <bind_index variable="heart.mesh.variable.element" index_number="1" />
    </binds>
-   <elementEvaluators default="heart.triquadratic_lagrange" />
+   <elementEvaluators default="heart.triquadraticLagrange" />
   </PiecewiseEvaluator>
 
 
@@ -134,9 +133,9 @@
     <bind variable="heart.nodal_component_dofs" source="heart.node.coordinates" />
    </binds>
   </ReferenceEvaluator>
-
+ 
 <ElementSet name="test.set" valueType="heart.mesh.type.elements">
 <elements>21-40 11 13 15 17 4-9</elements>
 </ElementSet>
- </Region>
+  </Region>
 </fieldml>

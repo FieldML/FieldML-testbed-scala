@@ -15,7 +15,7 @@ import framework.region.UserRegion
 
 object ContinuousTypeSerializer
 {
-    def insert( handle : Long, valueType : ContinuousType ) : Unit =
+    def insert( handle : Int, valueType : ContinuousType ) : Unit =
     {
         var componentHandle = FML_INVALID_HANDLE
         

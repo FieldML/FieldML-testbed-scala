@@ -7,7 +7,6 @@ import framework.io.serialize._
 
 import fieldml._
 import fieldml.valueType._
-import fieldml.valueType.bounds._
 import fieldml.evaluator._
 
 import fieldml.jni.FieldmlHandleType._
@@ -43,15 +42,19 @@ class UserRegion private( name : String )
     }
     
     
-    def createEnsembleType( objectName : String, bounds : Int, isComponentEnsemble : Boolean ) : EnsembleType =
+    def createEnsembleType( objectName : String, max : Int, isComponentEnsemble : Boolean ) : EnsembleType =
     {
-        createEnsembleType( objectName, new ContiguousEnsembleBounds( bounds ), isComponentEnsemble )
+        val ensemble = createEnsembleType( objectName, isComponentEnsemble )
+        
+        ensemble.elementSet.add( 1, max, 1 )
+        
+        ensemble
     }
     
     
-    def createEnsembleType( objectName : String, bounds : EnsembleBounds, isComponentEnsemble : Boolean ) : EnsembleType =
+    def createEnsembleType( objectName : String, isComponentEnsemble : Boolean ) : EnsembleType =
     {
-        val valueType = new EnsembleType( objectName, bounds, isComponentEnsemble )
+        val valueType = new EnsembleType( objectName, isComponentEnsemble )
 
         put( valueType )
 
@@ -69,15 +72,19 @@ class UserRegion private( name : String )
     }
 
     
-    def createMeshType( objectName : String, bounds : Int, xiComponents : EnsembleType ) : MeshType =
+    def createMeshType( objectName : String, max : Int, xiComponents : EnsembleType ) : MeshType =
     {
-        createMeshType( objectName, new ContiguousEnsembleBounds( bounds ), xiComponents )
+        val mesh = createMeshType( objectName, xiComponents )
+        
+        mesh.elementType.elementSet.add( 1, max, 1 )
+        
+        mesh
     }
 
 
-    def createMeshType( objectName : String, bounds : EnsembleBounds, xiComponents : EnsembleType ) : MeshType =
+    def createMeshType( objectName : String, xiComponents : EnsembleType ) : MeshType =
     {
-        val valueType = new MeshType( objectName, bounds, xiComponents )
+        val valueType = new MeshType( objectName, xiComponents )
 
         put( valueType )
 
@@ -207,14 +214,14 @@ class UserRegion private( name : String )
 
 object UserRegion
 {
-    private def getTypeHandles( fmlHandle : Long, handleType : FieldmlHandleType ) : Seq[Int] =
+    private def getTypeHandles( fmlHandle : Int, handleType : FieldmlHandleType ) : Seq[Int] =
     {
         return for( index <- 1 until Fieldml_GetObjectCount( fmlHandle, handleType ) + 1 )
             yield Fieldml_GetObject( fmlHandle, handleType, index )
     }
 
     
-    private def importObjects( fmlHandle : Long, region : UserRegion ) : Unit =
+    private def importObjects( fmlHandle : Int, region : UserRegion ) : Unit =
     {
         val source = new Deserializer( fmlHandle )
         for(
@@ -239,7 +246,6 @@ object UserRegion
     def fromFile( name : String, filename : String ) : Region =
     {
         val region = new UserRegion( name )
-        
         val fmlHandle = Fieldml_CreateFromFile( filename )
         
         importObjects( fmlHandle, region )

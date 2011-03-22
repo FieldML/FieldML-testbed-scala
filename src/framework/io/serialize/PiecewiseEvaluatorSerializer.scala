@@ -11,7 +11,7 @@ import framework.valuesource.PiecewiseEvaluatorValueSource
 
 object PiecewiseEvaluatorSerializer
 {
-    def insert( handle : Long, evaluator : PiecewiseEvaluator ) : Unit =
+    def insert( handle : Int, evaluator : PiecewiseEvaluator ) : Unit =
     {
         val indexHandle = GetNamedObject( handle, evaluator.index.name )
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )

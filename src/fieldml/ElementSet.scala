@@ -22,5 +22,20 @@ class ElementSet private( name : String, val ensemble : ValueType, private val s
     def apply( e : Int ) = set.contains( e )
     
     
+    def add( min : Int, max : Int, stride : Int ) =
+    {
+        set ++= Range.inclusive( min, max, stride )
+    }
+    
+    
+    def add( entry : Int ) =
+    {
+        set += entry
+    }
+    
+    
+    def toArray = set.toArray
+    
+    
     def size = set.size
 }
