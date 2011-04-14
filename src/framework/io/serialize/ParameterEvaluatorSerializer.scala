@@ -9,12 +9,10 @@ import framework.datastore._
 import fieldml.evaluator.Evaluator
 import fieldml.evaluator.ParameterEvaluator
 
-import fieldml.jni.DataFileType
+import fieldml.jni.DataSourceType
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
 import fieldml.jni.DataDescriptionType
-import fieldml.jni.DataLocationType
-import fieldml.jni.DataFileType
 
 import framework.valuesource.ParameterEvaluatorValueSource
 
@@ -24,11 +22,11 @@ object ParameterEvaluatorSerializer
 {
     private class IndexIterator( private val ensembles : Array[EnsembleType] )
     {
-        private val indexes = for( e <- ensembles ) yield 1
+        private val indexes = for( e <- ensembles ) yield e.elementSet.bufferedIterator
         
         private var _hasNext = true
         
-        def hasNext = _hasNext
+        def hasNext = indexes.last.hasNext
         
         def next() : Array[Int] =
         {
@@ -36,29 +34,22 @@ object ParameterEvaluatorSerializer
             {
                 throw new FmlException( "IndexIterator overrun" )
             }
-            
-            val next = indexes.clone
 
+            val values = indexes.map( _.head )
+
+            indexes( 0 ).next
             var incIdx = 0
-            while( ( incIdx < indexes.length ) && ( indexes( incIdx ) == ensembles( incIdx ).elementCount ) )
+            while( ( incIdx < indexes.length - 1 ) && !indexes( incIdx ).hasNext )
             {
-                incIdx += 1
+                indexes( incIdx ) = ensembles( incIdx ).elementSet.bufferedIterator
+                incIdx = incIdx + 1
+                if( incIdx < indexes.length )
+                {
+                    indexes( incIdx ).next
+                }
             }
             
-            if( incIdx == indexes.length )
-            {
-                _hasNext = false
-            }
-            else
-            {
-                for( i <- 0 until incIdx )
-                {
-                    indexes( i ) = 1
-                }
-                indexes( incIdx ) += 1
-            }
-         
-            return next
+            return values
         }
     }
     
@@ -80,24 +71,7 @@ object ParameterEvaluatorSerializer
     }
     
     
-    private def insertFileData( handle : Int, objectHandle : Int, location : FileDataLocation ) : Unit =
-    {
-        Fieldml_SetParameterDataLocation( handle, objectHandle, DataLocationType.LOCATION_FILE )
-        location.dataType match
-        {
-            case DataFileType.TYPE_LINES => Fieldml_SetParameterFileData( handle, objectHandle, location.filename, DataFileType.TYPE_LINES, location.offset )
-            case DataFileType.TYPE_TEXT => Fieldml_SetParameterFileData( handle, objectHandle, location.filename, DataFileType.TYPE_TEXT, location.offset )
-            case unknown => println( "Cannot yet serialize file data type " + unknown ) 
-        }
-    }
-    
-    
-    private def insertInlineData( handle : Int, objectHandle : Int, location : InlineDataLocation ) : Unit =
-    {
-        Fieldml_SetParameterDataLocation( handle, objectHandle, DataLocationType.LOCATION_INLINE )
-    }
-    
-    
+    /*
     private def writeIntDataStore( handle : Int, objectHandle : Int, dataStore : DataStore ) : Unit =
     {
         val semidense = dataStore.description.asInstanceOf[SemidenseDataDescription]
@@ -186,13 +160,18 @@ object ParameterEvaluatorSerializer
         
         Fieldml_CloseWriter( handle, writer )
     }
+    */
 
     
     def insert( handle : Int, evaluator : ParameterEvaluator  ) : Unit =
     {
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
-        var objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
+        val objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
+        
+        val dataHandle = GetNamedObject( handle, evaluator.dataStore.source.name )
+
+        Fieldml_SetDataObject( handle, objectHandle, dataHandle )
 
         evaluator.dataStore.description match
         {
@@ -205,18 +184,6 @@ object ParameterEvaluatorSerializer
         {
             println( "Cannot yet serialize semidata with sparse indexes" )
             return
-        }
-        
-        evaluator.dataStore.location match
-        {
-            case l : FileDataLocation => insertFileData( handle, objectHandle, l )
-            case l : InlineDataLocation => insertInlineData( handle, objectHandle, l )
-        }
-        
-        evaluator.valueType match
-        {
-            case d : ContinuousType => writeDoubleDataStore( handle, objectHandle, evaluator.dataStore )
-            case d : EnsembleType => writeIntDataStore( handle, objectHandle, evaluator.dataStore )
         }
     }
     
@@ -243,14 +210,15 @@ object ParameterEvaluatorSerializer
     {
         val minCount = getMinCount( semidense )
         val slices = 20
+        val indexCount = semidense.sparseIndexes.length
         
         val buffer = new Array[Int]( minCount * slices )
-        val indexes = new Array[Int]( semidense.sparseIndexes.length )
+        val indexes = new Array[Int]( indexCount )
         
         var err = 0
         var total = 0
         
-        while( Fieldml_ReadIndexSet( source.fmlHandle, reader, indexes ) == FML_ERR_NO_ERROR )
+        while( Fieldml_ReadIntValues( source.fmlHandle, reader, indexes, indexCount ) == FML_ERR_NO_ERROR )
         {
             val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
 
@@ -286,14 +254,15 @@ object ParameterEvaluatorSerializer
     {
         val minCount = getMinCount( semidense )
         val slices = 20
+        val indexCount = semidense.sparseIndexes.length
         
         val buffer = new Array[Double]( minCount * slices )
-        val indexes = new Array[Int]( semidense.sparseIndexes.length )
+        val indexes = new Array[Int]( indexCount )
         
         var err = 0
         var total = 0
         
-        while( Fieldml_ReadIndexSet( source.fmlHandle, reader, indexes ) == FML_ERR_NO_ERROR )
+        while( Fieldml_ReadIntValues( source.fmlHandle, reader, indexes, indexCount ) == FML_ERR_NO_ERROR )
         {
             val iterator = new IndexIterator( semidense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType] ) )
 
@@ -341,11 +310,14 @@ object ParameterEvaluatorSerializer
         for( i <- 1 to denseCount )
         {
             denseIndexes( i - 1 ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 0 ) )
+            val indexType = Fieldml_GetValueType( source.fmlHandle, Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 0 ) );
+            val ensembleCount = Fieldml_GetElementCount( source.fmlHandle, indexType );
         }
         
         val semidense = new SemidenseDataDescription( valueType, denseIndexes, sparseIndexes )
+        val dataHandle = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
         
-        val reader = Fieldml_OpenReader( source.fmlHandle, objectHandle )
+        val reader = Fieldml_OpenReader( source.fmlHandle, dataHandle )
         if( reader == FML_INVALID_HANDLE )
         {
             throw new FmlException( "Cannot create semidense reader: " + Fieldml_GetLastError( source.fmlHandle )  )
@@ -370,22 +342,6 @@ object ParameterEvaluatorSerializer
     }
     
     
-    private def extractInlineData( source : Deserializer, objectHandle : Int ) : InlineDataLocation =
-    {
-        new InlineDataLocation( Fieldml_GetParameterInlineData( source.fmlHandle, objectHandle ) )
-    }
-    
-    
-    private def extractFileData( source : Deserializer, objectHandle : Int ) : FileDataLocation =
-    {
-        val filename = Fieldml_GetParameterDataFilename( source.fmlHandle, objectHandle )
-        val offset = Fieldml_GetParameterDataOffset( source.fmlHandle, objectHandle )
-        val filetype = Fieldml_GetParameterDataFileType( source.fmlHandle, objectHandle )
-        
-        new FileDataLocation( filename, offset, filetype ) 
-    }
-    
-    
     def extract( source : Deserializer, objectHandle : Int ) : ParameterEvaluator =
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
@@ -399,14 +355,10 @@ object ParameterEvaluatorSerializer
             case d => throw new FmlException( "Unsupported data description: " + d ) 
         }
         
-        val dataLocation = Fieldml_GetParameterDataLocation( source.fmlHandle, objectHandle ) match
-        {
-            case DataLocationType.LOCATION_INLINE => extractInlineData( source, objectHandle )
-            case DataLocationType.LOCATION_FILE => extractFileData( source, objectHandle )
-            case l => throw new FmlException( "Unsupported data location: " + l ) 
-        }
+        val dataObjectHandle = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
+        val dataObject = source.getDataObject( dataObjectHandle )
         
-        val dataStore = new DataStore( dataLocation, dataDescription ) 
+        val dataStore = new DataStore( dataObject, dataDescription ) 
 
         val parameterEval = new ParameterEvaluatorValueSource( name, valueType, dataStore )
         

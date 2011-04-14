@@ -13,20 +13,20 @@ abstract class AggregateEvaluator( name : String, valueType : ContinuousType )
 {
     val componentEvaluators = new DefaultingHashMap[Int, Evaluator]()
     
-    val binds = Map[ AbstractEvaluator, Evaluator ]()
+    val binds = Map[ Evaluator, Evaluator ]()
     
     //NOTE Currently, continuous types can have no more than one component index
-    val indexBinds = Map[ Int, AbstractEvaluator ]()
+    val indexBinds = Map[ Int, Evaluator ]()
     
     def variables = componentEvaluators.values.flatMap( _.variables )
 
-    def bind( _bind : Tuple2[ AbstractEvaluator, Evaluator ] )
+    def bind( _bind : Tuple2[ Evaluator, Evaluator ] )
     {
         binds( _bind._1 ) = _bind._2
     }
     
     
-    def bind_index( _bind : Tuple2[ Int, AbstractEvaluator ] )
+    def bind_index( _bind : Tuple2[ Int, Evaluator ] )
     {
         indexBinds( _bind._1 ) = _bind._2
     }

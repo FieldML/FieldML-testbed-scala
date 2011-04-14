@@ -3,6 +3,7 @@ package framework.io
 import fieldml.valueType.ContinuousType
 import fieldml.valueType.EnsembleType
 import fieldml.valueType.MeshType
+import fieldml.DataObject
 import fieldml.evaluator.Evaluator
 import fieldml.evaluator.AbstractEvaluator
 import fieldml.evaluator.AggregateEvaluator
@@ -30,7 +31,7 @@ package object serialize
     }
     
     
-    def GetBinds( source : Deserializer, objectHandle : Int ) : Seq[Tuple2[AbstractEvaluator, Evaluator]] =
+    def GetBinds( source : Deserializer, objectHandle : Int ) : Seq[Tuple2[Evaluator, Evaluator]] =
     {
         val bindCount = Fieldml_GetBindCount( source.fmlHandle, objectHandle )
         
@@ -45,6 +46,7 @@ package object serialize
     implicit def continuousTypeSerializer( valueType : ContinuousType ) = ContinuousTypeSerializer
     implicit def ensembleTypeSerializer( valueType : EnsembleType ) = EnsembleTypeSerializer
     implicit def meshTypeSerializer( valueType : MeshType ) = MeshTypeSerializer
+    implicit def dataObjectSerializer( dataObject : DataObject ) = DataObjectSerializer
     implicit def abstractEvaluatorSerializer( evaluator : AbstractEvaluator ) = AbstractEvaluatorSerializer
     implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = PiecewiseEvaluatorSerializer
     implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = ParameterEvaluatorSerializer

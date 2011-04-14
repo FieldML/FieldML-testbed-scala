@@ -4,7 +4,6 @@ import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
 import fieldml.evaluator.Evaluator
-import fieldml.evaluator.AbstractEvaluator
 
 class EvaluationState
 {
@@ -16,7 +15,7 @@ class EvaluationState
     }
     
     
-    def pushAndApply( binds : Seq[Tuple2[AbstractEvaluator, Evaluator]] )
+    def pushAndApply( binds : Seq[Tuple2[Evaluator, Evaluator]] )
     {
         if( stack.size > 0 )
         {
@@ -34,7 +33,7 @@ class EvaluationState
     }
     
     
-    def getBind( variable : AbstractEvaluator ) : Option[Evaluator] =
+    def getBind( variable : Evaluator ) : Option[Evaluator] =
     {
         return stack( 0 ).getBind( variable )
     }

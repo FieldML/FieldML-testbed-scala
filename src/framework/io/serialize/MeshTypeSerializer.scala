@@ -18,10 +18,7 @@ object MeshTypeSerializer
         val componentHandle = GetNamedObject( handle, valueType.xiType.componentType.name )
         val objectHandle = Fieldml_CreateMeshType( handle, valueType.name, componentHandle )
 
-        
-        val elementArray = valueType.elementType.elementSet.toArray
-        
-        Fieldml_AddEnsembleElements( handle, objectHandle, elementArray, elementArray.size ) 
+        EnsembleTypeSerializer.insertElements( handle, objectHandle, valueType.elementType )
         
         valueType.shapes.default match
         {
@@ -45,16 +42,8 @@ object MeshTypeSerializer
         val elementHandle = Fieldml_GetMeshElementType( source.fmlHandle, objectHandle )
                 
         val mesh = new MeshType( name, xiComponentType )
-
-        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
         
-        val values = new Array[Int]( count )
-        Fieldml_GetElementEntries( source.fmlHandle, objectHandle, 1, values, count )
-        
-        for( i <- values )
-        {
-            mesh.elementType.elementSet.add( i )
-        }
+        EnsembleTypeSerializer.extractElements( source, objectHandle, mesh.elementType )
         
         mesh
     }

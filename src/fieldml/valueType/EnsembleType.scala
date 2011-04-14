@@ -1,7 +1,5 @@
 package fieldml.valueType
 
-import scala.collection.BitSet
-
 import fieldml.FieldmlObject
 import fieldml.ElementSet
 

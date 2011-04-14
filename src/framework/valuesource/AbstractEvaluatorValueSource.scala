@@ -21,8 +21,7 @@ class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explic
         {
             println( name + " is unbound" )
         }
-        val value = state.getBind( this ).flatMap( _.evaluate( state ) )
-        
-        return value
+
+        state.getBind( this ).flatMap( _.evaluate( state ) )
     }
 }

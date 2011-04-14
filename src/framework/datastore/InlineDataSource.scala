@@ -1,7 +1,7 @@
 package framework.datastore
 
-class InlineDataLocation( var data : String )
-    extends DataLocation
+class InlineDataSource( var data : String )
+    extends DataSource
 {
     def this() =
     {

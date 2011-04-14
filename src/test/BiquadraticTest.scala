@@ -16,22 +16,23 @@ import framework._
 import fieldml.jni.FieldmlApi._
 
 import util.ColladaExporter
+import util.JSONExporter
 import framework.region._
 
 object BiquadraticTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val region = UserRegion.fromLibrary( "test", "library_0.3.xml" )
+        val region = UserRegion.fromScratch( "test" )
 
         val realType : ContinuousType = region.getObject( "library.real.1d" )
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = region.getCompanionVariable( rc3ensemble )
+        val real3IndexVariable : AbstractEvaluator = region.getObject( "library.ensemble.rc.3d.variable" )
        
         val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = region.getCompanionVariable( xi2dType )
+        val xi2dVar : AbstractEvaluator = region.getObject( "library.xi.2d.variable" )
 
         val meshType = region.createMeshType( "test.mesh.type", 9, xi2dType.componentType )
         val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
@@ -42,12 +43,12 @@ object BiquadraticTest
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
         val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
-        val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
+        val bilinearParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.variable" )
+        val bilinearIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square2x2.variable" )
         
         val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.2d.biquadraticLagrange" )
-        val biquadraticParametersVariable = region.getCompanionVariable( biquadraticParametersType )
-        val biquadraticIndexVariable = region.getCompanionVariable( biquadraticParametersType.componentType )
+        val biquadraticParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.biquadraticLagrange.variable" )
+        val biquadraticIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square3x3.variable" )
         
         val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.interpolator.2d.unit.bilinearLagrange", region )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )
@@ -56,8 +57,10 @@ object BiquadraticTest
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
-        val parameterLocation = new InlineDataLocation()
-        val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
+        val parameterSource = new InlineDataSource()
+        val parameterData = region.createDataObject( "test.parameters.data", parameterSource, 48, 3, 0, 0 )
+        
+        val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterData, parameterDescription )
         
         parameters( 1 ) = ( 0.0, 0.0, 1.0 ); parameters( 2 ) = ( 1.0, 0.0, 1.0 ); parameters( 3 ) = ( 2.0, 0.0, 1.0 )
         parameters( 4 ) = ( 3.0, 0.0, 1.0 ); parameters( 5 ) = ( 0.0, 1.0, 1.0 ); parameters( 6 ) = ( 1.0, 1.0, 0.0 )
@@ -80,8 +83,9 @@ object BiquadraticTest
         val bilinearParameterSet = bilinearParametersType.componentType.elementSet
         
         val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearParameterSet, bilinearElementSet  ), Array( bilinearIndexVariable, elementVariable ), Array() )
-        val bilinearConnectivityLoc = new InlineDataLocation()
-        val bilinearConnectivity = region.createParameterEvaluator( "test.bilinear_connectivity", nodes, bilinearConnectivityLoc, bilinearConnectivityDesc )
+        val bilinearConnectivitySource = new InlineDataSource()
+        val bilinearConnectivityData = region.createDataObject( "test.bilinear_connectivity.data", parameterSource, 9, 4, 0, 0 )
+        val bilinearConnectivity = region.createParameterEvaluator( "test.bilinear_connectivity", nodes, bilinearConnectivityData, bilinearConnectivityDesc )
         
         bilinearConnectivity( 5 ) = ( 6, 7, 10, 11 ) 
 
@@ -89,8 +93,9 @@ object BiquadraticTest
         val biquadraticParameterSet = biquadraticParametersType.componentType.elementSet
         
         val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticParameterSet, biquadraticElementSet ), Array( biquadraticIndexVariable, elementVariable ), Array() )
-        val biquadraticConnectivityLoc = new InlineDataLocation()
-        val biquadraticConnectivity = region.createParameterEvaluator( "test.biquadratic_connectivity", nodes, biquadraticConnectivityLoc, biquadraticConnectivityDesc )
+        val biquadraticConnectivitySource = new InlineDataSource()
+        val biquadraticConnectivityData = region.createDataObject( "test.biquadratic_connectivity.data", parameterSource, 9, 9, 0, 0 )
+        val biquadraticConnectivity = region.createParameterEvaluator( "test.biquadratic_connectivity", nodes, biquadraticConnectivityData, biquadraticConnectivityDesc )
         
         biquadraticConnectivity( 1 ) = ( 1, 17, 2, 20, 21, 22, 5, 27, 6 ) 
         biquadraticConnectivity( 2 ) = ( 2, 18, 3, 22, 23, 24, 6, 28, 7 ) 
@@ -161,6 +166,10 @@ object BiquadraticTest
         f.write( colladaXml )
         f.close()
 
-//        region.serialize()
+        val json = JSONExporter.export2DFromFieldML( region, 8, "test.mesh", "test.aggregate" )
+        
+        val jsonFile = new FileWriter( "WebGL/test3_biquad.json" )
+        jsonFile.write( json )
+        jsonFile.close()
     }
 }

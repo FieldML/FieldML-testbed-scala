@@ -35,28 +35,11 @@ abstract class Region( val name : String )
         result match
         {
             case s : Some[A] => return s.get
-            case s : Some[_] => throw new FmlTypeException( s.get, null ) //MUSTDO Fix
             case None => throw new FmlUnknownObjectException( objectName, name )
         }
     }
     
     
-    def getCompanionVariable( vType : ValueType ) : AbstractEvaluator =
-    {
-        val eval = objects.get( vType.name + ".variable" ).get
-        if( eval != null )
-        {
-            return eval.asInstanceOf[AbstractEvaluator]
-        }
-        
-        companions.get( vType ) match
-        {
-            case s : Some[AbstractEvaluatorValueSource] => s.get
-            case None => companions( vType ) = new AbstractEvaluatorValueSource( vType.name + ".variable", vType ); companions( vType )
-        }
-    }
-    
-
     def evaluate( evaluator : Evaluator ) : Option[Value] =
     {
         val state = new EvaluationState()

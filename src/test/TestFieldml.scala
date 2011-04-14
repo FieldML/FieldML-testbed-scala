@@ -14,7 +14,7 @@ import framework.value._
 import framework._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.DataFileType
+import fieldml.jni.DataSourceType
 
 import util.ColladaExporter
 import framework.region._
@@ -23,16 +23,29 @@ object TestFieldml
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val region = UserRegion.fromLibrary( "test", "library_0.3.xml" )
+        val region = UserRegion.fromScratch( "test",
+            "library.real.1d" -> "library.real.1d",
+            "library.real.3d" -> "library.real.3d",
+            "library.ensemble.rc.3d" -> "library.ensemble.rc.3d",
+            "library.ensemble.rc.3d.variable" -> "library.ensemble.rc.3d.variable",
+            "library.xi.2d" -> "library.xi.2d",
+            "library.ensemble.xi.2d" -> "library.ensemble.xi.2d",
+            "library.xi.2d.variable" -> "library.xi.2d.variable",
+            "library.parameters.2d.bilinearLagrange" -> "library.parameters.2d.bilinearLagrange",
+            "library.parameters.2d.bilinearLagrange.variable" -> "library.parameters.2d.bilinearLagrange.variable",
+            "library.localNodes.2d.square2x2" -> "library.localNodes.2d.square2x2",
+            "library.localNodes.2d.square2x2.variable" -> "library.localNodes.2d.square2x2.variable",
+            "library.interpolator.2d.unit.bilinearLagrange" -> "library.interpolator.2d.unit.bilinearLagrange"
+            )
 
         val realType : ContinuousType = region.getObject( "library.real.1d" )
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = region.getCompanionVariable( rc3ensemble )
+        val real3IndexVariable : AbstractEvaluator = region.getObject( "library.ensemble.rc.3d.variable" )
        
         val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = region.getCompanionVariable( xi2dType )
+        val xi2dVar : AbstractEvaluator = region.getObject( "library.xi.2d.variable" )
 
         val meshType = region.createMeshType( "test.mesh.type", 2, xi2dType.componentType )
         val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
@@ -43,8 +56,8 @@ object TestFieldml
         val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
         
         val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable = region.getCompanionVariable( bilinearParametersType )
-        val bilinearIndexVariable = region.getCompanionVariable( bilinearParametersType.componentType )
+        val bilinearParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.variable" )
+        val bilinearIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square2x2.variable" )
         
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.interpolator.2d.unit.bilinearLagrange", region )
         firstInterpolator.bind( xi2dVar -> xiVariable )
@@ -53,8 +66,9 @@ object TestFieldml
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
-        val parameterLocation = new FileDataLocation( "test_fieldml_nodal_params", 0, DataFileType.TYPE_LINES )
-        val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterLocation, parameterDescription )
+        val parameterSource = new TextFileDataSource( "test_fieldml_nodal_params", 0 )
+        val parameterData = region.createDataObject( "test.parameters.data", parameterSource, 6, 3, 0, 0 )
+        val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterData, parameterDescription )
         
         parameters( 1 ) = ( 0.0, 0.0, 1.0 )
         parameters( 2 ) = ( 0.0, 1.0, 1.5 )
@@ -68,8 +82,9 @@ object TestFieldml
         println( "Parameters( 1 ) = " + parameters( 1 ) )
         
         val connectivityDescription = new SemidenseDataDescription( nodes, Array( bilinearIndexVariable, elementVariable ), Array() )
-        val connectivityLocation = new FileDataLocation( "test_fieldml_connectivity", 0, DataFileType.TYPE_LINES )
-        val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityLocation, connectivityDescription )
+        val connectivitySource = new TextFileDataSource( "test_fieldml_connectivity", 0 )
+        val connectivityData = region.createDataObject( "test.connectivity.data", connectivitySource, 2, 4, 0, 0 )
+        val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityData, connectivityDescription )
         
         connectivity( 1 ) = ( 1, 4, 2, 5 )
         connectivity( 2 ) = ( 2, 5, 3, 6 )
@@ -120,6 +135,6 @@ object TestFieldml
         f.write( colladaXml )
         f.close()
 
-        region.serialize( "library_0.3.xml" )
+        region.serialize()
     }
 }

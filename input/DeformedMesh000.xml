@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Fieldml version="0.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Fieldml_0.3.xsd">
+ <Region name="deformed_mesh">
+
+  <Import location="library_0.3.xml" region="library">
+    <ImportType localName="library.ensemble.xi.2d" remoteName="library.ensemble.xi.2d"/>
+    <ImportType localName="library.real.1d" remoteName="library.real.1d"/>
+    <ImportType localName="library.parameters.2d.bilinearSimplex" remoteName="library.parameters.2d.bilinearSimplex"/>
+    <ImportType localName="library.ensemble.rc.3d" remoteName="library.ensemble.rc.3d"/>
+    <ImportType localName="library.coordinates.rc.3d" remoteName="library.coordinates.rc.3d"/>
+
+    <ImportEvaluator localName="library.parameters.2d.bilinearSimplex.variable" remoteName="library.parameters.2d.bilinearSimplex.variable"/>
+    <ImportEvaluator localName="library.interpolator.2d.unit.bilinearSimplex" remoteName="library.interpolator.2d.unit.bilinearSimplex"/>
+    <ImportEvaluator localName="library.xi.2d.variable" remoteName="library.xi.2d.variable"/>
+    <ImportEvaluator localName="library.localNodes.2d.triangle1x1.variable" remoteName="library.localNodes.2d.triangle1x1.variable"/>
+  </Import>
+
+  <DataObject name="point.coordinates">
+    <Source>
+        <TextFileSource filename="DeformedMesh000.vtk" firstLine="6" />
+    </Source>
+    <Entries count="2677" length="3" head="0" tail="0" />
+  </DataObject>
+
+  <DataObject name="element.points">
+    <Source>
+        <TextFileSource filename="DeformedMesh000.vtk" firstLine="900" />
+    </Source>
+    <Entries count="5350" length="3" head="1" tail="0" />
+  </DataObject>
+
+  <EnsembleType name="deformed_mesh.nodes.type">
+   <Members>
+    <MemberRange min="0" max="2676" />
+   </Members>
+  </EnsembleType>
+
+  <AbstractEvaluator name="deformed_mesh.nodes.variable" valueType="deformed_mesh.nodes.type" />
+
+  <MeshType name="deformed_mesh.mesh.type" xiComponent="library.ensemble.xi.2d">
+   <Elements>
+    <MemberRange min="1" max="5350"/>
+   </Elements>
+   <Shapes default="library.shape.triangle" />
+  </MeshType>
+  
+  <AbstractEvaluator name="deformed_mesh.mesh.variable" valueType="deformed_mesh.mesh.type" />
+
+
+  <ParametersEvaluator name="deformed_mesh.triangle.1x1_nodes" valueType="deformed_mesh.nodes.type">
+   <Variables>
+     <Variable name="library.localNodes.2d.triangle1x1.variable" />
+     <Variable name="deformed_mesh.mesh.variable" />
+   </Variables>
+   <SemidenseData data="element.points">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="library.localNodes.2d.triangle1x1.variable" />
+     <IndexEvaluator evaluator="deformed_mesh.mesh.variable.element" />
+    </DenseIndexes>
+   </SemidenseData>
+  </ParametersEvaluator>
+
+
+  <AbstractEvaluator name="deformed_mesh.nodal_dofs" valueType="library.real.1d">
+   <Variables>
+     <Variable name="deformed_mesh.nodes.variable" />
+   </Variables>
+  </AbstractEvaluator>
+  
+  <AggregateEvaluator name="deformed_mesh.element_params.bilinearSimplex" valueType="library.parameters.2d.bilinearSimplex">
+   <Variables>
+     <Variable name="deformed_mesh.mesh.variable" />
+     <Variable name="deformed_mesh.nodal_dofs" />
+   </Variables>
+   <Bindings>
+     <BindIndex variable="library.localNodes.2d.triangle1x1.variable" indexNumber="1"/>
+     <Bind variable="deformed_mesh.nodes.variable" source="deformed_mesh.triangle.1x1_nodes"/>
+   </Bindings>
+   <ComponentEvaluators default="deformed_mesh.nodal_dofs" />
+  </AggregateEvaluator>
+
+
+  <ReferenceEvaluator name="deformed_mesh.bilinearSimplex" evaluator="library.interpolator.2d.unit.bilinearSimplex"
+      valueType="library.real.1d">
+   <Variables>
+     <Variable name="deformed_mesh.mesh.variable" />
+     <Variable name="deformed_mesh.nodal_dofs" />
+   </Variables>
+   <Bindings>
+    <Bind variable="library.parameters.2d.bilinearSimplex.variable" source="deformed_mesh.element_params.bilinearSimplex" />
+    <Bind variable="library.xi.2d.variable" source="deformed_mesh.mesh.variable.xi" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+
+  <PiecewiseEvaluator name="deformed_mesh.template.bilinearSimplex" valueType="library.real.1d">
+   <Variables>
+     <Variable name="deformed_mesh.mesh.variable" />
+     <Variable name="deformed_mesh.nodal_dofs" />
+   </Variables>
+   <Bindings>
+     <BindIndex variable="deformed_mesh.mesh.variable.element" indexNumber="1" />
+   </Bindings>
+   <ElementEvaluators default="deformed_mesh.bilinearSimplex" />
+  </PiecewiseEvaluator>
+
+
+  <AbstractEvaluator name="deformed_mesh.rc3.component" valueType="library.ensemble.rc.3d" />
+
+  <ParametersEvaluator name="deformed_mesh.node.coordinates" valueType="library.real.1d">
+   <Variables>
+     <Variable name="deformed_mesh.rc3.component" />
+     <Variable name="deformed_mesh.nodes.variable" />
+   </Variables>
+   <SemidenseData data="point.coordinates">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="deformed_mesh.rc3.component" />
+     <IndexEvaluator evaluator="deformed_mesh.nodes.variable" />
+    </DenseIndexes>
+   </SemidenseData>
+  </ParametersEvaluator>
+
+
+  <AbstractEvaluator name="deformed_mesh.nodal_component_dofs" valueType="library.real.1d">
+   <Variables>
+     <Variable name="deformed_mesh.rc3.component" />
+     <Variable name="deformed_mesh.nodes.variable" />
+   </Variables>
+  </AbstractEvaluator>
+
+
+  <AggregateEvaluator name="deformed_mesh.coordinates.template" valueType="library.coordinates.rc.3d">
+   <Variables>
+     <Variable name="deformed_mesh.mesh.variable" />
+     <Variable name="deformed_mesh.nodal_component_dofs" />
+   </Variables>
+   <Bindings>
+     <BindIndex variable="deformed_mesh.rc3.component" indexNumber="1"/>
+     <Bind variable="deformed_mesh.nodal_dofs" source="deformed_mesh.nodal_component_dofs"/>
+   </Bindings>
+   <ComponentEvaluators>
+    <ComponentEvaluator number="1" evaluator="deformed_mesh.template.bilinearSimplex" />
+    <ComponentEvaluator number="2" evaluator="deformed_mesh.template.bilinearSimplex" />
+    <ComponentEvaluator number="3" evaluator="deformed_mesh.template.bilinearSimplex" />
+   </ComponentEvaluators>
+  </AggregateEvaluator>
+  
+  <ReferenceEvaluator name="deformed_mesh.coordinates" evaluator="deformed_mesh.coordinates.template">
+   <Variables>
+     <Variable name="deformed_mesh.mesh.variable" />
+   </Variables>
+   <Bindings>
+    <Bind variable="deformed_mesh.nodal_component_dofs" source="deformed_mesh.node.coordinates" />
+   </Bindings>
+  </ReferenceEvaluator>
+  </Region>
+</Fieldml>

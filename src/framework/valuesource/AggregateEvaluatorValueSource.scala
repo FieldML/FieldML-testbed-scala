@@ -23,7 +23,7 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
     
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        state.pushAndApply( binds.toSeq ++ indexBinds.toSeq.map( ( t : Tuple2[Int, AbstractEvaluator] ) => Tuple2[AbstractEvaluator, Evaluator]( t._2, indexEvaluator ) ) )
+        state.pushAndApply( binds.toSeq ++ indexBinds.toSeq.map( ( t : Tuple2[Int, Evaluator] ) => Tuple2[Evaluator, Evaluator]( t._2, indexEvaluator ) ) )
 
         val values = for( i <- indexValues;
              e <- componentEvaluators.get( i.eValue );

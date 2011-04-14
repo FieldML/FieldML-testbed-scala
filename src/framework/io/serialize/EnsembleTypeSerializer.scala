@@ -1,10 +1,13 @@
 package framework.io.serialize
 
+import scala.collection.mutable.BitSet
+
 import fieldml.valueType.EnsembleType
 
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
+import fieldml.jni.EnsembleMembersType._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
@@ -12,13 +15,94 @@ import framework.region.UserRegion
 
 object EnsembleTypeSerializer
 {
+    def insertElements( handle : Int, objectHandle : Int, valueType : EnsembleType ) : Unit =
+    {
+        val elementArray = valueType.elementSet.toArray
+        
+        //NOTE elementArray is a bitset array, and is therefore already sorted and without duplicates.
+        val min = elementArray.first
+        val max = elementArray.last
+        var stride = 1
+        if( elementArray.size > 1 )
+        {
+            stride = elementArray( 1 ) - min
+        }
+        
+        if( elementArray.size == ( max - min ) + 1 )
+        {
+            //Trivial case. n elements with a stride of 1.
+            Fieldml_SetEnsembleElementRange( handle, objectHandle, min, max, stride )
+            return
+        }
+        
+        val strides = elementArray.foldLeft( Pair( new BitSet, min ) )( ( t, i ) => Pair( t._1 + ( i - t._2 ),  i ) )._1
+        
+        for( i <- strides )
+        {
+            print( i + " " )
+        }
+        println
+    }
+
+    
     def insert( handle : Int, valueType : EnsembleType ) : Unit =
     {
         val objectHandle = Fieldml_CreateEnsembleType( handle, valueType.name, valueType.isComponent match { case true => 1; case false => 0} )
+
+        insertElements( handle, objectHandle, valueType )
+    }
+    
+    
+    def extractElements( source : Deserializer, objectHandle : Int, ensemble : EnsembleType ) : Unit =
+    {
+        val entries = new Array[Int]( 3 )
+
+        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
         
-        val elementArray = valueType.elementSet.toArray
+        val membersType = Fieldml_GetEnsembleMembersType( source.fmlHandle, objectHandle )
         
-        Fieldml_AddEnsembleElements( handle, objectHandle, elementArray, elementArray.size ) 
+        if( membersType == MEMBER_RANGE )
+        {
+            val min = Fieldml_GetEnsembleMembersMin( source.fmlHandle, objectHandle )
+            val max = Fieldml_GetEnsembleMembersMax( source.fmlHandle, objectHandle )
+            val stride = Fieldml_GetEnsembleMembersStride( source.fmlHandle, objectHandle )
+            
+            ensemble.elementSet.add( min, max, stride )
+        }
+        else
+        {
+            val data = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
+            
+            val streamHandle = Fieldml_OpenReader( source.fmlHandle, data )
+            
+            val count = membersType match
+            {
+                case MEMBER_LIST_DATA => 1
+                case MEMBER_RANGE_DATA => 2
+                case MEMBER_STRIDE_RANGE_DATA => 3
+            }
+            var result = Fieldml_ReadIntValues( source.fmlHandle, streamHandle, entries, count )
+            
+            while( result == count )
+            {
+                print( "READ " )
+                for( i <- 0 until count )
+                {
+                    print( entries( i ) + " " )
+                }
+                println
+                membersType match
+                {
+                    case MEMBER_LIST_DATA => ensemble.elementSet.add( entries( 0 ) )
+                    case MEMBER_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), 1 )
+                    case MEMBER_STRIDE_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), entries( 2 ) )
+                }
+                
+                result = Fieldml_ReadIntValues( source.fmlHandle, streamHandle, entries, count )
+            }
+            
+            Fieldml_CloseReader( source.fmlHandle, streamHandle )
+        }
     }
 
     
@@ -33,15 +117,7 @@ object EnsembleTypeSerializer
             case err => throw new FmlException( "Fieldml_IsEnsembleComponentType failure: " + err )
         }
         
-        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
-        
-        val values = new Array[Int]( count )
-        Fieldml_GetElementEntries( source.fmlHandle, objectHandle, 1, values, count )
-        
-        for( i <- values )
-        {
-            ensemble.elementSet.add( i )
-        }
+        extractElements( source, objectHandle, ensemble )
         
         ensemble
     }

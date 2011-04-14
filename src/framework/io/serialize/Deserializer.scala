@@ -4,6 +4,7 @@ import scala.collection.mutable.Map
 
 import fieldml.evaluator._
 import fieldml.valueType._
+import fieldml.DataObject
 import fieldml.FieldmlObject
 
 import fieldml.jni.FieldmlApi._
@@ -31,6 +32,7 @@ class Deserializer( val fmlHandle : Int )
             case FHT_ENSEMBLE_TYPE => getEnsembleType( objectHandle )
             case FHT_CONTINUOUS_TYPE => getContinuousType( objectHandle )
             case FHT_MESH_TYPE => getMeshType( objectHandle )
+            case FHT_DATA_OBJECT => getDataObject( objectHandle )
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
             case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
@@ -107,6 +109,16 @@ class Deserializer( val fmlHandle : Int )
         {
             case s : Some[MeshType] => s.get
             case None => objects( objectHandle ) = MeshTypeSerializer.extract( this, objectHandle ); objects( objectHandle ).asInstanceOf[MeshType]
+        }
+    }
+    
+    
+    def getDataObject( objectHandle : Int ) : DataObject =
+    {
+        getTypedObject( objectHandle, FHT_DATA_OBJECT, classOf[DataObject] ) match
+        {
+            case s : Some[DataObject] => s.get
+            case None => objects( objectHandle ) = DataObjectSerializer.extract( this, objectHandle ); objects( objectHandle).asInstanceOf[DataObject]
         }
     }
     
@@ -227,8 +239,13 @@ class Deserializer( val fmlHandle : Int )
         for( n <- sType.subNames ) yield n
     }
     
+    
+    private def buildAbstractSubtypeEvaluator( evaluator : SubtypeEvaluator )
+    {
+        
+    }
 
-    def getAbstractEvaluator( objectHandle : Int ) : AbstractEvaluator =
+    def getAbstractEvaluator( objectHandle : Int ) : Evaluator =
     {
         getTypedObject( objectHandle, FHT_ABSTRACT_EVALUATOR, classOf[AbstractEvaluator] ) match
         {
@@ -236,7 +253,7 @@ class Deserializer( val fmlHandle : Int )
             case None => {
                 getSubtypeEvaluator( objectHandle ) match
                 {
-                    case s : Some[SubtypeEvaluator] => objects( objectHandle ) = s.get; null
+                    case s : Some[SubtypeEvaluator] => objects( objectHandle ) = s.get; s.get
                     case None => addEvaluator( objectHandle, AbstractEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
                 }
             }

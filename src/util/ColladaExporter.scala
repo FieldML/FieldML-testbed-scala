@@ -385,6 +385,70 @@ polygonBlock
     }
 
 
+    def export2DTrisFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
+    {
+        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshType = meshVariable.valueType.asInstanceOf[MeshType]
+        val meshEvaluator : Evaluator = region.getObject( evaluatorName )
+        val elementCount = meshType.elementType.elementCount
+
+        //TODO Currently ignores discretisation
+        
+        val xyzArray = new StringBuilder()
+        val polygonBlock = new StringBuilder()
+        for( elementNumber <- 1 to elementCount )
+        {
+            for( i <- 0 to 1 )
+            {
+                for( j <- 0 to 1 )
+                {
+                    val xi1 : Double = i * 1.0
+                    val xi2 : Double = j * 1.0
+                    if( xi1 + xi2 <= 1.0 )
+                    {
+                        region.bind( meshVariable, elementNumber, xi1, xi2 )
+                        
+                        val value = region.evaluate( meshEvaluator )
+                        
+                        appendTriple( value, xyzArray )
+                    }
+                }
+            }
+            xyzArray.append( "\n" )
+
+            val nodeOffsetOfElement = ( elementNumber - 1 ) * 3
+            var counter = 0
+            for( i <- 0 until 1 )
+            {
+                for( j <- 0 until 1 )
+                {
+                    if( i + j <= 1 )
+                    {
+                        val node1 = nodeOffsetOfElement + counter
+                        val node2 = nodeOffsetOfElement + counter + 1
+                        val node3 = nodeOffsetOfElement + counter + 2
+                        polygonBlock.append( "<p>" )
+                        polygonBlock.append( " " + node1 )
+                        polygonBlock.append( " " + node2 )
+                        polygonBlock.append( " " + node3 )
+                        polygonBlock.append( "</p>\n" )
+                        
+                        counter = counter + 3
+                    }
+                }
+            }
+        }
+
+        val polygonCount = elementCount
+        val vertexCount = 3 * elementCount
+        val xyzArrayCount = vertexCount * 3
+
+        val colladaString = fillInColladaTemplate( xyzArray, polygonBlock, polygonCount, vertexCount, xyzArrayCount )
+
+        return colladaString
+    }
+
+
     def export2DFromFieldML( region : Region, discretisation : Int, meshName : String, geometryName : String, valueName : String ) : String =
     {
         val meshVariable : AbstractEvaluator = region.getObject( meshName )

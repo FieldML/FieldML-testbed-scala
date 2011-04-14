@@ -8,13 +8,13 @@ import fieldml.FieldmlObject
 class ReferenceEvaluator( name : String, val refEvaluator : Evaluator ) 
     extends Evaluator( name, refEvaluator.valueType )
 {
-    val binds = Map[ AbstractEvaluator, Evaluator ]()
+    val binds = Map[ Evaluator, Evaluator ]()
     
 
     def variables = refEvaluator.variables
 
     
-    def bind( _bind : Tuple2[ AbstractEvaluator, Evaluator ] )
+    def bind( _bind : Tuple2[ Evaluator, Evaluator ] )
     {
         binds( _bind._1 ) = _bind._2
     }

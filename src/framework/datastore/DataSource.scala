@@ -1,5 +1,5 @@
 package framework.datastore
 
-abstract class DataLocation
+abstract class DataSource
 {
 }

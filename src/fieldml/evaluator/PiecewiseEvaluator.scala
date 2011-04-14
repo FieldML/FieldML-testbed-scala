@@ -15,11 +15,11 @@ abstract class PiecewiseEvaluator( name : String, valueType : ValueType, val ind
 {
     val delegations = new DefaultingHashMap[Int, Evaluator]()
     
-    val binds = Map[ AbstractEvaluator, Evaluator ]()
+    val binds = Map[ Evaluator, Evaluator ]()
     
     def variables = delegations.values.flatMap( _.variables )
 
-    def bind( _bind : Tuple2[ AbstractEvaluator, Evaluator ] )
+    def bind( _bind : Tuple2[ Evaluator, Evaluator ] )
     {
         binds( _bind._1 ) = _bind._2
     }

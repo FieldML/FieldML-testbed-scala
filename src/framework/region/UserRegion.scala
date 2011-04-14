@@ -24,7 +24,7 @@ import util._
 import util.library._
 import util.exception._
 
-class UserRegion private( name : String )
+class UserRegion private( name : String, val imports : Array[Pair[String, String]] )
     extends Region( name )
 {
     //Used for serialization, which must be order-sensitive.
@@ -92,6 +92,18 @@ class UserRegion private( name : String )
     }
     
     
+    def createDataObject( objectName : String, dataSource : DataSource, count : Int, length : Int, head : Int, tail : Int ) : DataObject =
+    {
+        val dataObject = new DataObject( objectName, dataSource, count, length, head, tail )
+        
+        put( dataObject )
+        
+        println( "Adding " + dataObject + " to " + this )
+        
+        dataObject
+    }
+    
+    
     def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : AbstractEvaluator, var2 : AbstractEvaluator, valueType : ContinuousType ) : Evaluator =
     {
         val evaluator = new FunctionEvaluatorValueSource( name, function, var1, var2, valueType ) 
@@ -133,9 +145,9 @@ class UserRegion private( name : String )
     }
     
     
-    def createParameterEvaluator( name : String, valueType : ValueType, location : DataLocation, description : DataDescription ) : ParameterEvaluator =
+    def createParameterEvaluator( name : String, valueType : ValueType, data : DataObject, description : DataDescription ) : ParameterEvaluator =
     {
-        val store = new DataStore( location, description )
+        val store = new DataStore( data, description )
         val evaluator = new ParameterEvaluatorValueSource( name, valueType, store )
         
         put( evaluator )
@@ -183,28 +195,30 @@ class UserRegion private( name : String )
     }
 
     
-    def serialize( libraryName : String ) : Unit =
+    def serialize() : Unit =
     {
-        val handle = Fieldml_Create( "", "test", libraryName )
+        val handle = Fieldml_Create( "", "test" )
         
-        for( o <- objectList )
+        val importIdx = Fieldml_AddImportSource( handle, "library_0.3.xml", "library" )
+        for( p <- imports )
         {
-            if( o.isLocal )
-            {
-                o match
-                {
-                case d : EnsembleType => d.insert( handle, d )
-                case d : ContinuousType => d.insert( handle, d )
-                case d : MeshType => d.insert( handle, d )
-                case e : AbstractEvaluator => e.insert( handle, e )
-                case e : PiecewiseEvaluator => e.insert( handle, e )
-                case e : ParameterEvaluator => e.insert( handle, e )
-                case e : ReferenceEvaluator => e.insert( handle, e )
-                case e : AggregateEvaluator => e.insert( handle, e )
-                case unknown => println( "Cannot yet serialize " + unknown )
-                }
-            }
+            Fieldml_AddImport( handle, importIdx, p._1, p._2 )
         }
+        
+        objectList.filter( _.isLocal ).foreach( _ match
+        {
+        case d : DataObject => d.insert( handle, d )
+        case d : EnsembleType => d.insert( handle, d )
+        case d : ContinuousType => d.insert( handle, d )
+        case d : MeshType => d.insert( handle, d )
+        case e : AbstractEvaluator => e.insert( handle, e )
+        case e : PiecewiseEvaluator => e.insert( handle, e )
+        case e : ParameterEvaluator => e.insert( handle, e )
+        case e : ReferenceEvaluator => e.insert( handle, e )
+        case e : AggregateEvaluator => e.insert( handle, e )
+        case unknown => println( "Cannot yet serialize " + unknown )
+        }
+        )
         
         Fieldml_WriteFile( handle, "test.xml" )
         Fieldml_Destroy( handle )
@@ -216,8 +230,17 @@ object UserRegion
 {
     private def getTypeHandles( fmlHandle : Int, handleType : FieldmlHandleType ) : Seq[Int] =
     {
-        return for( index <- 1 until Fieldml_GetObjectCount( fmlHandle, handleType ) + 1 )
-            yield Fieldml_GetObject( fmlHandle, handleType, index )
+        val locals = for( index <- 1 to Fieldml_GetObjectCount( fmlHandle, handleType ) ; objectHandle = Fieldml_GetObject( fmlHandle, handleType, index ) if Fieldml_IsObjectLocal( fmlHandle, objectHandle ) == 1 )
+            yield objectHandle
+            
+        val imports = for(
+            importIndex <- 1 to Fieldml_GetImportSourceCount( fmlHandle ) ;
+            index <- 1 to Fieldml_GetImportCount( fmlHandle, importIndex ) ;
+            objectHandle = Fieldml_GetImportObject( fmlHandle, importIndex, index )
+            if( Fieldml_GetObjectType( fmlHandle, objectHandle ) == handleType ) )
+            yield objectHandle
+            
+        return imports ++ locals
     }
 
     
@@ -245,9 +268,25 @@ object UserRegion
     
     def fromFile( name : String, filename : String ) : Region =
     {
-        val region = new UserRegion( name )
         val fmlHandle = Fieldml_CreateFromFile( filename )
         
+        //So very, very dirty.
+        val builder1 = new java.lang.StringBuilder( 100 )
+        val builder2 = new java.lang.StringBuilder( 100 )
+        val imports = for(
+            importSourceIdx <- 1 to Fieldml_GetImportSourceCount( fmlHandle );
+            importIdx <- 1 to Fieldml_GetImportCount( fmlHandle, importSourceIdx );
+            l1 = Fieldml_CopyImportLocalName( fmlHandle, importSourceIdx, importIdx, builder1, 100 );
+            l2 = Fieldml_CopyImportLocalName( fmlHandle, importSourceIdx, importIdx, builder2, 100 );
+            s1 = builder1.toString;
+            s2 = builder2.toString )
+            yield Pair( s1, s2 )
+        
+        val region = new UserRegion( name, imports.toArray )
+        
+        for( p <- imports )
+            println( "Import " + p._1 + " " + p._2 )
+
         importObjects( fmlHandle, region )
         
         Fieldml_Destroy( fmlHandle )
@@ -256,11 +295,17 @@ object UserRegion
     }
     
     
-    def fromLibrary( name : String, libraryName : String ) : UserRegion =
+    def fromScratch( name : String, imports : Pair[String, String]* ) : UserRegion =
     {
-        val region = new UserRegion( name )
+        val region = new UserRegion( name, imports.toArray[Pair[String, String]] )
+        val fmlHandle = Fieldml_Create( "", name )
         
-        val fmlHandle = Fieldml_Create( "", name, libraryName )
+        val importId = Fieldml_AddImportSource( fmlHandle, "library_0.3.xml", "library" )
+        
+        for( p <- imports )
+        {
+            Fieldml_AddImport( fmlHandle, importId, p._1, p._2 )
+        }
         
         importObjects( fmlHandle, region )
         

@@ -38,7 +38,7 @@ object ReferenceEvaluatorSerializer
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
 
-        val remoteHandle = Fieldml_GetReferenceRemoteEvaluator( source.fmlHandle, objectHandle )
+        val remoteHandle = Fieldml_GetReferenceSourceEvaluator( source.fmlHandle, objectHandle )
         
         val evaluator : Evaluator = source.getEvaluator( remoteHandle )
         
