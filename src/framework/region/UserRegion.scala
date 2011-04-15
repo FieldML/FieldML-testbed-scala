@@ -98,8 +98,6 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         
         put( dataObject )
         
-        println( "Adding " + dataObject + " to " + this )
-        
         dataObject
     }
     
@@ -284,9 +282,6 @@ object UserRegion
         
         val region = new UserRegion( name, imports.toArray )
         
-        for( p <- imports )
-            println( "Import " + p._1 + " " + p._2 )
-
         importObjects( fmlHandle, region )
         
         Fieldml_Destroy( fmlHandle )

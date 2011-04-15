@@ -23,7 +23,26 @@ object BiquadraticTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val region = UserRegion.fromScratch( "test" )
+        val region = UserRegion.fromScratch( "test",
+            "library.real.1d" -> "library.real.1d",
+            "library.real.3d" -> "library.real.3d",
+            "library.ensemble.rc.3d" -> "library.ensemble.rc.3d",
+            "library.ensemble.rc.3d.variable" -> "library.ensemble.rc.3d.variable",
+            "library.xi.2d" -> "library.xi.2d",
+            "library.xi.2d.variable" -> "library.xi.2d.variable",
+
+            "library.parameters.2d.bilinearLagrange" -> "library.parameters.2d.bilinearLagrange",
+            "library.parameters.2d.bilinearLagrange.variable" -> "library.parameters.2d.bilinearLagrange.variable",
+            "library.localNodes.2d.square2x2.variable" -> "library.localNodes.2d.square2x2.variable",
+            "library.interpolator.2d.unit.bilinearLagrange" -> "library.interpolator.2d.unit.bilinearLagrange",
+
+            "library.parameters.2d.biquadraticLagrange" -> "library.parameters.2d.biquadraticLagrange",
+            "library.parameters.2d.biquadraticLagrange.variable" -> "library.parameters.2d.biquadraticLagrange.variable",
+            "library.localNodes.2d.square3x3.variable" -> "library.localNodes.2d.square3x3.variable",
+            "library.interpolator.2d.unit.biquadraticLagrange" -> "library.interpolator.2d.unit.biquadraticLagrange"
+        )
+
+
 
         val realType : ContinuousType = region.getObject( "library.real.1d" )
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
@@ -79,8 +98,8 @@ object BiquadraticTest
         parameters( 43 ) = ( 2.0, 2.5, 0.25 ); parameters( 44 ) = ( 2.5, 2.5, 0.5 ); parameters( 45 ) = ( 3.0, 2.5, 1.0 )
         parameters( 46 ) = ( 0.5, 3.0, 1.0 ); parameters( 47 ) = ( 1.5, 3.0, 1.0 ); parameters( 48 ) = ( 2.5, 3.0, 1.0 )
         
-        val bilinearElementSet = region.createElementSet( "test.bilinear_elements", elementVariable.valueType, 5 )
-        val bilinearParameterSet = bilinearParametersType.componentType.elementSet
+        val bilinearElementSet = Array[Int]( 5 )
+        val bilinearParameterSet = null
         
         val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearParameterSet, bilinearElementSet  ), Array( bilinearIndexVariable, elementVariable ), Array() )
         val bilinearConnectivitySource = new InlineDataSource()
@@ -89,8 +108,8 @@ object BiquadraticTest
         
         bilinearConnectivity( 5 ) = ( 6, 7, 10, 11 ) 
 
-        val biquadraticElementSet = region.createElementSet( "test.biquadratic_elements", elementVariable.valueType, 1, 2, 3, 4, 6, 7, 8, 9 )
-        val biquadraticParameterSet = biquadraticParametersType.componentType.elementSet
+        val biquadraticElementSet = Array[Int]( 1, 2, 3, 4, 6, 7, 8, 9 )
+        val biquadraticParameterSet = null
         
         val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticParameterSet, biquadraticElementSet ), Array( biquadraticIndexVariable, elementVariable ), Array() )
         val biquadraticConnectivitySource = new InlineDataSource()

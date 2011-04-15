@@ -9,20 +9,18 @@ import fieldml.valueType.EnsembleType
 
 import framework.value.Value
 
-class SemidenseDataDescription( valueType : ValueType, val denseSets : Array[ElementSet], val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
+class SemidenseDataDescription( valueType : ValueType, val denseOrders : Array[Array[Int]], val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
     extends DataDescription( valueType )
 {
     def this( valueType : ValueType, denseIndexes : Array[Evaluator], sparseIndexes : Array[Evaluator] ) =
     {
-        this( valueType, denseIndexes.map( _.valueType.asInstanceOf[EnsembleType].elementSet ), denseIndexes, sparseIndexes )
+        this( valueType, denseIndexes.map( _.valueType.asInstanceOf[EnsembleType].elementSet.toArray ), denseIndexes, sparseIndexes )
     }
     
 
     override val indexEvaluators : Array[Evaluator] = Array.concat( denseIndexes, sparseIndexes )
     
-    
     private val counts = indexEvaluators.map( _.valueType.asInstanceOf[EnsembleType].elementSet.size )
-
     
     private val isQuick = calcIsQuick
         

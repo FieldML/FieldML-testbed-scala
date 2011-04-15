@@ -40,5 +40,5 @@ class ElementSet private( name : String, val ensemble : ValueType, private val s
     def size = set.size
     
     
-    def bufferedIterator = set.iterator.buffered
+    def bufferedIterator() = set.iterator.buffered
 }
