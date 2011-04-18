@@ -127,9 +127,9 @@
      <Variable name="heart.mesh.variable" />
      <Variable name="heart.nodal_dofs" />
    </Variables>
-   <Bindings>
-     <BindIndex variable="heart.mesh.variable.element" indexNumber="1" />
-   </Bindings>
+   <IndexEvaluators>
+     <IndexEvaluator evaluator="heart.mesh.variable.element" indexNumber="1" />
+   </IndexEvaluators>
    <ElementEvaluators default="heart.triquadratic_lagrange" />
   </PiecewiseEvaluator>
 

@@ -268,7 +268,7 @@ polygonBlock
         val meshVariable : AbstractEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
-        val elementCount = meshType.elementType.elementCount/2
+        val elementCount = meshType.elementType.elementCount
 
         val xyzArray = new StringBuilder()
         val polygonBlock = new StringBuilder()

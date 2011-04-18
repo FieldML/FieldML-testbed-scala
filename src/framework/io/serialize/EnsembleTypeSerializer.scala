@@ -85,12 +85,6 @@ object EnsembleTypeSerializer
             
             while( result == count )
             {
-                print( "READ " )
-                for( i <- 0 until count )
-                {
-                    print( entries( i ) + " " )
-                }
-                println
                 membersType match
                 {
                     case MEMBER_LIST_DATA => ensemble.elementSet.add( entries( 0 ) )

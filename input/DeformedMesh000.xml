@@ -12,7 +12,7 @@
     <ImportEvaluator localName="library.parameters.2d.bilinearSimplex.variable" remoteName="library.parameters.2d.bilinearSimplex.variable"/>
     <ImportEvaluator localName="library.interpolator.2d.unit.bilinearSimplex" remoteName="library.interpolator.2d.unit.bilinearSimplex"/>
     <ImportEvaluator localName="library.xi.2d.variable" remoteName="library.xi.2d.variable"/>
-    <ImportEvaluator localName="library.localNodes.2d.triangle1x1.variable" remoteName="library.localNodes.2d.triangle1x1.variable"/>
+    <ImportEvaluator localName="library.localNodes.2d.triangle2x2.variable" remoteName="library.localNodes.2d.triangle2x2.variable"/>
   </Import>
 
   <DataObject name="point.coordinates">
@@ -47,14 +47,14 @@
   <AbstractEvaluator name="deformed_mesh.mesh.variable" valueType="deformed_mesh.mesh.type" />
 
 
-  <ParametersEvaluator name="deformed_mesh.triangle.1x1_nodes" valueType="deformed_mesh.nodes.type">
+  <ParametersEvaluator name="deformed_mesh.triangle.2x2_nodes" valueType="deformed_mesh.nodes.type">
    <Variables>
-     <Variable name="library.localNodes.2d.triangle1x1.variable" />
+     <Variable name="library.localNodes.2d.triangle2x2.variable" />
      <Variable name="deformed_mesh.mesh.variable" />
    </Variables>
    <SemidenseData data="element.points">
     <DenseIndexes>
-     <IndexEvaluator evaluator="library.localNodes.2d.triangle1x1.variable" />
+     <IndexEvaluator evaluator="library.localNodes.2d.triangle2x2.variable" />
      <IndexEvaluator evaluator="deformed_mesh.mesh.variable.element" />
     </DenseIndexes>
    </SemidenseData>
@@ -73,8 +73,8 @@
      <Variable name="deformed_mesh.nodal_dofs" />
    </Variables>
    <Bindings>
-     <BindIndex variable="library.localNodes.2d.triangle1x1.variable" indexNumber="1"/>
-     <Bind variable="deformed_mesh.nodes.variable" source="deformed_mesh.triangle.1x1_nodes"/>
+     <BindIndex variable="library.localNodes.2d.triangle2x2.variable" indexNumber="1"/>
+     <Bind variable="deformed_mesh.nodes.variable" source="deformed_mesh.triangle.2x2_nodes"/>
    </Bindings>
    <ComponentEvaluators default="deformed_mesh.nodal_dofs" />
   </AggregateEvaluator>
@@ -98,9 +98,9 @@
      <Variable name="deformed_mesh.mesh.variable" />
      <Variable name="deformed_mesh.nodal_dofs" />
    </Variables>
-   <Bindings>
-     <BindIndex variable="deformed_mesh.mesh.variable.element" indexNumber="1" />
-   </Bindings>
+   <IndexEvaluators>
+     <IndexEvaluator evaluator="deformed_mesh.mesh.variable.element" indexNumber="1" />
+   </IndexEvaluators>
    <ElementEvaluators default="deformed_mesh.bilinearSimplex" />
   </PiecewiseEvaluator>
 
