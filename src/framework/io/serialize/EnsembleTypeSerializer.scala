@@ -47,9 +47,12 @@ object EnsembleTypeSerializer
     
     def insert( handle : Int, valueType : EnsembleType ) : Unit =
     {
-        val objectHandle = Fieldml_CreateEnsembleType( handle, valueType.name, valueType.isComponent match { case true => 1; case false => 0} )
+        if( !valueType.isComponent )
+        {
+            val objectHandle = Fieldml_CreateEnsembleType( handle, valueType.name )
 
-        insertElements( handle, objectHandle, valueType )
+            insertElements( handle, objectHandle, valueType )
+        }
     }
     
     

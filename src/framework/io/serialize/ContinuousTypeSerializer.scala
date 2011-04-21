@@ -17,14 +17,12 @@ object ContinuousTypeSerializer
 {
     def insert( handle : Int, valueType : ContinuousType ) : Unit =
     {
-        var componentHandle = FML_INVALID_HANDLE
+        val objectHandle = Fieldml_CreateContinuousType( handle, valueType.name )
         
         if( valueType.componentType != null )
         {
-            componentHandle = GetNamedObject( handle, valueType.componentType.name )
+            Fieldml_CreateContinuousTypeComponents( handle, objectHandle, valueType.componentType.name, valueType.componentType.elementCount )
         }
-        
-        val objectHandle = Fieldml_CreateContinuousType( handle, valueType.name, componentHandle )
     }
 
 

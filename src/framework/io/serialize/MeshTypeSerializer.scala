@@ -16,9 +16,14 @@ object MeshTypeSerializer
     def insert( handle : Int, valueType : MeshType ) : Unit =
     {
         val componentHandle = GetNamedObject( handle, valueType.xiType.componentType.name )
-        val objectHandle = Fieldml_CreateMeshType( handle, valueType.name, componentHandle )
+        val objectHandle = Fieldml_CreateMeshType( handle, valueType.name )
+        
+        val xiHandle = Fieldml_CreateMeshXiType( handle, objectHandle, valueType.xiType.name )
+        Fieldml_CreateContinuousTypeComponents( handle, xiHandle, valueType.xiType.componentType.name, valueType.xiType.componentType.elementCount )
+        
+        val elementsHandle = Fieldml_CreateMeshElementsType( handle, objectHandle, valueType.elementType.name )
 
-        EnsembleTypeSerializer.insertElements( handle, objectHandle, valueType.elementType )
+        EnsembleTypeSerializer.insertElements( handle, elementsHandle, valueType.elementType )
         
         valueType.shapes.default match
         {
@@ -39,7 +44,7 @@ object MeshTypeSerializer
         val xiComponentHandle = Fieldml_GetMeshXiComponentType( source.fmlHandle, objectHandle )
         val xiComponentType = source.getEnsembleType( xiComponentHandle )
         
-        val elementHandle = Fieldml_GetMeshElementType( source.fmlHandle, objectHandle )
+        val elementHandle = Fieldml_GetMeshElementsType( source.fmlHandle, objectHandle )
                 
         val mesh = new MeshType( name, xiComponentType )
         

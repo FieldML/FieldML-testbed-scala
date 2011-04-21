@@ -4,6 +4,7 @@ import fieldml.evaluator.AbstractEvaluator
 import fieldml.evaluator.AggregateEvaluator
 import fieldml.evaluator.Evaluator
 import fieldml.valueType.ContinuousType
+import fieldml.valueType.EnsembleType
 
 import framework.value.Value
 import framework.value.ContinuousValue
@@ -15,14 +16,14 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
     extends AggregateEvaluator( name, valueType )
     with ValueSource
 {
-    private val indexType = valueType.componentType
-    
-    private val indexEvaluator = new VariableValueSource( name + ".index", indexType )
-    
-    private val indexValues = ( for( i <- 1 to indexType.elementCount ) yield new EnsembleValue( indexType, i ) ).toArray
-    
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
+        val indexType = indexBinds(1).valueType.asInstanceOf[EnsembleType]
+        
+        val indexEvaluator = new VariableValueSource( name + ".index", indexType )
+        
+        val indexValues = ( for( i <- 1 to indexType.elementCount ) yield new EnsembleValue( indexType, i ) ).toArray
+        
         state.pushAndApply( binds.toSeq ++ indexBinds.toSeq.map( ( t : Tuple2[Int, Evaluator] ) => Tuple2[Evaluator, Evaluator]( t._2, indexEvaluator ) ) )
 
         val values = for( i <- indexValues;
