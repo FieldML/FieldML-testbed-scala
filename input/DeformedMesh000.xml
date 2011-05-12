@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Fieldml version="0.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Fieldml_0.3.xsd">
+<Fieldml version="0.4"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xsi:noNamespaceSchemaLocation="Fieldml_0.4.xsd">
  <Region name="deformed_mesh">
 
-  <Import location="library_0.3.xml" region="library">
+  <Import location="library.xml" region="library">
     <ImportType localName="library.real.1d" remoteName="library.real.1d"/>
     <ImportType localName="library.parameters.2d.bilinearSimplex" remoteName="library.parameters.2d.bilinearSimplex"/>
     <ImportType localName="library.coordinates.rc.3d" remoteName="library.coordinates.rc.3d"/>
@@ -10,23 +13,14 @@
 
     <ImportEvaluator localName="library.parameters.2d.bilinearSimplex.variable" remoteName="library.parameters.2d.bilinearSimplex.variable"/>
     <ImportEvaluator localName="library.interpolator.2d.unit.bilinearSimplex" remoteName="library.interpolator.2d.unit.bilinearSimplex"/>
-    <ImportEvaluator localName="library.xi.2d.variable" remoteName="library.xi.2d.variable"/>
+    <ImportEvaluator localName="library.chart.2d.variable" remoteName="library.chart.2d.variable"/>
     <ImportEvaluator localName="library.localNodes.2d.triangle2x2.variable" remoteName="library.localNodes.2d.triangle2x2.variable"/>
   </Import>
 
-  <DataObject name="point.coordinates">
-    <Source>
-        <TextFileSource filename="DeformedMesh000.vtk" firstLine="6" />
-    </Source>
-    <Entries count="2677" length="3" head="0" tail="0" />
-  </DataObject>
-
-  <DataObject name="element.points">
-    <Source>
-        <TextFileSource filename="DeformedMesh000.vtk" firstLine="900" />
-    </Source>
-    <Entries count="5350" length="3" head="1" tail="0" />
-  </DataObject>
+  <TextFileResource name="vtk.resource" xlink:href="DeformedMesh000.vtk">
+    <TextDataSource name="point.coordinates" firstLine="6" count="2677" length="3" head="0" tail="0" />
+    <TextDataSource name="element.points" firstLine="900" count="5350" length="3" head="1" tail="0" />
+  </TextFileResource>
 
   <EnsembleType name="deformed_mesh.nodes.type">
    <Members>
@@ -42,9 +36,9 @@
        <MemberRange min="1" max="5350"/>
      </Members>
    </Elements>
-   <Xi name="xi">
+   <Chart name="xi">
      <Components name="deformed_mesh.mesh.type.xi.component" count="2"/>
-   </Xi>
+   </Chart>
    <Shapes default="library.shape.triangle" />
   </MeshType>
   
@@ -92,7 +86,7 @@
    </Variables>
    <Bindings>
     <Bind variable="library.parameters.2d.bilinearSimplex.variable" source="deformed_mesh.element_params.bilinearSimplex" />
-    <Bind variable="library.xi.2d.variable" source="deformed_mesh.mesh.variable.xi" />
+    <Bind variable="library.chart.2d.variable" source="deformed_mesh.mesh.variable.xi" />
    </Bindings>
   </ReferenceEvaluator>
 

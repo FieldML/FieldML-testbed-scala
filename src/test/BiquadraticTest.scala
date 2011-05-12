@@ -76,8 +76,8 @@ object BiquadraticTest
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
-        val parameterSource = new InlineDataSource()
-        val parameterData = region.createDataObject( "test.parameters.data", parameterSource, 48, 3, 0, 0 )
+        val parameterResource = region.createTextInlineResource( "test.parameters.resource", "" )
+        val parameterData = region.createTextDataSource( "test.parameters.data", parameterResource, 1, 48, 3, 0, 0 )
         
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterData, parameterDescription )
         
@@ -102,8 +102,8 @@ object BiquadraticTest
         val bilinearParameterSet = null
         
         val bilinearConnectivityDesc = new SemidenseDataDescription( nodes, Array( bilinearParameterSet, bilinearElementSet  ), Array( bilinearIndexVariable, elementVariable ), Array() )
-        val bilinearConnectivitySource = new InlineDataSource()
-        val bilinearConnectivityData = region.createDataObject( "test.bilinear_connectivity.data", parameterSource, 9, 4, 0, 0 )
+        val bilinearConnectivityResource = region.createTextInlineResource( "test.bilinear_connectivity.resource", "" )
+        val bilinearConnectivityData = region.createTextDataSource( "test.bilinear_connectivity.data", bilinearConnectivityResource, 1, 9, 4, 0, 0 )
         val bilinearConnectivity = region.createParameterEvaluator( "test.bilinear_connectivity", nodes, bilinearConnectivityData, bilinearConnectivityDesc )
         
         bilinearConnectivity( 5 ) = ( 6, 7, 10, 11 ) 
@@ -112,8 +112,8 @@ object BiquadraticTest
         val biquadraticParameterSet = null
         
         val biquadraticConnectivityDesc = new SemidenseDataDescription( nodes, Array( biquadraticParameterSet, biquadraticElementSet ), Array( biquadraticIndexVariable, elementVariable ), Array() )
-        val biquadraticConnectivitySource = new InlineDataSource()
-        val biquadraticConnectivityData = region.createDataObject( "test.biquadratic_connectivity.data", parameterSource, 9, 9, 0, 0 )
+        val biquadraticConnectivityResource = region.createTextInlineResource( "test.biquadratic_connectivity.resource", "" )
+        val biquadraticConnectivityData = region.createTextDataSource( "test.biquadratic_connectivity.data", parameterResource, 1, 9, 9, 0, 0 )
         val biquadraticConnectivity = region.createParameterEvaluator( "test.biquadratic_connectivity", nodes, biquadraticConnectivityData, biquadraticConnectivityDesc )
         
         biquadraticConnectivity( 1 ) = ( 1, 17, 2, 20, 21, 22, 5, 27, 6 ) 

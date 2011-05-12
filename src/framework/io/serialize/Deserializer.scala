@@ -4,7 +4,8 @@ import scala.collection.mutable.Map
 
 import fieldml.evaluator._
 import fieldml.valueType._
-import fieldml.DataObject
+import fieldml.DataResource
+import fieldml.DataSource
 import fieldml.FieldmlObject
 
 import fieldml.jni.FieldmlApi._
@@ -32,7 +33,8 @@ class Deserializer( val fmlHandle : Int )
             case FHT_ENSEMBLE_TYPE => getEnsembleType( objectHandle )
             case FHT_CONTINUOUS_TYPE => getContinuousType( objectHandle )
             case FHT_MESH_TYPE => getMeshType( objectHandle )
-            case FHT_DATA_OBJECT => getDataObject( objectHandle )
+            case FHT_DATA_RESOURCE => getDataResource( objectHandle )
+            case FHT_DATA_SOURCE => getDataSource( objectHandle )
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
             case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
@@ -113,12 +115,22 @@ class Deserializer( val fmlHandle : Int )
     }
     
     
-    def getDataObject( objectHandle : Int ) : DataObject =
+    def getDataResource( objectHandle : Int ) : DataResource =
     {
-        getTypedObject( objectHandle, FHT_DATA_OBJECT, classOf[DataObject] ) match
+        getTypedObject( objectHandle, FHT_DATA_RESOURCE, classOf[DataResource] ) match
         {
-            case s : Some[DataObject] => s.get
-            case None => objects( objectHandle ) = DataObjectSerializer.extract( this, objectHandle ); objects( objectHandle).asInstanceOf[DataObject]
+            case s : Some[DataResource] => s.get
+            case None => objects( objectHandle ) = DataResourceSerializer.extract( this, objectHandle ); objects( objectHandle).asInstanceOf[DataResource]
+        }
+    }
+    
+
+    def getDataSource( objectHandle : Int ) : DataSource =
+    {
+        getTypedObject( objectHandle, FHT_DATA_SOURCE, classOf[DataSource] ) match
+        {
+            case s : Some[DataSource] => s.get
+            case None => objects( objectHandle ) = DataSourceSerializer.extract( this, objectHandle ); objects( objectHandle).asInstanceOf[DataSource]
         }
     }
     

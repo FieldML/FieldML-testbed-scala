@@ -66,8 +66,8 @@ object TestFieldml
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
-        val parameterSource = new TextFileDataSource( "test_fieldml_nodal_params", 0 )
-        val parameterData = region.createDataObject( "test.parameters.data", parameterSource, 6, 3, 0, 0 )
+        val parameterSource = region.createTextFileResource( "test.parameters.resource", "test_fieldml_nodal_params" )
+        val parameterData = region.createTextDataSource( "test.parameters.data", parameterSource, 1, 6, 3, 0, 0 )
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterData, parameterDescription )
         
         parameters( 1 ) = ( 0.0, 0.0, 1.0 )
@@ -82,8 +82,8 @@ object TestFieldml
         println( "Parameters( 1 ) = " + parameters( 1 ) )
         
         val connectivityDescription = new SemidenseDataDescription( nodes, Array( bilinearIndexVariable, elementVariable ), Array() )
-        val connectivitySource = new TextFileDataSource( "test_fieldml_connectivity", 0 )
-        val connectivityData = region.createDataObject( "test.connectivity.data", connectivitySource, 2, 4, 0, 0 )
+        val connectivitySource = region.createTextFileResource( "test.connectivity.resource", "test_fieldml_connectivity" )
+        val connectivityData = region.createTextDataSource( "test.connectivity.data", connectivitySource, 1, 2, 4, 0, 0 )
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityData, connectivityDescription )
         
         connectivity( 1 ) = ( 1, 4, 2, 5 )

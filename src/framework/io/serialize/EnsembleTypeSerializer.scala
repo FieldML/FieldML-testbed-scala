@@ -74,7 +74,7 @@ object EnsembleTypeSerializer
         }
         else
         {
-            val data = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
+            val data = Fieldml_GetDataSource( source.fmlHandle, objectHandle )
             
             val streamHandle = Fieldml_OpenReader( source.fmlHandle, data )
             

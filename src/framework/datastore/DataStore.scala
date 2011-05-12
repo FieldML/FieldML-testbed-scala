@@ -1,8 +1,8 @@
 package framework.datastore
 
-import fieldml.DataObject
+import fieldml.DataSource
 
-class DataStore( val source : DataObject, val description : DataDescription )
+class DataStore( val source : DataSource, val description : DataDescription )
 {
 
 }

@@ -3,6 +3,7 @@ package test
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
 import fieldml.jni.DataDescriptionType._
+import fieldml.jni.DataResourceType._
 import fieldml.jni.DataSourceType._
 
 object TestDofVector 
@@ -19,7 +20,7 @@ object TestDofVector
         val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "library.localNodes.2d.square2x2.variable" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
-        val xiType = Fieldml_CreateMeshXiType( fml, meshType, "test.mesh.xi" )
+        val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
         Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
@@ -35,10 +36,9 @@ object TestDofVector
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsVariable, FML_INVALID_HANDLE )
         
-        val connectivityData = Fieldml_CreateDataObject( fml, "test.bilinear_connectivity.data" )
-        Fieldml_SetDataObjectSourceType( fml, connectivityData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, connectivityData, 3, 4, 0, 0 )
-        Fieldml_SetDataObject( fml, connectivity, connectivityData )
+        val connectivityResource = Fieldml_CreateTextInlineDataResource( fml, "test.bilinear_connectivity.resource" )
+        val connectivityData = Fieldml_CreateTextDataSource( fml, "test.bilinear_connectivity.data", connectivityResource, 1, 3, 4, 0, 0 )
+        Fieldml_SetDataSource( fml, connectivity, connectivityData )
 
         Fieldml_AddInlineData( fml, connectivityData, "\n", 1 )
         Fieldml_AddInlineData( fml, connectivityData, "1 2 5 6\n", 8 );
@@ -50,10 +50,9 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, nodalParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, nodalParams, nodesVariable )
 
-        val nodalData = Fieldml_CreateDataObject( fml, "test.nodal_params.data" )
-        Fieldml_SetDataObjectSourceType( fml, nodalData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, nodalData, 4, 2, 0, 0 )
-        Fieldml_SetDataObject( fml, nodalParams, nodalData )
+        val nodalResource = Fieldml_CreateTextInlineDataResource( fml, "test.nodal_params.resource" )
+        val nodalData = Fieldml_CreateTextDataSource( fml, "test.nodal_params.data", nodalResource, 1, 4, 2, 0, 0 )
+        Fieldml_SetDataSource( fml, nodalParams, nodalData )
 
         Fieldml_AddInlineData( fml, nodalData, "1 0.0 ", 6 )
         Fieldml_AddInlineData( fml, nodalData, "2 0.5 ", 6 )
@@ -64,20 +63,18 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, elementParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, elementParams, elementsVariable )
 
-        val elementData = Fieldml_CreateDataObject( fml, "test.element_params.data" )
-        Fieldml_SetDataObjectSourceType( fml, elementData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, elementData, 1, 2, 0, 0 )
-        Fieldml_SetDataObject( fml, elementParams, elementData )
+        val elementResource = Fieldml_CreateTextInlineDataResource( fml, "test.element_params.resource" )
+        val elementData = Fieldml_CreateTextDataSource( fml, "test.element_params.data", elementResource, 1, 1, 2, 0, 0 )
+        Fieldml_SetDataSource( fml, elementParams, elementData )
 
         Fieldml_AddInlineData( fml, elementData, "2 2.0 ", 6 )
 
         val globalParams = Fieldml_CreateParametersEvaluator( fml, "test.global_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, globalParams, DESCRIPTION_SEMIDENSE )
 
-        val globalData = Fieldml_CreateDataObject( fml, "test.global_params.data" )
-        Fieldml_SetDataObjectSourceType( fml, globalData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, globalData, 1, 1, 0, 0 )
-        Fieldml_SetDataObject( fml, globalParams, globalData )
+        val globalResource = Fieldml_CreateTextInlineDataResource( fml, "test.global_params.resource" )
+        val globalData = Fieldml_CreateTextDataSource( fml, "test.global_params.data", globalResource, 1, 1, 1, 0, 0 )
+        Fieldml_SetDataSource( fml, globalParams, globalData )
 
         Fieldml_AddInlineData( fml, globalData, "3.0 ", 4 )
         
@@ -118,7 +115,7 @@ object TestDofVector
         val xiEnsemble = Fieldml_GetObjectByName( fml, "library.ensemble.xi.2d" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
-        val xiType = Fieldml_CreateMeshXiType( fml, meshType, "test.mesh.xi" )
+        val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
         Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
@@ -130,10 +127,9 @@ object TestDofVector
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
-        val connectivityData = Fieldml_CreateDataObject( fml, "test.bilinear_connectivity.data" )
-        Fieldml_SetDataObjectSourceType( fml, connectivityData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, connectivityData, 3, 4, 0, 0 )
-        Fieldml_SetDataObject( fml, connectivity, connectivityData )
+        val connectivityResource = Fieldml_CreateTextInlineDataResource( fml, "test.bilinear_connectivity.resource" )
+        val connectivityData = Fieldml_CreateTextDataSource( fml, "test.bilinear_connectivity.data", connectivityResource, 1, 3, 4, 0, 0 )
+        Fieldml_SetDataSource( fml, connectivity, connectivityData )
 
         Fieldml_AddInlineData( fml, connectivityData, "\n", 1 )
         Fieldml_AddInlineData( fml, connectivityData, "1 2 5 6\n", 8 );
@@ -149,10 +145,9 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
-        val dofData = Fieldml_CreateDataObject( fml, "test.dof_params.data" )
-        Fieldml_SetDataObjectSourceType( fml, dofData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, dofData, 6, 1, 0, 0 )
-        Fieldml_SetDataObject( fml, dofParams, dofData )
+        val dofResource = Fieldml_CreateTextInlineDataResource( fml, "test.dof_params.resource" )
+        val dofData = Fieldml_CreateTextDataSource( fml, "test.dof_params.data", dofResource, 1, 6, 1, 0, 0 )
+        Fieldml_SetDataSource( fml, dofParams, dofData )
 
         Fieldml_AddInlineData( fml, dofData, "0.0 0.5 1.0 1.5 2.0 3.0 ", 24 )
         
@@ -160,10 +155,9 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, nodalIndexes, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, nodalIndexes, nodesType )
         
-        val nodalIndexData = Fieldml_CreateDataObject( fml, "test.nodal_indexes.data" )
-        Fieldml_SetDataObjectSourceType( fml, nodalIndexData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, nodalIndexData, 4, 2, 0, 0 )
-        Fieldml_SetDataObject( fml, nodalIndexes, nodalIndexData )
+        val nodalIndexResource = Fieldml_CreateTextInlineDataResource( fml, "test.nodal_indexes.resource" )
+        val nodalIndexData = Fieldml_CreateTextDataSource( fml, "test.nodal_indexes.data", nodalIndexResource, 1, 4, 2, 0, 0 )
+        Fieldml_SetDataSource( fml, nodalIndexes, nodalIndexData )
 
         Fieldml_AddInlineData( fml, nodalIndexData, "1 2 ", 4 )
         Fieldml_AddInlineData( fml, nodalIndexData, "2 3 ", 4 )
@@ -174,20 +168,18 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, elementIndexes, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, elementIndexes, elementsType )
         
-        val elementIndexData = Fieldml_CreateDataObject( fml, "test.element_indexes.data" )
-        Fieldml_SetDataObjectSourceType( fml, elementIndexData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, elementIndexData, 1, 2, 0, 0 )
-        Fieldml_SetDataObject( fml, elementIndexes, elementIndexData )
+        val elementIndexResource = Fieldml_CreateTextInlineDataResource( fml, "test.element_indexes.resource" )
+        val elementIndexData = Fieldml_CreateTextDataSource( fml, "test.element_indexes.data", elementIndexResource, 1, 1, 2, 0, 0 )
+        Fieldml_SetDataSource( fml, elementIndexes, elementIndexData )
 
         Fieldml_AddInlineData( fml, elementIndexData, "2 6 ", 4 )
 
         val globalIndexes = Fieldml_CreateParametersEvaluator( fml, "test.global_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, globalIndexes, DESCRIPTION_SEMIDENSE )
         
-        val globalIndexData = Fieldml_CreateDataObject( fml, "test.global_indexes.data" )
-        Fieldml_SetDataObjectSourceType( fml, globalIndexData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, globalIndexData, 1, 1, 0, 0 )
-        Fieldml_SetDataObject( fml, globalIndexes, globalIndexData )
+        val globalIndexResource = Fieldml_CreateTextInlineDataResource( fml, "test.global_indexes.resource" )
+        val globalIndexData = Fieldml_CreateTextDataSource( fml, "test.global_indexes.data", globalIndexResource, 1, 1, 1, 0, 0 )
+        Fieldml_SetDataSource( fml, globalIndexes, globalIndexData )
 
         Fieldml_AddInlineData( fml, globalIndexData, "1 ", 2 )
         
@@ -233,7 +225,7 @@ object TestDofVector
         val xiEnsemble = Fieldml_GetObjectByName( fml, "library.ensemble.xi.2d" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
-        val xiType = Fieldml_CreateMeshXiType( fml, meshType, "test.mesh.xi" )
+        val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
         Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
@@ -245,10 +237,9 @@ object TestDofVector
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
-        val connectivityData = Fieldml_CreateDataObject( fml, "test.bilinear_connectivity.data" )
-        Fieldml_SetDataObjectSourceType( fml, connectivityData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, connectivityData, 3, 4, 0, 0 )
-        Fieldml_SetDataObject( fml, connectivity, connectivityData )
+        val connectivityResource = Fieldml_CreateTextInlineDataResource( fml, "test.bilinear_connectivity.resource" )
+        val connectivityData = Fieldml_CreateTextDataSource( fml, "test.bilinear_connectivity.data", connectivityResource, 1, 3, 4, 0, 0 )
+        Fieldml_SetDataSource( fml, connectivity, connectivityData )
 
         Fieldml_AddInlineData( fml, connectivityData, "\n", 1 )
         Fieldml_AddInlineData( fml, connectivityData, "1 2 5 6\n", 8 );
@@ -264,10 +255,9 @@ object TestDofVector
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
-        val dofData = Fieldml_CreateDataObject( fml, "test.dof_params.data" )
-        Fieldml_SetDataObjectSourceType( fml, dofData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, dofData, 6, 1, 0, 0 )
-        Fieldml_SetDataObject( fml, dofParams, dofData )
+        val dofResource = Fieldml_CreateTextInlineDataResource( fml, "test.dof_params.resource" )
+        val dofData = Fieldml_CreateTextDataSource( fml, "test.dof_params.data", dofResource, 1, 6, 1, 0, 0 )
+        Fieldml_SetDataSource( fml, dofParams, dofData )
 
         Fieldml_AddInlineData( fml, dofData, "0.0 0.5 1.0 1.5 2.0 3.0 ", 24 )
 
@@ -280,10 +270,9 @@ object TestDofVector
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, nodesType )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, elementsType )
         
-        val dofIndexData = Fieldml_CreateDataObject( fml, "test.dof_indexes.data" )
-        Fieldml_SetDataObjectSourceType( fml, dofIndexData, SOURCE_INLINE )
-        Fieldml_SetDataObjectEntryInfo( fml, dofIndexData, 44, 4, 0, 0 )
-        Fieldml_SetDataObject( fml, dofIndexes, dofIndexData )
+        val dofIndexResource = Fieldml_CreateTextInlineDataResource( fml, "test.dof_indexes.resource" )
+        val dofIndexData = Fieldml_CreateTextDataSource( fml, "test.dof_indexes.data", dofIndexResource, 1, 44, 4, 0, 0 )
+        Fieldml_SetDataSource( fml, dofIndexes, dofIndexData )
 
         Fieldml_AddInlineData( fml, dofIndexData, "\n", 1 )
         Fieldml_AddInlineData( fml, dofIndexData, "1 1 1 2\n", 8 )

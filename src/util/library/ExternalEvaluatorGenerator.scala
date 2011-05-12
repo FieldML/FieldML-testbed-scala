@@ -40,9 +40,9 @@ object ExternalEvaluatorGenerator
         val evaluatorType : ContinuousType = source.getContinuousType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
         val xiNames = Array[String](
             null,
-            "library.xi.1d.variable",
-            "library.xi.2d.variable",
-            "library.xi.3d.variable"
+            "library.chart.1d.variable",
+            "library.chart.2d.variable",
+            "library.chart.3d.variable"
             )
         val linearParamNames = Array[String](
             null,

@@ -92,13 +92,34 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createDataObject( objectName : String, dataSource : DataSource, count : Int, length : Int, head : Int, tail : Int ) : DataObject =
+    def createTextFileResource( objectName : String, href : String ) : DataResource =
     {
-        val dataObject = new DataObject( objectName, dataSource, count, length, head, tail )
+        val dataResource = new TextFileDataResource( objectName )
+        dataResource.href = href
         
-        put( dataObject )
+        put( dataResource )
         
-        dataObject
+        dataResource
+    }
+    
+    
+    def createTextInlineResource( objectName : String, data : String ) : DataResource =
+    {
+        val dataResource = new InlineDataResource( objectName, data )
+        
+        put( dataResource )
+        
+        dataResource
+    }
+    
+    
+    def createTextDataSource( objectName : String, resource : DataResource, firstLine : Int, count : Int, length : Int, head : Int, tail : Int ) : DataSource =
+    {
+        val dataSource = new TextDataSource( objectName, resource, firstLine, count, length, head, tail )
+        
+        put( dataSource )
+        
+        dataSource
     }
     
     
@@ -143,7 +164,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createParameterEvaluator( name : String, valueType : ValueType, data : DataObject, description : DataDescription ) : ParameterEvaluator =
+    def createParameterEvaluator( name : String, valueType : ValueType, data : DataSource, description : DataDescription ) : ParameterEvaluator =
     {
         val store = new DataStore( data, description )
         val evaluator = new ParameterEvaluatorValueSource( name, valueType, store )
@@ -205,7 +226,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         
         objectList.filter( _.isLocal ).foreach( _ match
         {
-        case d : DataObject => d.insert( handle, d )
+        case d : DataResource => d.insert( handle, d )
         case d : EnsembleType => d.insert( handle, d )
         case d : ContinuousType => d.insert( handle, d )
         case d : MeshType => d.insert( handle, d )
@@ -267,6 +288,10 @@ object UserRegion
     def fromFile( name : String, filename : String ) : Region =
     {
         val fmlHandle = Fieldml_CreateFromFile( filename )
+        
+        val count = Fieldml_GetErrorCount( fmlHandle )
+        for( i <- 1 to count )
+            println( Fieldml_GetError( fmlHandle, i ) )
         
         //So very, very dirty.
         val builder1 = new java.lang.StringBuilder( 100 )

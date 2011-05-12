@@ -179,7 +179,7 @@ object ParameterEvaluatorSerializer
         
         val dataHandle = GetNamedObject( handle, evaluator.dataStore.source.name )
 
-        Fieldml_SetDataObject( handle, objectHandle, dataHandle )
+        Fieldml_SetDataSource( handle, objectHandle, dataHandle )
 
         evaluator.dataStore.description match
         {
@@ -324,7 +324,7 @@ object ParameterEvaluatorSerializer
         
         val values = new Array[Int]( count )
         
-        Fieldml_ReadIntValues( source.fmlHandle, reader, values, count )
+        val readCount = Fieldml_ReadIntValues( source.fmlHandle, reader, values, count )
         
         Fieldml_CloseReader( source.fmlHandle, reader )
         
@@ -360,7 +360,7 @@ object ParameterEvaluatorSerializer
         }
         
         val semidense = new SemidenseDataDescription( valueType, denseOrders, denseIndexes, sparseIndexes )
-        val dataHandle = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
+        val dataHandle = Fieldml_GetDataSource( source.fmlHandle, objectHandle )
         
         val reader = Fieldml_OpenReader( source.fmlHandle, dataHandle )
         if( reader == FML_INVALID_HANDLE )
@@ -400,8 +400,8 @@ object ParameterEvaluatorSerializer
             case d => throw new FmlException( "Unsupported data description: " + d ) 
         }
         
-        val dataObjectHandle = Fieldml_GetDataObject( source.fmlHandle, objectHandle )
-        val dataObject = source.getDataObject( dataObjectHandle )
+        val dataObjectHandle = Fieldml_GetDataSource( source.fmlHandle, objectHandle )
+        val dataObject = source.getDataSource( dataObjectHandle )
         
         val dataStore = new DataStore( dataObject, dataDescription ) 
 

@@ -18,7 +18,7 @@ object MeshTypeSerializer
         val componentHandle = GetNamedObject( handle, valueType.xiType.componentType.name )
         val objectHandle = Fieldml_CreateMeshType( handle, valueType.name )
         
-        val xiHandle = Fieldml_CreateMeshXiType( handle, objectHandle, valueType.xiType.name )
+        val xiHandle = Fieldml_CreateMeshChartType( handle, objectHandle, valueType.xiType.name )
         Fieldml_CreateContinuousTypeComponents( handle, xiHandle, valueType.xiType.componentType.name, valueType.xiType.componentType.elementCount )
         
         val elementsHandle = Fieldml_CreateMeshElementsType( handle, objectHandle, valueType.elementType.name )
@@ -41,7 +41,7 @@ object MeshTypeSerializer
     def extract( source : Deserializer, objectHandle : Int ) : MeshType =
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
-        val xiComponentHandle = Fieldml_GetMeshXiComponentType( source.fmlHandle, objectHandle )
+        val xiComponentHandle = Fieldml_GetMeshChartComponentType( source.fmlHandle, objectHandle )
         val xiComponentType = source.getEnsembleType( xiComponentHandle )
         
         val elementHandle = Fieldml_GetMeshElementsType( source.fmlHandle, objectHandle )
