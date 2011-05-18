@@ -45,7 +45,7 @@ object AggregateEvaluatorSerializer
         val aggEval = new AggregateEvaluatorValueSource( name, valueType )
         
         val indexEval = Fieldml_GetIndexEvaluator( source.fmlHandle, objectHandle, 1 )
-        aggEval.bind_index( 1 -> source.getAbstractEvaluator( indexEval ) )
+        aggEval.bind_index( 1 -> source.getArgumentEvaluator( indexEval ) )
         
         val defaultEval = Fieldml_GetDefaultEvaluator( source.fmlHandle, objectHandle )
         if( defaultEval != FML_INVALID_HANDLE )

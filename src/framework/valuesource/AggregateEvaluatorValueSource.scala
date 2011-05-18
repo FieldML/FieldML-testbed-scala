@@ -1,6 +1,6 @@
 package framework.valuesource
 
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.AggregateEvaluator
 import fieldml.evaluator.Evaluator
 import fieldml.valueType.ContinuousType

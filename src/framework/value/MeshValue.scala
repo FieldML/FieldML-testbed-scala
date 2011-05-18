@@ -4,7 +4,7 @@ import fieldml.valueType.MeshType
 
 class MeshValue( vType : MeshType, val elementValue : Int, val xiValue : Double* )
     extends StructuredValue( vType,
-        Tuple2( "elements", new EnsembleValue( vType.elementType, elementValue ) ),
+        Tuple2( "element", new EnsembleValue( vType.elementType, elementValue ) ),
         Tuple2( "xi", new ContinuousValue( vType.xiType, xiValue:_* ) )
         )
 {

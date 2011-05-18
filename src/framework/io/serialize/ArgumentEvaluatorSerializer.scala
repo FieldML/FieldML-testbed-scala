@@ -1,6 +1,6 @@
 package framework.io.serialize
 
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.valueType.ValueType
 
 import util.exception._
@@ -11,19 +11,19 @@ import fieldml.jni.FieldmlApiConstants._
 
 import framework.region.UserRegion
 
-import framework.valuesource.AbstractEvaluatorValueSource
+import framework.valuesource.ArgumentEvaluatorValueSource
 
 
-object AbstractEvaluatorSerializer
+object ArgumentEvaluatorSerializer
 {
-    def insert( handle : Int, evaluator : AbstractEvaluator ) : Unit =
+    def insert( handle : Int, evaluator : ArgumentEvaluator ) : Unit =
     {
         val typeHandle = GetNamedObject( handle, evaluator.valueType.name )
-        val objectHandle = Fieldml_CreateAbstractEvaluator( handle, evaluator.name, typeHandle )
+        val objectHandle = Fieldml_CreateArgumentEvaluator( handle, evaluator.name, typeHandle )
     }
 
     
-    def extract( source : Deserializer, objectHandle : Int ) : AbstractEvaluator =
+    def extract( source : Deserializer, objectHandle : Int ) : ArgumentEvaluator =
     {
         val name = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
         
@@ -33,6 +33,6 @@ object AbstractEvaluatorSerializer
         
         val valueType = source.getType( typeHandle )
         
-        new AbstractEvaluatorValueSource( name, valueType )
+        new ArgumentEvaluatorValueSource( name, valueType )
     }
 }

@@ -24,22 +24,22 @@ object BiquadraticTest
     def main( argv : Array[String] ) : Unit =
     {
         val region = UserRegion.fromScratch( "test",
-            "library.real.1d" -> "library.real.1d",
-            "library.real.3d" -> "library.real.3d",
-            "library.ensemble.rc.3d" -> "library.ensemble.rc.3d",
-            "library.ensemble.rc.3d.variable" -> "library.ensemble.rc.3d.variable",
-            "library.xi.2d" -> "library.xi.2d",
-            "library.xi.2d.variable" -> "library.xi.2d.variable",
+            "library.real.1d" -> "real.1d",
+            "library.real.3d" -> "real.3d",
+            "library.ensemble.rc.3d" -> "coordinates.rc.3d.component",
+            "library.ensemble.rc.3d.argument" -> "coordinates.rc.3d.component.argument",
+            "library.xi.2d" -> "chart.2d",
+            "library.xi.2d.argument" -> "chart.2d.argument",
 
-            "library.parameters.2d.bilinearLagrange" -> "library.parameters.2d.bilinearLagrange",
-            "library.parameters.2d.bilinearLagrange.variable" -> "library.parameters.2d.bilinearLagrange.variable",
-            "library.localNodes.2d.square2x2.variable" -> "library.localNodes.2d.square2x2.variable",
-            "library.interpolator.2d.unit.bilinearLagrange" -> "library.interpolator.2d.unit.bilinearLagrange",
+            "library.parameters.2d.bilinearLagrange" -> "parameters.2d.bilinearLagrange",
+            "library.parameters.2d.bilinearLagrange.argument" -> "parameters.2d.bilinearLagrange.argument",
+            "library.localNodes.2d.square2x2.argument" -> "localNodes.2d.square2x2.argument",
+            "library.interpolator.2d.unit.bilinearLagrange" -> "interpolator.2d.unit.bilinearLagrange",
 
-            "library.parameters.2d.biquadraticLagrange" -> "library.parameters.2d.biquadraticLagrange",
-            "library.parameters.2d.biquadraticLagrange.variable" -> "library.parameters.2d.biquadraticLagrange.variable",
-            "library.localNodes.2d.square3x3.variable" -> "library.localNodes.2d.square3x3.variable",
-            "library.interpolator.2d.unit.biquadraticLagrange" -> "library.interpolator.2d.unit.biquadraticLagrange"
+            "library.parameters.2d.biquadraticLagrange" -> "parameters.2d.biquadraticLagrange",
+            "library.parameters.2d.biquadraticLagrange.argument" -> "parameters.2d.biquadraticLagrange.argument",
+            "library.localNodes.2d.square3x3.argument" -> "localNodes.2d.square3x3.argument",
+            "library.interpolator.2d.unit.biquadraticLagrange" -> "interpolator.2d.unit.biquadraticLagrange"
         )
 
 
@@ -48,26 +48,26 @@ object BiquadraticTest
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = region.getObject( "library.ensemble.rc.3d.variable" )
+        val real3IndexVariable : ArgumentEvaluator = region.getObject( "library.ensemble.rc.3d.argument" )
        
         val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = region.getObject( "library.xi.2d.variable" )
+        val xi2dVar : ArgumentEvaluator = region.getObject( "library.xi.2d.argument" )
 
-        val meshType = region.createMeshType( "test.mesh.type", 9, xi2dType.componentType )
-        val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
+        val meshType = region.createMeshType( "test.mesh.type", 9, 2 )
+        val meshVariable = region.createArgumentEvaluator( "test.mesh", meshType )
         val elementVariable = region.createSubtypeEvaluator( meshVariable, "element" )
         val xiVariable = region.createSubtypeEvaluator( meshVariable, "xi" )
 
         val nodes = region.createEnsembleType( "test.nodes.type", 48, false )
-        val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
+        val nodesVariable = region.createArgumentEvaluator( "test.nodes", nodes )
         
         val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.variable" )
-        val bilinearIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square2x2.variable" )
+        val bilinearParametersVariable : ArgumentEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.argument" )
+        val bilinearIndexVariable : ArgumentEvaluator = region.getObject( "library.localNodes.2d.square2x2.argument" )
         
         val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.2d.biquadraticLagrange" )
-        val biquadraticParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.biquadraticLagrange.variable" )
-        val biquadraticIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square3x3.variable" )
+        val biquadraticParametersVariable : ArgumentEvaluator = region.getObject( "library.parameters.2d.biquadraticLagrange.argument" )
+        val biquadraticIndexVariable : ArgumentEvaluator = region.getObject( "library.localNodes.2d.square3x3.argument" )
         
         val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.interpolator.2d.unit.bilinearLagrange", region )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )

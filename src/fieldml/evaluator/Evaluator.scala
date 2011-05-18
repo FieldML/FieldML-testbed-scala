@@ -8,7 +8,7 @@ import fieldml.FieldmlObject
 abstract class Evaluator( name : String, val valueType : ValueType )
     extends FieldmlObject( name )
 {
-    def variables : Iterable[AbstractEvaluator]
+    def variables : Iterable[ArgumentEvaluator]
 
     
     override def toString() : String =

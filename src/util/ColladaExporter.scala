@@ -5,7 +5,7 @@ import framework.region._
 import framework.value.ContinuousValue
 import framework.value.Value
 
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.Evaluator
 import fieldml.valueType.MeshType
 
@@ -265,7 +265,7 @@ polygonBlock
 
     def export3DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
@@ -331,7 +331,7 @@ polygonBlock
 
     def export2DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
@@ -387,7 +387,7 @@ polygonBlock
 
     def export2DTrisFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
@@ -451,7 +451,7 @@ polygonBlock
 
     def export2DFromFieldML( region : Region, discretisation : Int, meshName : String, geometryName : String, valueName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( geometryName )
         val heightEvaluator : Evaluator = region.getObject( valueName )
@@ -511,8 +511,8 @@ polygonBlock
     def exportFromFieldML( region : Region, discretisation : Int, evaluatorName : String, mesh1Name : String,
         mesh2Name : String ) : String =
     {
-        val mesh1Variable : AbstractEvaluator = region.getObject( mesh1Name )
-        val mesh2Variable : AbstractEvaluator = region.getObject( mesh2Name )
+        val mesh1Variable : ArgumentEvaluator = region.getObject( mesh1Name )
+        val mesh2Variable : ArgumentEvaluator = region.getObject( mesh2Name )
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val mesh1Type = mesh1Variable.valueType.asInstanceOf[MeshType]
         val mesh2Type = mesh2Variable.valueType.asInstanceOf[MeshType]
@@ -576,7 +576,7 @@ polygonBlock
 
     def export1DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
@@ -631,7 +631,7 @@ polygonBlock
 
     def export2Din1DFromFieldML( region : Region, discretisation : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount

@@ -1,7 +1,7 @@
 package framework
 
 import fieldml.evaluator.Evaluator
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.ParameterEvaluator
 import fieldml.evaluator.PiecewiseEvaluator
 import fieldml.evaluator.ReferenceEvaluator

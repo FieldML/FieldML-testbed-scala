@@ -8,7 +8,7 @@ import fieldml.evaluator._
 
 import util.exception._
 
-import framework.valuesource.AbstractEvaluatorValueSource
+import framework.valuesource.ArgumentEvaluatorValueSource
 
 import framework.valuesource._
 
@@ -23,9 +23,9 @@ abstract class Region( val name : String )
 {
     protected val objects = Map[String, FieldmlObject]()
 
-    private val companions = Map[ValueType, AbstractEvaluatorValueSource]()
+    private val companions = Map[ValueType, ArgumentEvaluatorValueSource]()
     
-    private val binds = Map[ AbstractEvaluator, Evaluator ]()
+    private val binds = Map[ ArgumentEvaluator, Evaluator ]()
     
     //TODO Use region names
     def getObject[A <: FieldmlObject]( objectName : String ) : A =
@@ -54,13 +54,13 @@ abstract class Region( val name : String )
     }
     
     
-    def bind( variable : AbstractEvaluator, value : Value ) : Unit =
+    def bind( variable : ArgumentEvaluator, value : Value ) : Unit =
     {
         binds( variable ) = new ConstantValueSource( value )
     }
     
     
-    def bind( variable : AbstractEvaluator, element : Int, xi : Double* ) : Unit =
+    def bind( variable : ArgumentEvaluator, element : Int, xi : Double* ) : Unit =
     {
         variable.valueType match
         {
@@ -70,7 +70,7 @@ abstract class Region( val name : String )
     }
     
     
-    def bind( variable : AbstractEvaluator, value : Int ) : Unit =
+    def bind( variable : ArgumentEvaluator, value : Int ) : Unit =
     {
         variable.valueType match
         {
@@ -80,7 +80,7 @@ abstract class Region( val name : String )
     }
     
     
-    def bind( variable : AbstractEvaluator, value : Double* ) : Unit =
+    def bind( variable : ArgumentEvaluator, value : Double* ) : Unit =
     {
         variable.valueType match
         {

@@ -40,26 +40,26 @@ object ExternalEvaluatorGenerator
         val evaluatorType : ContinuousType = source.getContinuousType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
         val xiNames = Array[String](
             null,
-            "library.chart.1d.variable",
-            "library.chart.2d.variable",
-            "library.chart.3d.variable"
+            "chart.1d.argument",
+            "chart.2d.argument",
+            "chart.3d.argument"
             )
         val linearParamNames = Array[String](
             null,
-            "library.parameters.1d.linearLagrange.variable",
-            "library.parameters.2d.bilinearLagrange.variable",
-            "library.parameters.3d.trilinearLagrange.variable"
+            "parameters.1d.unit.linearLagrange.argument",
+            "parameters.2d.unit.bilinearLagrange.argument",
+            "parameters.3d.unit.trilinearLagrange.argument"
             )
         val quadraticParamNames = Array[String](
             null,
-            "library.parameters.1d.quadraticLagrange.variable",
-            "library.parameters.2d.biquadraticLagrange.variable",
-            "library.parameters.3d.triquadraticLagrange.variable",
+            "parameters.1d.unit.quadraticLagrange.argument",
+            "parameters.2d.unit.biquadraticLagrange.argument",
+            "parameters.3d.unit.triquadraticLagrange.argument",
             null
             )
         val cubicHermiteParamNames = Array[String](
             null,
-            "library.parameters.1d.cubicHermite.variable",
+            "parameters.1d.unit.cubicHermite.argument",
             null,
             null,
             null
@@ -68,27 +68,29 @@ object ExternalEvaluatorGenerator
         val linearSimplexParamNames = Array[String](
             null,
             null, //NYI
-            "library.parameters.2d.bilinearSimplex.variable",
+            "parameters.2d.unit.bilinearSimplex.argument",
             null //NYI
             )
 
         val fparams =
         name match
         {
-            case "library.interpolator.1d.unit.cubicHermite" => ( new CubicHermite( 1 ).evaluate _, xiNames( 1 ), cubicHermiteParamNames( 1 ) )
-            case "library.interpolator.1d.unit.linearLagrange" => ( new LinearLagrange( 1 ).evaluate _, xiNames( 1 ), linearParamNames( 1 ) )
-            case "library.interpolator.2d.unit.bilinearLagrange" => ( new LinearLagrange( 2 ).evaluate _, xiNames( 2 ), linearParamNames( 2 ) )
-            case "library.interpolator.3d.unit.trilinearLagrange" => ( new LinearLagrange( 3 ).evaluate _, xiNames( 3 ), linearParamNames( 3 ) )
-            case "library.interpolator.1d.unit.quadraticLagrange" => ( new QuadraticLagrange( 1 ).evaluate _, xiNames( 1 ), quadraticParamNames( 1 ) )
-            case "library.interpolator.2d.unit.biquadraticLagrange" => ( new QuadraticLagrange( 2 ).evaluate _, xiNames( 2 ), quadraticParamNames( 2 ) )
-            case "library.interpolator.3d.unit.triquadraticLagrange" => ( new QuadraticLagrange( 3 ).evaluate _, xiNames( 3 ), quadraticParamNames( 3 ) )
-            case "library.interpolator.2d.unit.bilinearSimplex" => ( new BilinearSimplex().evaluate _, xiNames( 2 ), linearSimplexParamNames( 2 ) )
+            case "interpolator.1d.unit.cubicHermite" => ( new CubicHermite( 1 ).evaluate _, xiNames( 1 ), cubicHermiteParamNames( 1 ) )
+            case "interpolator.1d.unit.linearLagrange" => ( new LinearLagrange( 1 ).evaluate _, xiNames( 1 ), linearParamNames( 1 ) )
+            case "interpolator.2d.unit.bilinearLagrange" => ( new LinearLagrange( 2 ).evaluate _, xiNames( 2 ), linearParamNames( 2 ) )
+            case "interpolator.3d.unit.trilinearLagrange" => ( new LinearLagrange( 3 ).evaluate _, xiNames( 3 ), linearParamNames( 3 ) )
+            case "interpolator.1d.unit.quadraticLagrange" => ( new QuadraticLagrange( 1 ).evaluate _, xiNames( 1 ), quadraticParamNames( 1 ) )
+            case "interpolator.2d.unit.biquadraticLagrange" => ( new QuadraticLagrange( 2 ).evaluate _, xiNames( 2 ), quadraticParamNames( 2 ) )
+            case "interpolator.3d.unit.triquadraticLagrange" => ( new QuadraticLagrange( 3 ).evaluate _, xiNames( 3 ), quadraticParamNames( 3 ) )
+            case "interpolator.2d.unit.bilinearSimplex" => ( new BilinearSimplex().evaluate _, xiNames( 2 ), linearSimplexParamNames( 2 ) )
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
         
-        val xiVariable = source.getAbstractEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 ) )
-        val phiVariable = source.getAbstractEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._3 ) )
+        val xiVariable = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 ) )
+        val phiVariable = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._3 ) )
+        
+        val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
     
-        return new FunctionEvaluatorValueSource( name, fparams._1, xiVariable, phiVariable, evaluatorType )
+        return new FunctionEvaluatorValueSource( localName, fparams._1, xiVariable, phiVariable, evaluatorType )
     }
 }

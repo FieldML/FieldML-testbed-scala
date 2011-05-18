@@ -72,19 +72,9 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
 
     
-    def createMeshType( objectName : String, max : Int, xiComponents : EnsembleType ) : MeshType =
+    def createMeshType( objectName : String, elementCount : Int, dimensions : Int ) : MeshType =
     {
-        val mesh = createMeshType( objectName, xiComponents )
-        
-        mesh.elementType.elementSet.add( 1, max, 1 )
-        
-        mesh
-    }
-
-
-    def createMeshType( objectName : String, xiComponents : EnsembleType ) : MeshType =
-    {
-        val valueType = new MeshType( objectName, xiComponents )
+        val valueType = new MeshType( objectName, elementCount, dimensions )
 
         put( valueType )
 
@@ -123,7 +113,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : AbstractEvaluator, var2 : AbstractEvaluator, valueType : ContinuousType ) : Evaluator =
+    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : ArgumentEvaluator, var2 : ArgumentEvaluator, valueType : ContinuousType ) : Evaluator =
     {
         val evaluator = new FunctionEvaluatorValueSource( name, function, var1, var2, valueType ) 
 
@@ -185,9 +175,9 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createAbstractEvaluator( name : String, valueType : ValueType ) : AbstractEvaluator =
+    def createArgumentEvaluator( name : String, valueType : ValueType ) : ArgumentEvaluator =
     {
-        val evaluator = new AbstractEvaluatorValueSource( name, valueType )
+        val evaluator = new ArgumentEvaluatorValueSource( name, valueType )
         
         put( evaluator )
         
@@ -230,7 +220,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         case d : EnsembleType => d.insert( handle, d )
         case d : ContinuousType => d.insert( handle, d )
         case d : MeshType => d.insert( handle, d )
-        case e : AbstractEvaluator => e.insert( handle, e )
+        case e : ArgumentEvaluator => e.insert( handle, e )
         case e : PiecewiseEvaluator => e.insert( handle, e )
         case e : ParameterEvaluator => e.insert( handle, e )
         case e : ReferenceEvaluator => e.insert( handle, e )
@@ -320,7 +310,7 @@ object UserRegion
         val region = new UserRegion( name, imports.toArray[Pair[String, String]] )
         val fmlHandle = Fieldml_Create( "", name )
         
-        val importId = Fieldml_AddImportSource( fmlHandle, "library_0.3.xml", "library" )
+        val importId = Fieldml_AddImportSource( fmlHandle, "library.xml", "library" )
         
         for( p <- imports )
         {

@@ -175,7 +175,7 @@ object ParameterEvaluatorSerializer
     {
         val valueHandle = GetNamedObject( handle, evaluator.valueType.name )
         
-        val objectHandle = Fieldml_CreateParametersEvaluator( handle, evaluator.name, valueHandle )
+        val objectHandle = Fieldml_CreateParameterEvaluator( handle, evaluator.name, valueHandle )
         
         val dataHandle = GetNamedObject( handle, evaluator.dataStore.source.name )
 

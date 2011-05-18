@@ -6,7 +6,7 @@ import fieldml.valueType.MeshType
 import fieldml.DataSource
 import fieldml.DataResource
 import fieldml.evaluator.Evaluator
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.AggregateEvaluator
 import fieldml.evaluator.PiecewiseEvaluator
 import fieldml.evaluator.ParameterEvaluator
@@ -37,7 +37,7 @@ package object serialize
         val bindCount = Fieldml_GetBindCount( source.fmlHandle, objectHandle )
         
         for( i <- 1 to bindCount;
-            variable = source.getAbstractEvaluator( Fieldml_GetBindVariable( source.fmlHandle, objectHandle, i ) );
+            variable = source.getArgumentEvaluator( Fieldml_GetBindArgument( source.fmlHandle, objectHandle, i ) );
             evaluator = source.getEvaluator( Fieldml_GetBindEvaluator( source.fmlHandle, objectHandle, i ) )
             )
             yield Tuple2( variable, evaluator )
@@ -48,7 +48,7 @@ package object serialize
     implicit def ensembleTypeSerializer( valueType : EnsembleType ) = EnsembleTypeSerializer
     implicit def meshTypeSerializer( valueType : MeshType ) = MeshTypeSerializer
     implicit def dataResourceSerializer( dataResource : DataResource ) = DataResourceSerializer
-    implicit def abstractEvaluatorSerializer( evaluator : AbstractEvaluator ) = AbstractEvaluatorSerializer
+    implicit def argumentEvaluatorSerializer( evaluator : ArgumentEvaluator ) = ArgumentEvaluatorSerializer
     implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = PiecewiseEvaluatorSerializer
     implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = ParameterEvaluatorSerializer
     implicit def aggregateEvaluatorSerializer( evaluator : AggregateEvaluator ) = AggregateEvaluatorSerializer

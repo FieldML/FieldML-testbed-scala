@@ -5,7 +5,7 @@ import framework.region._
 import framework.value.ContinuousValue
 import framework.value.Value
 
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.Evaluator
 import fieldml.valueType.MeshType
 
@@ -70,7 +70,7 @@ object JSONExporter
     
     def export2DTrisFromFieldML( region : Region, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
@@ -105,7 +105,7 @@ object JSONExporter
 
     def export2DFromFieldML( region : Region, discretization : Int, meshName : String, evaluatorName : String ) : String =
     {
-        val meshVariable : AbstractEvaluator = region.getObject( meshName )
+        val meshVariable : ArgumentEvaluator = region.getObject( meshName )
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount

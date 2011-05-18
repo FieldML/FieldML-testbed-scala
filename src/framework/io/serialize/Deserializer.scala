@@ -37,7 +37,7 @@ class Deserializer( val fmlHandle : Int )
             case FHT_DATA_SOURCE => getDataSource( objectHandle )
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
-            case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
+            case FHT_ARGUMENT_EVALUATOR => return getArgumentEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
             case FHT_ELEMENT_SEQUENCE => return null
@@ -60,7 +60,7 @@ class Deserializer( val fmlHandle : Int )
         {
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
-            case FHT_ABSTRACT_EVALUATOR => return getAbstractEvaluator( objectHandle )
+            case FHT_ARGUMENT_EVALUATOR => return getArgumentEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
             case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
@@ -252,21 +252,21 @@ class Deserializer( val fmlHandle : Int )
     }
     
     
-    private def buildAbstractSubtypeEvaluator( evaluator : SubtypeEvaluator )
+    private def buildArgumentSubtypeEvaluator( evaluator : SubtypeEvaluator )
     {
         
     }
 
-    def getAbstractEvaluator( objectHandle : Int ) : Evaluator =
+    def getArgumentEvaluator( objectHandle : Int ) : Evaluator =
     {
-        getTypedObject( objectHandle, FHT_ABSTRACT_EVALUATOR, classOf[AbstractEvaluator] ) match
+        getTypedObject( objectHandle, FHT_ARGUMENT_EVALUATOR, classOf[ArgumentEvaluator] ) match
         {
-            case s : Some[AbstractEvaluator] => s.get
+            case s : Some[ArgumentEvaluator] => s.get
             case None => {
                 getSubtypeEvaluator( objectHandle ) match
                 {
                     case s : Some[SubtypeEvaluator] => objects( objectHandle ) = s.get; s.get
-                    case None => addEvaluator( objectHandle, AbstractEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[AbstractEvaluator]
+                    case None => addEvaluator( objectHandle, ArgumentEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[ArgumentEvaluator]
                 }
             }
         }

@@ -42,22 +42,21 @@ object TestFieldml
         val real3Type : ContinuousType = region.getObject( "library.real.3d" )
     
         val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : AbstractEvaluator = region.getObject( "library.ensemble.rc.3d.variable" )
+        val real3IndexVariable : ArgumentEvaluator = region.getObject( "library.ensemble.rc.3d.variable" )
        
-        val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
-        val xi2dVar : AbstractEvaluator = region.getObject( "library.xi.2d.variable" )
+        val xi2dVar : ArgumentEvaluator = region.getObject( "library.xi.2d.variable" )
 
-        val meshType = region.createMeshType( "test.mesh.type", 2, xi2dType.componentType )
-        val meshVariable = region.createAbstractEvaluator( "test.mesh", meshType )
+        val meshType = region.createMeshType( "test.mesh.type", 2, 2 )
+        val meshVariable = region.createArgumentEvaluator( "test.mesh", meshType )
         val elementVariable = region.createSubtypeEvaluator( meshVariable, "element" )
         val xiVariable = region.createSubtypeEvaluator( meshVariable, "xi" )
 
         val nodes = region.createEnsembleType( "test.nodes.type", 6, false )
-        val nodesVariable = region.createAbstractEvaluator( "test.nodes", nodes )
+        val nodesVariable = region.createArgumentEvaluator( "test.nodes", nodes )
         
         val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable : AbstractEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.variable" )
-        val bilinearIndexVariable : AbstractEvaluator = region.getObject( "library.localNodes.2d.square2x2.variable" )
+        val bilinearParametersVariable : ArgumentEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.variable" )
+        val bilinearIndexVariable : ArgumentEvaluator = region.getObject( "library.localNodes.2d.square2x2.variable" )
         
         val firstInterpolator = region.createReferenceEvaluator( "test.interpolator_v1", "library.interpolator.2d.unit.bilinearLagrange", region )
         firstInterpolator.bind( xi2dVar -> xiVariable )

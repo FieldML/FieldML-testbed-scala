@@ -15,22 +15,22 @@ object TestDofVector
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes" )
         Fieldml_SetEnsembleElementRange( fml, nodesType, 1, 8, 1 )
         
-        val nodesVariable = Fieldml_CreateAbstractEvaluator( fml, "test.mesh_nodes.variable", nodesType )
+        val nodesVariable = Fieldml_CreateArgumentEvaluator( fml, "test.mesh_nodes.variable", nodesType )
         
-        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "library.localNodes.2d.square2x2.variable" )
+        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "localNodes.2d.square2x2.variable" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
+        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleElementRange( fml, meshType, 1, 3, 1 )
         
-        val meshVariable = Fieldml_CreateAbstractEvaluator( fml, "test.mesh.variable", meshType )
+        val meshVariable = Fieldml_CreateArgumentEvaluator( fml, "test.mesh.variable", meshType )
         val elementsVariable = Fieldml_GetObjectByName( fml, "test.mesh.variable.elements" )
         val xiVariable = Fieldml_GetObjectByName( fml, "test.mesh.variable.xi" )
 
-        val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
+        val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
@@ -45,8 +45,8 @@ object TestDofVector
         Fieldml_AddInlineData( fml, connectivityData, "2 3 6 7\n", 8 );
         Fieldml_AddInlineData( fml, connectivityData, "3 4 7 8", 8 );
         
-        val fieldValue = Fieldml_GetObjectByName( fml, "library.real.1d" )
-        val nodalParams = Fieldml_CreateParametersEvaluator( fml, "test.nodal_params", fieldValue )
+        val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
+        val nodalParams = Fieldml_CreateParameterEvaluator( fml, "test.nodal_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, nodalParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, nodalParams, nodesVariable )
 
@@ -59,7 +59,7 @@ object TestDofVector
         Fieldml_AddInlineData( fml, nodalData, "3 1.0 ", 6 )
         Fieldml_AddInlineData( fml, nodalData, "4 1.5 ", 6 )
         
-        val elementParams = Fieldml_CreateParametersEvaluator( fml, "test.element_params", fieldValue )
+        val elementParams = Fieldml_CreateParameterEvaluator( fml, "test.element_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, elementParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, elementParams, elementsVariable )
 
@@ -69,7 +69,7 @@ object TestDofVector
 
         Fieldml_AddInlineData( fml, elementData, "2 2.0 ", 6 )
 
-        val globalParams = Fieldml_CreateParametersEvaluator( fml, "test.global_params", fieldValue )
+        val globalParams = Fieldml_CreateParameterEvaluator( fml, "test.global_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, globalParams, DESCRIPTION_SEMIDENSE )
 
         val globalResource = Fieldml_CreateTextInlineDataResource( fml, "test.global_params.resource" )
@@ -78,11 +78,11 @@ object TestDofVector
 
         Fieldml_AddInlineData( fml, globalData, "3.0 ", 4 )
         
-        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "library.interpolator.2d.unit.bilinearLagrange" )
-        val bilinearEnsembleVariable = Fieldml_GetObjectByName( fml, "library.interpolator.2d.unit.bilinearLagrange" )
-        val bilinearParameters = Fieldml_GetObjectByName( fml, "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable = Fieldml_GetObjectByName( fml, "library.parameters.2d.bilinearLagrange.variable" )
-        val generic2d = Fieldml_GetObjectByName( fml, "library.xi.2d.variable" )
+        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "interpolator.2d.unit.bilinearLagrange" )
+        val bilinearEnsembleVariable = Fieldml_GetObjectByName( fml, "interpolator.2d.unit.bilinearLagrange" )
+        val bilinearParameters = Fieldml_GetObjectByName( fml, "parameters.2d.bilinearLagrange" )
+        val bilinearParametersVariable = Fieldml_GetObjectByName( fml, "parameters.2d.bilinearLagrange.variable" )
+        val generic2d = Fieldml_GetObjectByName( fml, "xi.2d.variable" )
         
         val bilinearNodalParams = Fieldml_CreateAggregateEvaluator( fml, "test.bilinear_nodal_params", bilinearParameters )
         Fieldml_SetIndexEvaluator( fml, bilinearNodalParams, 1, bilinearNodesVariable )
@@ -110,18 +110,18 @@ object TestDofVector
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes" )
         Fieldml_SetEnsembleElementRange( fml, nodesType, 1, 8, 1 )
         
-        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "library.localNodes.2d.square2x2.variable" )
+        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "localNodes.2d.square2x2.variable" )
         
-        val xiEnsemble = Fieldml_GetObjectByName( fml, "library.ensemble.xi.2d" )
+        val xiEnsemble = Fieldml_GetObjectByName( fml, "ensemble.xi.2d" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
+        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleElementRange( fml, meshType, 1, 3, 1 )
 
-        val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
+        val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
@@ -139,9 +139,9 @@ object TestDofVector
         val dofIndexType = Fieldml_CreateEnsembleType( fml, "test.dof_number" )
         Fieldml_SetEnsembleElementRange( fml, dofIndexType, 1, 6, 1 )
         
-        val fieldValue = Fieldml_GetObjectByName( fml, "library.real.1d" )
+        val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
 
-        val dofParams = Fieldml_CreateParametersEvaluator( fml, "test.dof_params", fieldValue )
+        val dofParams = Fieldml_CreateParameterEvaluator( fml, "test.dof_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
@@ -151,7 +151,7 @@ object TestDofVector
 
         Fieldml_AddInlineData( fml, dofData, "0.0 0.5 1.0 1.5 2.0 3.0 ", 24 )
         
-        val nodalIndexes = Fieldml_CreateParametersEvaluator( fml, "test.nodal_indexes", dofIndexType )
+        val nodalIndexes = Fieldml_CreateParameterEvaluator( fml, "test.nodal_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, nodalIndexes, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, nodalIndexes, nodesType )
         
@@ -164,7 +164,7 @@ object TestDofVector
         Fieldml_AddInlineData( fml, nodalIndexData, "3 4 ", 4 )
         Fieldml_AddInlineData( fml, nodalIndexData, "4 5 ", 4 )
         
-        val elementIndexes = Fieldml_CreateParametersEvaluator( fml, "test.element_indexes", dofIndexType )
+        val elementIndexes = Fieldml_CreateParameterEvaluator( fml, "test.element_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, elementIndexes, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, elementIndexes, elementsType )
         
@@ -174,7 +174,7 @@ object TestDofVector
 
         Fieldml_AddInlineData( fml, elementIndexData, "2 6 ", 4 )
 
-        val globalIndexes = Fieldml_CreateParametersEvaluator( fml, "test.global_indexes", dofIndexType )
+        val globalIndexes = Fieldml_CreateParameterEvaluator( fml, "test.global_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, globalIndexes, DESCRIPTION_SEMIDENSE )
         
         val globalIndexResource = Fieldml_CreateTextInlineDataResource( fml, "test.global_indexes.resource" )
@@ -195,9 +195,9 @@ object TestDofVector
         val bilinearNodalParams = Fieldml_CreateReferenceEvaluator( fml, "test.bilinear_nodal_params", nodalParams )
         Fieldml_SetBind( fml, bilinearNodalParams, nodesType, connectivity )
         
-        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "library.interpolator.2d.unit.bilinearLagrange" )
-        val bilinearParameters = Fieldml_GetObjectByName( fml, "library.parameters.2d.bilinearLagrange" )
-        val generic2d = Fieldml_GetObjectByName( fml, "library.xi.2d.variable" )
+        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "interpolator.2d.unit.bilinearLagrange" )
+        val bilinearParameters = Fieldml_GetObjectByName( fml, "parameters.2d.bilinearLagrange" )
+        val generic2d = Fieldml_GetObjectByName( fml, "xi.2d.variable" )
         
         val bilinearInterpolator = Fieldml_CreateReferenceEvaluator( fml, "test.bilinear_interpolator", bilinearEvaluator )
         Fieldml_SetBind( fml, bilinearInterpolator, generic2d, xiType )
@@ -220,18 +220,18 @@ object TestDofVector
         val nodesType = Fieldml_CreateEnsembleType( fml, "test.mesh_nodes" )
         Fieldml_SetEnsembleElementRange( fml, nodesType, 1, 8, 1 )
         
-        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "library.localNodes.2d.square2x2.variable" )
+        val bilinearNodesVariable = Fieldml_GetObjectByName( fml, "localNodes.2d.square2x2.variable" )
         
-        val xiEnsemble = Fieldml_GetObjectByName( fml, "library.ensemble.xi.2d" )
+        val xiEnsemble = Fieldml_GetObjectByName( fml, "ensemble.xi.2d" )
         
         val meshType = Fieldml_CreateMeshType( fml, "test.mesh" )
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "library.shape.square" )
+        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleElementRange( fml, meshType, 1, 3, 1 )
 
-        val connectivity = Fieldml_CreateParametersEvaluator( fml, "test.bilinear_connectivity", nodesType )
+        val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
@@ -249,9 +249,9 @@ object TestDofVector
         val dofIndexType = Fieldml_CreateEnsembleType( fml, "test.dof_number" )
         Fieldml_SetEnsembleElementRange( fml, dofIndexType, 1, 6, 1 )
         
-        val fieldValue = Fieldml_GetObjectByName( fml, "library.real.1d" )
+        val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
 
-        val dofParams = Fieldml_CreateParametersEvaluator( fml, "test.dof_params", fieldValue )
+        val dofParams = Fieldml_CreateParameterEvaluator( fml, "test.dof_params", fieldValue )
         Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_SEMIDENSE )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
@@ -264,7 +264,7 @@ object TestDofVector
         val dofTypeType = Fieldml_CreateEnsembleType( fml, "test.dof_type" )
         Fieldml_SetEnsembleElementRange( fml, dofTypeType, 1, 3, 1 )
         
-        val dofIndexes = Fieldml_CreateParametersEvaluator( fml, "test.dof_indexes", dofIndexType )
+        val dofIndexes = Fieldml_CreateParameterEvaluator( fml, "test.dof_indexes", dofIndexType )
         Fieldml_SetParameterDataDescription( fml, dofIndexes, DESCRIPTION_SEMIDENSE )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, dofTypeType )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, nodesType )
@@ -351,9 +351,9 @@ object TestDofVector
         val bilinearNodalParams = Fieldml_CreateReferenceEvaluator( fml, "test.bilinear_nodal_params", nodalParams )
         Fieldml_SetBind( fml, bilinearNodalParams, nodesType, connectivity )
         
-        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "library.interpolator.2d.unit.bilinearLagrange" )
-        val bilinearParameters = Fieldml_GetObjectByName( fml, "library.parameters.2d.bilinearLagrange" )
-        val generic2d = Fieldml_GetObjectByName( fml, "library.xi.2d.variable" )
+        val bilinearEvaluator = Fieldml_GetObjectByName( fml, "interpolator.2d.unit.bilinearLagrange" )
+        val bilinearParameters = Fieldml_GetObjectByName( fml, "parameters.2d.bilinearLagrange" )
+        val generic2d = Fieldml_GetObjectByName( fml, "xi.2d.variable" )
         
         val bilinearInterpolator = Fieldml_CreateReferenceEvaluator( fml, "test.bilinear_interpolator", bilinearEvaluator )
         Fieldml_SetBind( fml, bilinearInterpolator, generic2d, xiType )

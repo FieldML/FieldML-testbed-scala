@@ -5,14 +5,14 @@ import scala.collection.mutable.Stack
 import fieldml.valueType.ValueType
 import fieldml.FieldmlObject
 import fieldml.evaluator.Evaluator
-import fieldml.evaluator.AbstractEvaluator
+import fieldml.evaluator.ArgumentEvaluator
 
 import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class AbstractEvaluatorValueSource( name : String, valueType : ValueType, explicitVariables : AbstractEvaluator* )
-    extends AbstractEvaluator( name, valueType, explicitVariables:_* )
+class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, explicitVariables : ArgumentEvaluator* )
+    extends ArgumentEvaluator( name, valueType, explicitVariables:_* )
     with ValueSource
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
