@@ -127,14 +127,14 @@
   </ArgumentEvaluator>
 
 
-  <AggregateEvaluator name="deformed_mesh.coordinates.template" valueType="library.coordinates.rc.3d">
+  <AggregateEvaluator name="deformed_mesh.coordinates" valueType="library.coordinates.rc.3d">
    <Arguments>
      <Argument name="deformed_mesh.mesh.argument" />
      <Argument name="deformed_mesh.nodal_component_dofs" />
    </Arguments>
    <Bindings>
      <BindIndex argument="deformed_mesh.rc3.component" indexNumber="1"/>
-     <Bind argument="deformed_mesh.nodal_dofs" source="deformed_mesh.nodal_component_dofs"/>
+     <Bind argument="deformed_mesh.nodal_dofs" source="deformed_mesh.node.coordinates"/>
    </Bindings>
    <ComponentEvaluators>
     <ComponentEvaluator component="1" evaluator="deformed_mesh.template.bilinearSimplex" />
@@ -142,14 +142,6 @@
     <ComponentEvaluator component="3" evaluator="deformed_mesh.template.bilinearSimplex" />
    </ComponentEvaluators>
   </AggregateEvaluator>
-  
-  <ReferenceEvaluator name="deformed_mesh.coordinates" evaluator="deformed_mesh.coordinates.template">
-   <Arguments>
-     <Argument name="deformed_mesh.mesh.argument" />
-   </Arguments>
-   <Bindings>
-    <Bind argument="deformed_mesh.nodal_component_dofs" source="deformed_mesh.node.coordinates" />
-   </Bindings>
-  </ReferenceEvaluator>
+
   </Region>
 </Fieldml>

@@ -157,14 +157,14 @@
   </ArgumentEvaluator>
 
 
-  <AggregateEvaluator name="heart.coordinates.template" valueType="rc3.type">
+  <AggregateEvaluator name="heart.coordinates" valueType="rc3.type">
    <Arguments>
      <Argument name="heart.mesh.argument" />
      <Argument name="heart.nodal_component_dofs" />
    </Arguments>
    <Bindings>
      <BindIndex argument="heart.rc3.component" indexNumber="1"/>
-     <Bind argument="heart.nodal_dofs" source="heart.nodal_component_dofs"/>
+     <Bind argument="heart.nodal_dofs" source="heart.node.coordinates"/>
    </Bindings>
    <ComponentEvaluators>
     <ComponentEvaluator component="1" evaluator="heart.template.triquadratic" />
@@ -172,15 +172,6 @@
     <ComponentEvaluator component="3" evaluator="heart.template.triquadratic" />
    </ComponentEvaluators>
   </AggregateEvaluator>
-  
-  <ReferenceEvaluator name="heart.coordinates" evaluator="heart.coordinates.template">
-   <Arguments>
-     <Argument name="heart.mesh.argument" />
-   </Arguments>
-   <Bindings>
-    <Bind argument="heart.nodal_component_dofs" source="heart.node.coordinates" />
-   </Bindings>
-  </ReferenceEvaluator>
 
  </Region>
 </Fieldml>

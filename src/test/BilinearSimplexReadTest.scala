@@ -23,21 +23,20 @@ object BilinearSimplexReadTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        /*
         val regionName = "deformed_mesh"
         val fileName = "input\\DeformedMesh000.xml"
         val meshTypeName = "deformed_mesh.mesh.type"
         val meshArgumentName = "deformed_mesh.mesh.argument"
-        val meshCoordinatesName = "deformed_mesh.coordinates"
+        val meshCoordinatesName = "deformed_mesh.coordinates.template"//"deformed_mesh.coordinates"
         val outputName = "collada deformed mesh.xml"
-          */  
+        /*
         val regionName = "fullbiv_mesh"
         val fileName = "input\\UPFMean_FullBiV.xml"
         val meshTypeName = "full_biv_mesh.mesh.type"
         val meshArgumentName = "full_biv_mesh.mesh.argument"
         val meshCoordinatesName = "full_biv_mesh.coordinates"
         val outputName = "collada full_biv mesh.xml"
-            
+          */  
             
         val region = UserRegion.fromFile( regionName, fileName )
 
