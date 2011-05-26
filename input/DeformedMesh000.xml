@@ -2,10 +2,10 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="Fieldml_0.4.xsd">
+  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/fieldml.xsd">
  <Region name="deformed_mesh">
 
-  <Import location="library.xml" region="library">
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/fieldml_library.xml" region="library">
     <ImportType localName="library.real.1d" remoteName="real.1d"/>
     <ImportType localName="library.parameters.2d.unit.bilinearSimplex" remoteName="parameters.2d.unit.bilinearSimplex"/>
     <ImportType localName="library.coordinates.rc.3d" remoteName="coordinates.rc.3d"/>

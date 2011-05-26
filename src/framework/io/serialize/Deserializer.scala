@@ -40,7 +40,6 @@ class Deserializer( val fmlHandle : Int )
             case FHT_ARGUMENT_EVALUATOR => return getArgumentEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
-            case FHT_ELEMENT_SEQUENCE => return null
             case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }

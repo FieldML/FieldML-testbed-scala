@@ -2,10 +2,10 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="Fieldml_0.3.xsd">
+  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/fieldml.xsd">
  <Region name="heart">
  
-  <Import location="library.xml" region="library">
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/fieldml_library.xml" region="library">
     <ImportType localName="real.type" remoteName="real.1d"/>
     <ImportType localName="triquadratic.parameters.type" remoteName="parameters.3d.unit.triquadraticLagrange"/>
     <ImportType localName="rc3.ensemble" remoteName="coordinates.rc.3d.component"/>

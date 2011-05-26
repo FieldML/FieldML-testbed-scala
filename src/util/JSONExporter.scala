@@ -43,6 +43,17 @@ object JSONExporter
         string.append( ", " )
         string.append( z )
     }
+    
+    
+    private def addInt( string : StringBuilder, x : Int )
+    {
+        if( string.length > 0 )
+        {
+            string.append( ", " )
+            string.append( "\n" )
+        }
+        string.append( x )
+    }
 
     
     private def buildJson( pairs : Pair[String, String]* ) : String =
@@ -74,7 +85,7 @@ object JSONExporter
         val meshType = meshVariable.valueType.asInstanceOf[MeshType]
         val meshEvaluator : Evaluator = region.getObject( evaluatorName )
         val elementCount = meshType.elementType.elementCount
-
+        
         val coords = new StringBuilder()
         val verts = new StringBuilder()
         

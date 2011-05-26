@@ -350,7 +350,7 @@ object ParameterEvaluatorSerializer
         {
             denseIndexes( i - 1 ) = source.getEvaluator( Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 0 ) )
             val indexType = Fieldml_GetValueType( source.fmlHandle, Fieldml_GetSemidenseIndexEvaluator( source.fmlHandle, objectHandle, i, 0 ) );
-            val ensembleCount = Fieldml_GetElementCount( source.fmlHandle, indexType );
+            val ensembleCount = Fieldml_GetMemberCount( source.fmlHandle, indexType );
             
             denseOrders( i - 1 ) = Fieldml_GetSemidenseIndexOrder( source.fmlHandle, objectHandle, i ) match
             {

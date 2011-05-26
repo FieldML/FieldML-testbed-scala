@@ -31,7 +31,7 @@ object EnsembleTypeSerializer
         if( elementArray.size == ( max - min ) + 1 )
         {
             //Trivial case. n elements with a stride of 1.
-            Fieldml_SetEnsembleElementRange( handle, objectHandle, min, max, stride )
+            Fieldml_SetEnsembleMembersRange( handle, objectHandle, min, max, stride )
             return
         }
         
@@ -60,7 +60,7 @@ object EnsembleTypeSerializer
     {
         val entries = new Array[Int]( 3 )
 
-        val count = Fieldml_GetElementCount( source.fmlHandle, objectHandle )
+        val count = Fieldml_GetMemberCount( source.fmlHandle, objectHandle )
         
         val membersType = Fieldml_GetEnsembleMembersType( source.fmlHandle, objectHandle )
         

@@ -310,7 +310,7 @@ object UserRegion
         val region = new UserRegion( name, imports.toArray[Pair[String, String]] )
         val fmlHandle = Fieldml_Create( "", name )
         
-        val importId = Fieldml_AddImportSource( fmlHandle, "library.xml", "library" )
+        val importId = Fieldml_AddImportSource( fmlHandle, "http://www.fieldml.org/resources/xml/0.4/fieldml_library.xml", "library" )
         
         for( p <- imports )
         {
