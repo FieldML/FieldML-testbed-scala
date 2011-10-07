@@ -2,10 +2,10 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/fieldml.xsd">
+  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/FieldML_0.4.xsd">
  <Region name="heart">
  
-  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/fieldml_library.xml" region="library">
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
     <ImportType localName="real.type" remoteName="real.1d"/>
     <ImportType localName="triquadratic.parameters.type" remoteName="parameters.3d.unit.triquadraticLagrange"/>
     <ImportType localName="rc3.ensemble" remoteName="coordinates.rc.3d.component"/>
@@ -18,27 +18,30 @@
   </Import>
   
 
-  <TextFileResource name="heart.connectivity.resource" xlink:href="heart.connectivity">
-    <TextDataSource name="heart.connectivity.data" firstLine="1" count="60" length="27" head="0" tail="0" />
-  </TextFileResource>
+  <DataResource name="heart.connectivity.resource">
+    <DataResourceDescription>
+      <DataResourceHref xlink:href="heart.connectivity" format="PLAIN_TEXT"/>
+    </DataResourceDescription>
+    <ArrayDataSource name="heart.connectivity.data" location="1" rank="2">
+      <RawArraySize>
+        60 27
+      </RawArraySize>
+    </ArrayDataSource>
+  </DataResource>
   
   
-  <TextFileResource name="heart.node.coordinates.resource" xlink:href="heart.node.coordinates">
-    <TextDataSource name="heart.node.coordinates.data" firstLine="1" count="633" length="3" head="0" tail="0" />
-  </TextFileResource>
+  <DataResource name="heart.node.coordinates.resource">
+    <DataResourceDescription>
+      <DataResourceHref xlink:href="heart.node.coordinates" format="PLAIN_TEXT"/>
+    </DataResourceDescription>
+    <ArrayDataSource name="heart.node.coordinates.data" location="1" rank="2">
+      <RawArraySize>
+        633 3
+      </RawArraySize>
+    </ArrayDataSource>
+  </DataResource>
   
   
-  <TextInlineResource name="heart.element.ordering.resource">
-    <TextString>
-         31 32 33 34 35 36 37 38 39 40
-        41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
-        1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
-        21 22 23 24 25 26 27 28 29 30
-    </TextString>
-    <TextDataSource name="heart.element.ordering" firstLine="1" count="1" length="60" />
-  </TextInlineResource>
-
-
   <EnsembleType name="heart.nodes.type">
    <Members>
     <MemberRange min="1" max="633" />
@@ -48,22 +51,10 @@
 
   <ArgumentEvaluator name="heart.nodes.argument" valueType="heart.nodes.type" />
   
-  <TextInlineResource name="heart.mesh.element.resource">
-    <TextString>
-        1 15 1
-        16 30 1
-        31 60 2
-        32 60 2
-    </TextString>
-    <TextDataSource name="heart.mesh.element.data" firstLine="1" count="4" length="3" />
-  </TextInlineResource>
-
-
   <MeshType name="heart.mesh.type">
    <Elements name="element">
      <Members>
-<!--     <MemberRange min="1" max="60"/>  -->
-       <MemberStrideRangeData count="60" data="heart.mesh.element.data"/>
+       <MemberRange min="1" max="60"/>
      </Members>
    </Elements>
    <Chart name="xi">
@@ -80,12 +71,12 @@
      <Argument name="triquadratic.node.argument" />
      <Argument name="heart.mesh.argument" />
    </Arguments>
-   <SemidenseData data="heart.connectivity.data">
+   <DenseArrayData data="heart.connectivity.data">
     <DenseIndexes>
+     <IndexEvaluator evaluator="heart.mesh.argument.element" />
      <IndexEvaluator evaluator="triquadratic.node.argument" />
-     <IndexEvaluator evaluator="heart.mesh.argument.element" order="heart.element.ordering" />
     </DenseIndexes>
-   </SemidenseData>
+   </DenseArrayData>
   </ParameterEvaluator>
 
 
@@ -140,12 +131,12 @@
      <Argument name="heart.rc3.component" />
      <Argument name="heart.nodes.argument" />
    </Arguments>
-   <SemidenseData data="heart.node.coordinates.data">
+   <DenseArrayData data="heart.node.coordinates.data">
     <DenseIndexes>
-     <IndexEvaluator evaluator="heart.rc3.component" />
      <IndexEvaluator evaluator="heart.nodes.argument" />
+     <IndexEvaluator evaluator="heart.rc3.component" />
     </DenseIndexes>
-   </SemidenseData>
+   </DenseArrayData>
   </ParameterEvaluator>
 
 

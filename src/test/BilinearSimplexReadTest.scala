@@ -23,12 +23,24 @@ object BilinearSimplexReadTest
 {
     def main( argv : Array[String] ) : Unit =
     {
+        /*
+        val regionName = "heart"
+        val fileName = "input\\heart.xml"
+        val meshTypeName = "heart.mesh.type"
+        val meshArgumentName = "heart.mesh.argument"
+        val meshCoordinatesName = "heart.coordinates"
+        val outputName = "collada deformed mesh.xml"
+        val exporter = ColladaExporter.export3DFromFieldML
+        */
+
         val regionName = "deformed_mesh"
         val fileName = "input\\DeformedMesh000.xml"
         val meshTypeName = "deformed_mesh.mesh.type"
         val meshArgumentName = "deformed_mesh.mesh.argument"
-        val meshCoordinatesName = "deformed_mesh.coordinates.template"//"deformed_mesh.coordinates"
+        val meshCoordinatesName = "deformed_mesh.coordinates"
         val outputName = "collada deformed mesh.xml"
+        val exporter = ColladaExporter.export2DTrisFromFieldML _
+
         /*
         val regionName = "fullbiv_mesh"
         val fileName = "input\\UPFMean_FullBiV.xml"
@@ -36,7 +48,8 @@ object BilinearSimplexReadTest
         val meshArgumentName = "full_biv_mesh.mesh.argument"
         val meshCoordinatesName = "full_biv_mesh.coordinates"
         val outputName = "collada full_biv mesh.xml"
-          */  
+        val exporter = ColladaExporter.export2DTrisFromFieldML _
+        */
             
         val region = UserRegion.fromFile( regionName, fileName )
 
@@ -45,20 +58,20 @@ object BilinearSimplexReadTest
 
         val coordinates : Evaluator = region.getObject( meshCoordinatesName )
         
-        region.bind( meshArgument, 100, 0.5, 0.5 )
+        region.bind( meshArgument, 20, 0.5, 0.5, 0.5 )
 
         println( "*** aggregate = " + region.evaluate( coordinates ) )
 
-        val colladaXml = ColladaExporter.export2DTrisFromFieldML( region, 1, meshArgumentName, meshCoordinatesName )
+        val colladaXml = exporter( region, 1, meshArgumentName, meshCoordinatesName )
         
         val f = new FileWriter( outputName )
         f.write( colladaXml )
         f.close()
         
-        val json = JSONExporter.export2DTrisFromFieldML( region, meshArgumentName, meshCoordinatesName )
+//        val json = JSONExporter.export2DTrisFromFieldML( region, meshArgumentName, meshCoordinatesName )
         
-        val jsonFile = new FileWriter( "WebGL/test3_full_biv000.json" )
-        jsonFile.write( json )
-        jsonFile.close()
+//        val jsonFile = new FileWriter( "WebGL/test3_biv000.json" )
+//        jsonFile.write( json )
+//        jsonFile.close()
     }
 }

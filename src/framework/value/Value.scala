@@ -16,22 +16,12 @@ abstract class Value( val vType : ValueType )
 
 object Value
 {
-    def apply( vType : ValueType, value : Int ) : Value =
-    {
-        vType match
-        {
-            case t : EnsembleType => new EnsembleValue( t, value )
-            case t : ContinuousType => new ContinuousValue( t, value )
-            case _ => throw new FmlException( "Cannot create a " + vType.name + " value with " + value )
-        }
-    }
-
-
     def apply( vType : ValueType, values : Double* ) : Value =
     {
         vType match
         {
-            case t : ContinuousType => new ContinuousValue( t, values: _* )
+            case t : EnsembleType => EnsembleValue( t, values: _* )
+            case t : ContinuousType => ContinuousValue( t, values: _* )
             case _ => throw new FmlException( "Cannot create a " + vType.name + " value with " + values )
         }
     }

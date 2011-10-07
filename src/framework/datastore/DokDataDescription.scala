@@ -9,7 +9,7 @@ import fieldml.valueType.EnsembleType
 
 import framework.value.Value
 
-class SemidenseDataDescription( valueType : ValueType, val denseOrders : Array[Array[Int]], val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
+class DokDataDescription( valueType : ValueType, val denseOrders : Array[Array[Int]], val denseIndexes : Array[Evaluator], val sparseIndexes : Array[Evaluator] )
     extends DataDescription( valueType )
 {
     def this( valueType : ValueType, denseIndexes : Array[Evaluator], sparseIndexes : Array[Evaluator] ) =

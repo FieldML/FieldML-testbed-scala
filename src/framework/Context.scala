@@ -12,17 +12,17 @@ import valuesource._
 
 import util.exception._
 
-class Context( initialBinds : Seq[Tuple2[Evaluator, Evaluator]] )
+class Context( val location : String, initialBinds : Seq[Tuple2[Evaluator, Evaluator]] )
 {
-    def this()
+    def this( location : String )
     {
-        this( Seq[Tuple2[Evaluator, Evaluator]]() )
+        this( location, Seq[Tuple2[Evaluator, Evaluator]]() )
     }
     
     
-    def this( otherContext : Context )
+    def this( location : String, otherContext : Context )
     {
-        this( otherContext.binds.toSeq )
+        this( location, otherContext.binds.toSeq )
     }
     
     private val binds = Map[Evaluator, Evaluator]( initialBinds:_* )

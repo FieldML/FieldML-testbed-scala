@@ -28,3 +28,12 @@ class ContinuousValue( valueType : ContinuousType, val value : Array[Double] )
         return string.toString
     }
 }
+
+
+object ContinuousValue
+{
+    def apply( vType : ContinuousType, values : Double* ) : Value =
+    {
+        new ContinuousValue( vType, values.toArray )
+    }
+}

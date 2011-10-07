@@ -14,7 +14,7 @@ class ReferenceEvaluatorValueSource( name : String, refEvaluator : Evaluator )
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        state.pushAndApply( binds.toSeq )
+        state.pushAndApply( name, binds.toSeq )
         
         val v = refEvaluator.evaluate( state )
         

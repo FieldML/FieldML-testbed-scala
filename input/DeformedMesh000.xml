@@ -2,10 +2,10 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/fieldml.xsd">
+  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/FieldML_0.4.xsd">
  <Region name="deformed_mesh">
 
-  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/fieldml_library.xml" region="library">
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
     <ImportType localName="library.real.1d" remoteName="real.1d"/>
     <ImportType localName="library.parameters.2d.unit.bilinearSimplex" remoteName="parameters.2d.unit.bilinearSimplex"/>
     <ImportType localName="library.coordinates.rc.3d" remoteName="coordinates.rc.3d"/>
@@ -17,10 +17,27 @@
     <ImportEvaluator localName="library.localNodes.2d.triangle3.argument" remoteName="localNodes.2d.triangle3.argument"/>
   </Import>
 
-  <TextFileResource name="vtk.resource" xlink:href="DeformedMesh000.vtk">
-    <TextDataSource name="point.coordinates" firstLine="6" count="2677" length="3" head="0" tail="0" />
-    <TextDataSource name="element.points" firstLine="900" count="5350" length="3" head="1" tail="0" />
-  </TextFileResource>
+  <DataResource name="vtk.resource">
+    <DataResourceDescription>
+      <DataResourceHref xlink:href="DeformedMesh000.vtk" format="PLAIN_TEXT"/>
+    </DataResourceDescription>
+    <ArrayDataSource name="point.coordinates" location="6" rank="2">
+      <RawArraySize>
+        2677 3
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="element.points" location="900" rank="2">
+      <RawArraySize>
+        5350 4
+      </RawArraySize>
+      <ArrayDataOffset>
+        0 1
+      </ArrayDataOffset>
+      <ArrayDataSize>
+        5350 3
+      </ArrayDataSize>
+    </ArrayDataSource>
+  </DataResource>
 
   <EnsembleType name="deformed_mesh.nodes.type">
    <Members>
@@ -50,12 +67,12 @@
      <Argument name="library.localNodes.2d.triangle3.argument" />
      <Argument name="deformed_mesh.mesh.argument" />
    </Arguments>
-   <SemidenseData data="element.points">
+   <DenseArrayData data="element.points">
     <DenseIndexes>
-     <IndexEvaluator evaluator="library.localNodes.2d.triangle3.argument" />
      <IndexEvaluator evaluator="deformed_mesh.mesh.argument.element" />
+     <IndexEvaluator evaluator="library.localNodes.2d.triangle3.argument" />
     </DenseIndexes>
-   </SemidenseData>
+   </DenseArrayData>
   </ParameterEvaluator>
 
 
@@ -110,12 +127,12 @@
      <Argument name="deformed_mesh.rc3.component" />
      <Argument name="deformed_mesh.nodes.argument" />
    </Arguments>
-   <SemidenseData data="point.coordinates">
+   <DenseArrayData data="point.coordinates">
     <DenseIndexes>
-     <IndexEvaluator evaluator="deformed_mesh.rc3.component" />
      <IndexEvaluator evaluator="deformed_mesh.nodes.argument" />
+     <IndexEvaluator evaluator="deformed_mesh.rc3.component" />
     </DenseIndexes>
-   </SemidenseData>
+   </DenseArrayData>
   </ParameterEvaluator>
 
 

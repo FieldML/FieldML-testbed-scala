@@ -44,7 +44,7 @@ abstract class Region( val name : String )
     {
         val state = new EvaluationState()
         
-        state.pushAndApply( binds.toSeq )
+        state.pushAndApply( "Region " + name, binds.toSeq )
         
         val v = evaluator.evaluate( state )
         

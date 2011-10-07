@@ -14,7 +14,7 @@ class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        state.pushAndApply( binds.toSeq )
+        state.pushAndApply( name, binds.toSeq )
         
         val value = for(
             key <- index.evaluate( state );
@@ -23,6 +23,13 @@ class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index
             ) yield v
 
         state.pop()
+
+        if( value == None )
+        {
+            val key = index.evaluate( state );
+            val eval = delegations.get( key.get.eValue );
+            println( "eval failed " + key + " in " + name )
+        }
         
         return value
     }

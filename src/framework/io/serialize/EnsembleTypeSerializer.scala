@@ -84,7 +84,12 @@ object EnsembleTypeSerializer
                 case MEMBER_RANGE_DATA => 2
                 case MEMBER_STRIDE_RANGE_DATA => 3
             }
-            var result = Fieldml_ReadIntValues( source.fmlHandle, streamHandle, entries, count )
+            val offsets = new Array[Int]( 1 );
+            val sizes = new Array[Int]( 1 );
+            
+            offsets( 0 ) = 0
+            sizes( 0 ) = count
+            var result = Fieldml_ReadIntSlab( source.fmlHandle, streamHandle, offsets, sizes, entries )
             
             while( result == count )
             {
@@ -95,7 +100,9 @@ object EnsembleTypeSerializer
                     case MEMBER_STRIDE_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), entries( 2 ) )
                 }
                 
-                result = Fieldml_ReadIntValues( source.fmlHandle, streamHandle, entries, count )
+                offsets( 0 ) += count
+                
+                result = Fieldml_ReadIntSlab( source.fmlHandle, streamHandle, offsets, sizes, entries )
             }
             
             Fieldml_CloseReader( source.fmlHandle, streamHandle )

@@ -24,7 +24,7 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
         
         val indexValues = ( for( i <- 1 to indexType.elementCount ) yield new EnsembleValue( indexType, i ) ).toArray
         
-        state.pushAndApply( binds.toSeq ++ indexBinds.toSeq.map( ( t : Tuple2[Int, Evaluator] ) => Tuple2[Evaluator, Evaluator]( t._2, indexEvaluator ) ) )
+        state.pushAndApply( name, binds.toSeq ++ indexBinds.toSeq.map( ( t : Tuple2[Int, Evaluator] ) => Tuple2[Evaluator, Evaluator]( t._2, indexEvaluator ) ) )
 
         val values = for( i <- indexValues;
              e <- componentEvaluators.get( i.eValue );

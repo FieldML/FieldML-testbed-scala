@@ -9,7 +9,7 @@ import util.exception.FmlException
 
 import util.TupleToArray
 
-abstract class DataDescription( valueType : ValueType )
+abstract class DataDescription( val valueType : ValueType )
 {
     def indexEvaluators : Array[Evaluator]
     
