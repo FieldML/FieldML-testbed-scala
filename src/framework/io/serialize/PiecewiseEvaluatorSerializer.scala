@@ -52,7 +52,7 @@ object PiecewiseEvaluatorSerializer
         {
             piecewiseEval.setDefault( source.getEvaluator( defaultEval ) )
         }
-        
+
         val evalCount = Fieldml_GetEvaluatorCount( source.fmlHandle, objectHandle )
         for( i <- 1 to evalCount )
         {

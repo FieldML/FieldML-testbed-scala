@@ -123,7 +123,7 @@
    <IndexEvaluators>
      <IndexEvaluator evaluator="heart.mesh.argument.element" indexNumber="1" />
    </IndexEvaluators>
-   <EvaluatorMap defaultEvaluator="heart.triquadratic_lagrange" />
+   <EvaluatorMap default="heart.triquadratic_lagrange" />
   </PiecewiseEvaluator>
 
 

@@ -1,5 +1,5 @@
 package fieldml
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ArrayBuffer
 
 class DataResource( name : String )
     extends FieldmlObject( name )

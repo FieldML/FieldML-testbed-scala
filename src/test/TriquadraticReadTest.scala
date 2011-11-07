@@ -17,7 +17,7 @@ object TriquadraticReadTest
 {
     def main( argv : Array[String] ) : Unit =
     {
-        val configStrings = Tuple4( "input\\triquadratic heart test.xml", "heart.mesh.type", "heart.mesh.argument", "heart.coordinates" )
+        val configStrings = Tuple4( "input/triquadratic heart test.xml", "heart.mesh.type", "heart.mesh.argument", "heart.coordinates" )
         
         // configStrings = Tuple4( "input\\StaticAdvectionDiffusion.xml", "static_advection_diffusion.mesh", "static_advection_diffusion.mesh.argument", "static_advection_diffusion.geometric" )
         
