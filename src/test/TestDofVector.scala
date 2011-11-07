@@ -23,8 +23,11 @@ object TestDofVector
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleMembersRange( fml, meshType, 1, 3, 1 )
+        
+        val booleanType = Fieldml_CreateBooleanType( fml, "boolean" )
+        val boundsEvaluator = Fieldml_CreateExternalEvaluator( fml, "shape.square", booleanType )
+        Fieldml_SetMeshShapes( fml, meshType, boundsEvaluator )
         
         val meshVariable = Fieldml_CreateArgumentEvaluator( fml, "test.mesh.variable", meshType )
         val elementsVariable = Fieldml_GetObjectByName( fml, "test.mesh.variable.elements" )
@@ -125,9 +128,12 @@ object TestDofVector
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleMembersRange( fml, meshType, 1, 3, 1 )
 
+        val booleanType = Fieldml_CreateBooleanType( fml, "boolean" )
+        val boundsEvaluator = Fieldml_CreateExternalEvaluator( fml, "shape.square", booleanType )
+        Fieldml_SetMeshShapes( fml, meshType, boundsEvaluator )
+        
         val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
@@ -243,9 +249,12 @@ object TestDofVector
         val xiType = Fieldml_CreateMeshChartType( fml, meshType, "test.mesh.xi" )
         Fieldml_CreateContinuousTypeComponents( fml, xiType, "test.mesh.xi.components", 2 )
         val elementsType = Fieldml_CreateMeshElementsType( fml, meshType, "test.mesh.elements" )
-        Fieldml_SetMeshDefaultShape( fml, meshType, "shape.square" )
         Fieldml_SetEnsembleMembersRange( fml, meshType, 1, 3, 1 )
 
+        val booleanType = Fieldml_CreateBooleanType( fml, "boolean" )
+        val boundsEvaluator = Fieldml_CreateExternalEvaluator( fml, "shape.square", booleanType )
+        Fieldml_SetMeshShapes( fml, meshType, boundsEvaluator )
+        
         val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
         Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_DENSE_ARRAY )

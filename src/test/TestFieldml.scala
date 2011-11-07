@@ -64,9 +64,11 @@ object TestFieldml
         val secondInterpolator = region.createReferenceEvaluator( "test.interpolator_v2", "library.interpolator.2d.unit.bilinearLagrange", region )
         secondInterpolator.bind( xi2dVar -> xiVariable )
         
-        val parameterDescription = new SemidenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ), Array() )
+        val parameterDescription = new DenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ) )
         val parameterSource = region.createTextFileResource( "test.parameters.resource", "test_fieldml_nodal_params" )
-        val parameterData = region.createTextDataSource( "test.parameters.data", parameterSource, 1, 6, 3, 0, 0 )
+        val parameterData = region.createArrayDataSource( "test.parameters.data", parameterSource, "1", 2 )
+        parameterData.rawSizes = Array( 6, 3 )
+        parameterData.sizes = Array( 6, 3 )
         val parameters = region.createParameterEvaluator( "test.parameters", realType, parameterData, parameterDescription )
         
         parameters( 1 ) = ( 0.0, 0.0, 1.0 )
@@ -80,9 +82,11 @@ object TestFieldml
         println( "Parameters( 2 ) = " + parameters( 2 ) )
         println( "Parameters( 1 ) = " + parameters( 1 ) )
         
-        val connectivityDescription = new SemidenseDataDescription( nodes, Array( bilinearIndexVariable, elementVariable ), Array() )
+        val connectivityDescription = new DenseDataDescription( nodes, Array( bilinearIndexVariable, elementVariable ) )
         val connectivitySource = region.createTextFileResource( "test.connectivity.resource", "test_fieldml_connectivity" )
-        val connectivityData = region.createTextDataSource( "test.connectivity.data", connectivitySource, 1, 2, 4, 0, 0 )
+        val connectivityData = region.createArrayDataSource( "test.connectivity.data", connectivitySource, "1", 2 )
+        connectivityData.rawSizes = Array( 2, 4 )
+        connectivityData.sizes = Array( 2, 4 )
         val connectivity = region.createParameterEvaluator( "test.connectivity", nodes, connectivityData, connectivityDescription )
         
         connectivity( 1 ) = ( 1, 4, 2, 5 )

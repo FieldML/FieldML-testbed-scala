@@ -10,6 +10,8 @@ abstract class Value( val vType : ValueType )
     
     def eValue : Int = throw new FmlException( "Value type " + vType + " is not ensemble-valued" )
     
+    def bValue : Boolean = throw new FmlException( "Value type " + vType + " is not boolean-valued" )
+    
     def subvalue( name : String ) : Value = throw new FmlException( "Value type " + vType + " is not structured" )
 }
 
@@ -23,6 +25,15 @@ object Value
             case t : EnsembleType => EnsembleValue( t, values: _* )
             case t : ContinuousType => ContinuousValue( t, values: _* )
             case _ => throw new FmlException( "Cannot create a " + vType.name + " value with " + values )
+        }
+    }
+
+    def apply( vType : ValueType, value : Boolean ) : Value =
+    {
+        vType match
+        {
+            case t : BooleanType => BooleanValue( t, value )
+            case _ => throw new FmlException( "Cannot create a " + vType.name + " value with " + value )
         }
     }
 }

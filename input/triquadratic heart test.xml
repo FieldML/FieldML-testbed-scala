@@ -2,7 +2,7 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/FieldML_0.4.xsd">
+  xsi:noNamespaceSchemaLocation="http://api.fieldml.googlecode.com/hg/Fieldml.xsd">
  <Region name="heart">
  
   <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
@@ -10,6 +10,7 @@
     <ImportType localName="triquadratic.parameters.type" remoteName="parameters.3d.unit.triquadraticLagrange"/>
     <ImportType localName="rc3.ensemble" remoteName="coordinates.rc.3d.component"/>
     <ImportType localName="rc3.type" remoteName="coordinates.rc.3d"/>
+    <ImportType localName="boolean" remoteName="boolean"/>
 
     <ImportEvaluator localName="triquadratic.node.argument" remoteName="localNodes.3d.cube3x3x3.argument"/>
     <ImportEvaluator localName="triquadratic.parameters.argument" remoteName="parameters.3d.unit.triquadraticLagrange.argument"/>
@@ -51,6 +52,8 @@
 
   <ArgumentEvaluator name="heart.nodes.argument" valueType="heart.nodes.type" />
   
+  <ExternalEvaluator name="shape.unit.cube" valueType="boolean" />
+  
   <MeshType name="heart.mesh.type">
    <Elements name="element">
      <Members>
@@ -60,7 +63,7 @@
    <Chart name="xi">
      <Components name="heart.mesh.type.chart.components" count="3"/>
    </Chart>
-   <Shapes default="shape.cube" />
+   <Shapes evaluator="shape.unit.cube"/>
   </MeshType>
   
   <ArgumentEvaluator name="heart.mesh.argument" valueType="heart.mesh.type" />
@@ -120,7 +123,7 @@
    <IndexEvaluators>
      <IndexEvaluator evaluator="heart.mesh.argument.element" indexNumber="1" />
    </IndexEvaluators>
-   <ElementEvaluators default="heart.triquadratic_lagrange" />
+   <EvaluatorMap defaultEvaluator="heart.triquadratic_lagrange" />
   </PiecewiseEvaluator>
 
 

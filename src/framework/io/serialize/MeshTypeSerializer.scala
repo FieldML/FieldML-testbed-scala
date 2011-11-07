@@ -24,17 +24,6 @@ object MeshTypeSerializer
         val elementsHandle = Fieldml_CreateMeshElementsType( handle, objectHandle, valueType.elementType.name )
 
         EnsembleTypeSerializer.insertElements( handle, elementsHandle, valueType.elementType )
-        
-        valueType.shapes.default match
-        {
-            case s : Some[String] => Fieldml_SetMeshDefaultShape( handle, objectHandle, s.get )
-            case _ =>
-        }
-        
-        for( pair <- valueType.shapes )
-        {
-            Fieldml_SetMeshElementShape( handle, objectHandle, pair._1, pair._2 )
-        }
     }
 
     
@@ -45,10 +34,21 @@ object MeshTypeSerializer
         val xiComponentType = source.getEnsembleType( xiComponentHandle )
         
         val elementHandle = Fieldml_GetMeshElementsType( source.fmlHandle, objectHandle )
+        
+        val meshName = Fieldml_GetObjectDeclaredName( source.fmlHandle, objectHandle )
+        val elementName = Fieldml_GetObjectDeclaredName( source.fmlHandle, Fieldml_GetMeshElementsType( source.fmlHandle, objectHandle ) )
+        val xiName = Fieldml_GetObjectDeclaredName( source.fmlHandle, Fieldml_GetMeshChartType( source.fmlHandle, objectHandle ) )
+        
+        if( !elementName.startsWith( meshName ) || !xiName.startsWith( meshName ) )
+        {
+            throw new FmlInvalidObjectException( "Mesh " + meshName + " has incorrectly named components" )
+        }
                 
-        val mesh = new MeshType( name, xiComponentType )
+        val mesh = new MeshType( name, xiComponentType, elementName.stripPrefix( meshName + "." ), xiName.stripPrefix( meshName + "." ) )
         
         EnsembleTypeSerializer.extractElements( source, objectHandle, mesh.elementType )
+        
+        mesh.shapes = source.getEvaluator( Fieldml_GetMeshShapes( source.fmlHandle, objectHandle ) )
         
         mesh
     }

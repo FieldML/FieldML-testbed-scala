@@ -2,7 +2,7 @@
 <Fieldml version="0.4"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/FieldML_0.4.xsd">
+  xsi:noNamespaceSchemaLocation="http://api.fieldml.googlecode.com/hg/Fieldml.xsd">
  <Region name="deformed_mesh">
 
   <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
@@ -10,6 +10,7 @@
     <ImportType localName="library.parameters.2d.unit.bilinearSimplex" remoteName="parameters.2d.unit.bilinearSimplex"/>
     <ImportType localName="library.coordinates.rc.3d" remoteName="coordinates.rc.3d"/>
     <ImportType localName="library.coordinates.rc.3d.component" remoteName="coordinates.rc.3d.component"/>
+    <ImportType localName="boolean" remoteName="boolean"/>
 
     <ImportEvaluator localName="library.parameters.2d.unit.bilinearSimplex.argument" remoteName="parameters.2d.unit.bilinearSimplex.argument"/>
     <ImportEvaluator localName="library.interpolator.2d.unit.bilinearSimplex" remoteName="interpolator.2d.unit.bilinearSimplex"/>
@@ -46,6 +47,8 @@
   </EnsembleType>
 
   <ArgumentEvaluator name="deformed_mesh.nodes.argument" valueType="deformed_mesh.nodes.type" />
+  
+  <ExternalEvaluator name="shape.unit.triangle" valueType="boolean"/>
 
   <MeshType name="deformed_mesh.mesh.type">
    <Elements name="element">
@@ -56,7 +59,7 @@
    <Chart name="xi">
      <Components name="deformed_mesh.mesh.type.xi.component" count="2"/>
    </Chart>
-   <Shapes default="shape.triangle" />
+   <Shapes evaluator="shape.unit.triangle"/>
   </MeshType>
   
   <ArgumentEvaluator name="deformed_mesh.mesh.argument" valueType="deformed_mesh.mesh.type" />
@@ -116,7 +119,7 @@
    <IndexEvaluators>
      <IndexEvaluator evaluator="deformed_mesh.mesh.argument.element" indexNumber="1" />
    </IndexEvaluators>
-   <ElementEvaluators default="deformed_mesh.bilinearSimplex" />
+   <EvaluatorMap defaultEvaluator="deformed_mesh.bilinearSimplex" />
   </PiecewiseEvaluator>
 
 

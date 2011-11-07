@@ -103,9 +103,9 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createTextDataSource( objectName : String, resource : DataResource, firstLine : Int, count : Int, length : Int, head : Int, tail : Int ) : DataSource =
+    def createArrayDataSource( objectName : String, resource : DataResource, location : String, rank : Int ) : ArrayDataSource =
     {
-        val dataSource = new TextDataSource( objectName, resource, firstLine, count, length, head, tail )
+        val dataSource = new ArrayDataSource( objectName, resource, location, rank )
         
         put( dataSource )
         
@@ -113,9 +113,9 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     }
     
     
-    def createFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : ArgumentEvaluator, var2 : ArgumentEvaluator, valueType : ContinuousType ) : Evaluator =
+    def createContinuousFunctionEvaluator( name : String, function : ( Array[Double], Array[Double] ) => Array[Double], var1 : ArgumentEvaluator, var2 : ArgumentEvaluator, valueType : ContinuousType ) : Evaluator =
     {
-        val evaluator = new FunctionEvaluatorValueSource( name, function, var1, var2, valueType ) 
+        val evaluator = new ContinuousFunctionEvaluatorValueSource( name, function, var1, var2, valueType ) 
 
         put( evaluator )
         
@@ -213,13 +213,15 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         {
             Fieldml_AddImport( handle, importIdx, p._1, p._2 )
         }
+
+        val meshList = new ArrayBuffer[MeshType]
         
         objectList.filter( _.isLocal ).foreach( _ match
         {
         case d : DataResource => d.insert( handle, d )
         case d : EnsembleType => d.insert( handle, d )
         case d : ContinuousType => d.insert( handle, d )
-        case d : MeshType => d.insert( handle, d )
+        case d : MeshType => { d.insert( handle, d ); meshList += d }
         case e : ArgumentEvaluator => e.insert( handle, e )
         case e : PiecewiseEvaluator => e.insert( handle, e )
         case e : ParameterEvaluator => e.insert( handle, e )
@@ -228,6 +230,8 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         case unknown => println( "Cannot yet serialize " + unknown )
         }
         )
+        
+        meshList.map( x => Fieldml_SetMeshShapes( handle, GetNamedObject( handle, x.name ), GetNamedObject( handle, x.shapes.name ) ) )
         
         Fieldml_WriteFile( handle, "test.xml" )
         Fieldml_Destroy( handle )

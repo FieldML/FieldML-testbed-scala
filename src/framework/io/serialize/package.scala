@@ -3,6 +3,7 @@ package framework.io
 import fieldml.valueType.ContinuousType
 import fieldml.valueType.EnsembleType
 import fieldml.valueType.MeshType
+import fieldml.valueType.BooleanType
 import fieldml.DataSource
 import fieldml.DataResource
 import fieldml.evaluator.Evaluator
@@ -47,6 +48,7 @@ package object serialize
     implicit def continuousTypeSerializer( valueType : ContinuousType ) = ContinuousTypeSerializer
     implicit def ensembleTypeSerializer( valueType : EnsembleType ) = EnsembleTypeSerializer
     implicit def meshTypeSerializer( valueType : MeshType ) = MeshTypeSerializer
+    implicit def booleanTypeSerializer( valueType : BooleanType ) = BooleanTypeSerializer
     implicit def dataResourceSerializer( dataResource : DataResource ) = DataResourceSerializer
     implicit def argumentEvaluatorSerializer( evaluator : ArgumentEvaluator ) = ArgumentEvaluatorSerializer
     implicit def piecewiseEvaluatorSerializer( evaluator : PiecewiseEvaluator ) = PiecewiseEvaluatorSerializer

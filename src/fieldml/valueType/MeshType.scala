@@ -4,24 +4,24 @@ import fieldml.evaluator.Evaluator
 
 import util.DefaultingHashMap
 
-class MeshType( name : String, xiComponents : EnsembleType )
+class MeshType( name : String, xiComponents : EnsembleType, val elementName : String, val xiName : String )
     extends StructuredType( name,
-        Tuple2( "element", new EnsembleType( name + ".element", false ) ),
-        Tuple2( "xi", new ContinuousType( name + ".xi", xiComponents ) )
+        Tuple2( elementName, new EnsembleType( name + "." + elementName, false ) ),
+        Tuple2( xiName, new ContinuousType( name + "." + xiName, xiComponents ) )
         )
 {
     def this( name : String, elementCount : Int, dimensions : Int )
     {
-        this( name, new EnsembleType( name + ".xi.component", true ) )
+        this( name, new EnsembleType( name + ".xi.component", true ), "element", "xi" )
         
         elementType.elementSet.add( 1, elementCount, 1 )
         xiType.componentType.elementSet.add( 1, dimensions, 1 )
     }
     
     
-    val shapes = new DefaultingHashMap[Int, String]()
+    var shapes : Evaluator = null
     
-    val elementType = subtype( "element" ).asInstanceOf[EnsembleType]
+    val elementType = subtype( elementName ).asInstanceOf[EnsembleType]
     
-    val xiType = subtype( "xi" ).asInstanceOf[ContinuousType]
+    val xiType = subtype( xiName ).asInstanceOf[ContinuousType]
 }

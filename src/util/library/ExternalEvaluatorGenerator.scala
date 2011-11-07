@@ -12,8 +12,7 @@ import fieldml.jni.DataSourceType._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 
-import framework.valuesource.FunctionEvaluatorValueSource
-import framework.valuesource.ParamSwizzleValueSource
+import framework.valuesource._
 import framework.region._
 import framework.io.serialize.Deserializer
 
@@ -22,7 +21,7 @@ import util._
 
 object ExternalEvaluatorGenerator
 {
-    def generateContinuousEvaluator( source : Deserializer, objectHandle : Int ) :
+    def generateExternalEvaluator( source : Deserializer, objectHandle : Int ) :
         Evaluator =
     {
         val name = Fieldml_GetObjectDeclaredName( source.fmlHandle, objectHandle )
@@ -37,6 +36,28 @@ object ExternalEvaluatorGenerator
             }
         }
 
+        name match
+        {
+            case "interpolator.1d.unit.cubicHermite" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.1d.unit.linearLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.2d.unit.bilinearLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.3d.unit.trilinearLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.1d.unit.quadraticLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.2d.unit.biquadraticLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.3d.unit.triquadraticLagrange" => generateContinuousEvaluator( source, objectHandle, name )
+            case "interpolator.2d.unit.bilinearSimplex" => generateContinuousEvaluator( source, objectHandle, name )
+            case "shape.unit.line" => generateBooleanEvaluator( source, objectHandle, name )
+            case "shape.unit.square" => generateBooleanEvaluator( source, objectHandle, name )
+            case "shape.unit.cube" => generateBooleanEvaluator( source, objectHandle, name )
+            case "shape.unit.triangle" => generateBooleanEvaluator( source, objectHandle, name )
+            case _ => System.err.println( "Unknown external evaluator " + name ); return null
+        }
+    }
+    
+    
+    private def generateContinuousEvaluator( source : Deserializer, objectHandle : Int, name : String ) :
+        Evaluator =
+    {
         val evaluatorType : ContinuousType = source.getContinuousType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
         val xiNames = Array[String](
             null,
@@ -71,6 +92,8 @@ object ExternalEvaluatorGenerator
             "parameters.2d.unit.bilinearSimplex.argument",
             null //NYI
             )
+        
+        val booleanName = "boolean"
 
         val fparams =
         name match
@@ -86,11 +109,56 @@ object ExternalEvaluatorGenerator
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
         
-        val xiVariable = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 ) )
-        val phiVariable = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._3 ) )
+        val xiHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 )
+        if( Fieldml_GetObjectName( source.fmlHandle, xiHandle ) == null )
+        {
+            throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
+        }
+        val xiVariable = source.getArgumentEvaluator( xiHandle )
+        
+        val phiHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._3 )
+        if( Fieldml_GetObjectName( source.fmlHandle, phiHandle ) == null )
+        {
+            throw new FmlInvalidObjectException( "Object " + fparams._3 + " needed by " + name + " is not local" )            
+        }
+        val phiVariable = source.getArgumentEvaluator( phiHandle )
         
         val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
     
-        return new FunctionEvaluatorValueSource( localName, fparams._1, xiVariable, phiVariable, evaluatorType )
+        return new ContinuousFunctionEvaluatorValueSource( localName, fparams._1, xiVariable, phiVariable, evaluatorType )
+    }
+    
+    
+    private def generateBooleanEvaluator( source : Deserializer, objectHandle : Int, name : String ) :
+        Evaluator =
+    {
+        val evaluatorType : BooleanType = source.getBooleanType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
+        val xiNames = Array[String](
+            null,
+            "chart.1d.argument",
+            "chart.2d.argument",
+            "chart.3d.argument"
+            )
+
+        val fparams =
+        name match
+        {
+            case "shape.unit.triangle" => ( new Shape2DUnitTriangle().evaluate _, xiNames( 2 ) )
+            case "shape.unit.line" => ( new ShapeUnitLinear( 1 ).evaluate _, xiNames( 1 ) )
+            case "shape.unit.square" => ( new ShapeUnitLinear( 2 ).evaluate _, xiNames( 2 ) )
+            case "shape.unit.cube" => ( new ShapeUnitLinear( 3 ).evaluate _, xiNames( 3 ) )
+            case _ => System.err.println( "Unknown external evaluator " + name ); return null
+        }
+        
+        val xiHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 )
+        if( Fieldml_GetObjectName( source.fmlHandle, xiHandle ) == null )
+        {
+            throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
+        }
+        val xiVariable = source.getArgumentEvaluator( xiHandle )
+        
+        val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
+    
+        return new BooleanFunctionEvaluatorValueSource( localName, fparams._1, xiVariable, evaluatorType )
     }
 }

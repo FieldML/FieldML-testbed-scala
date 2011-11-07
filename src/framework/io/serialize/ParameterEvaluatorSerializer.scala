@@ -205,24 +205,6 @@ object ParameterEvaluatorSerializer
     }
     
     
-    private def getMinCount( semidense : SemidenseDataDescription ) : Int =
-    {
-        if( semidense.denseIndexes.length == 0 )
-        {
-            return 1
-        }
-        
-        val indexType = semidense.denseIndexes( 0 ).valueType.asInstanceOf[EnsembleType]
-        
-        if( !indexType.isComponent )
-        {
-            return 1
-        }
-        
-        return indexType.elementCount
-    }
-
-    
     private def initializeDokValues[T<:AnyVal:Manifest]( source : Deserializer, valueReader : Int, keyReader : Int, dok : DokDataDescription,
         SlabReader : ( Int, Int, Array[Int], Array[Int], Array[T] ) => Int,
         ValueGenerator : ( ValueType, T* ) => Value ) : Unit =

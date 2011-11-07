@@ -7,7 +7,7 @@ import framework.valuesource._
 
 import value.ContinuousValue
 
-class FunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val var1 : Evaluator, val var2 : Evaluator, valueType : ContinuousType )
+class ContinuousFunctionEvaluator( name : String, val function : ( Array[Double], Array[Double] ) => Array[Double], val var1 : Evaluator, val var2 : Evaluator, valueType : ContinuousType )
     extends Evaluator( name, valueType )
 {
     private val _variables = ( var1.variables ++ var2.variables ).toSeq.distinct

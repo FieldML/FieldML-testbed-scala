@@ -33,6 +33,7 @@ class Deserializer( val fmlHandle : Int )
             case FHT_ENSEMBLE_TYPE => getEnsembleType( objectHandle )
             case FHT_CONTINUOUS_TYPE => getContinuousType( objectHandle )
             case FHT_MESH_TYPE => getMeshType( objectHandle )
+            case FHT_BOOLEAN_TYPE => getBooleanType( objectHandle )
             case FHT_DATA_RESOURCE => getDataResource( objectHandle )
             case FHT_DATA_SOURCE => getDataSource( objectHandle )
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
@@ -104,6 +105,16 @@ class Deserializer( val fmlHandle : Int )
     }
     
     
+    def getBooleanType( objectHandle : Int ) : BooleanType =
+    {
+        getTypedObject( objectHandle, FHT_BOOLEAN_TYPE, classOf[BooleanType] ) match
+        {
+            case s : Some[BooleanType] => s.get
+            case None => objects( objectHandle ) = BooleanTypeSerializer.extract( this, objectHandle ); objects( objectHandle ).asInstanceOf[BooleanType]
+        }
+    }
+    
+    
     def getMeshType( objectHandle : Int ) : MeshType =
     {
         getTypedObject( objectHandle, FHT_MESH_TYPE, classOf[MeshType] ) match
@@ -137,6 +148,10 @@ class Deserializer( val fmlHandle : Int )
     private def getSubtypeEvaluator( objectHandle : Int ) : Option[Evaluator] =
     {
         val name = Fieldml_GetObjectName( fmlHandle, objectHandle )
+        if( name == null )
+        {
+            return None
+        }
         
         val lastDot = name.lastIndexOf( '.' )
         if( lastDot == -1 )
@@ -182,7 +197,7 @@ class Deserializer( val fmlHandle : Int )
         getSubtypeEvaluator( objectHandle ) match
         {
             case s : Some[Evaluator] => s.get
-            case None => ExternalEvaluatorGenerator.generateContinuousEvaluator( this, objectHandle )
+            case None => ExternalEvaluatorGenerator.generateExternalEvaluator( this, objectHandle )
         }
     }
     
