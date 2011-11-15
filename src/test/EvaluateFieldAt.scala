@@ -18,8 +18,8 @@ import valuesource.ParameterEvaluatorValueSource
 object EvaluateFieldAt
 {
   def main( argv : Array[String] ) : Unit = {
-    println(argv(2))
     if (argv.size == 3) {
+      println(argv(2))
       ExpressionParser.parse(argv(2)) match {
         case ExpressionParser.Success(res, _) =>
           evaluateFieldAt(argv(0), argv(1), res)
@@ -69,18 +69,18 @@ object EvaluateFieldAt
 
   object ExpressionParser extends RegexParsers {
     def parse(s : String) = parseAll(expressionParser, s)
-    def expressionParser = repsep(actionParser, (" " | ";"))
+    def expressionParser = rep(actionParser)
     def actionParser = bindActionParser | evaluateActionParser
-    def bindActionParser = "bind " ~> (regex(new Regex("[A-Z|a-z|\\.]+")) <~ " ") ~ valueParser ^^
+    def bindActionParser = "bind" ~> (regex(new Regex("[A-Z|a-z|\\.]+"))) ~ valueParser ^^
       (p => p match { case n~v => new BindParameterAction(n, v) })
-    def evaluateActionParser = "evaluate " ~> commit(regex(new Regex("[A-Z|a-z|\\.]+")) ^^
+    def evaluateActionParser = "evaluate" ~> commit(regex(new Regex("[A-Z|a-z|\\.]+")) ^^
       (v => new EvaluateAction(v)))
     def valueParser = meshValueParser | ensembleValueParser | continuousValueParser
-    def meshValueParser = commit("meshValue ") ~> commit(intParser ~ (" " ~> repsep(doubleParser, " ")) ^^
+    def meshValueParser = "meshValue" ~> commit(intParser ~ rep(doubleParser) ^^
       (v => v match { case el ~ xi => new MeshMakeValue(el, xi) }))
-    def ensembleValueParser = commit("ensembleValue ") ~> commit(intParser ^^
+    def ensembleValueParser = "ensembleValue" ~> commit(intParser ^^
       (ensv => new EnsembleMakeValue(ensv)))
-    def continuousValueParser = commit("continuousValue ") ~> commit(repsep(doubleParser, " ") ^^ (ensv => new ContinuousMakeValue(ensv)))
+    def continuousValueParser = "continuousValue" ~> commit(rep(doubleParser) ^^ (ensv => new ContinuousMakeValue(ensv)))
     def intParser = commit(regex(new Regex("-?[0-9]+")) ^^ Integer.parseInt)
     def doubleParser = commit(regex(new Regex("-?[0-9|\\.]+")) ^^ java.lang.Double.parseDouble)
   }

@@ -13,6 +13,7 @@ import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 
 import framework.valuesource._
+import framework.RandomEvaluator
 import framework.region._
 import framework.io.serialize.Deserializer
 
@@ -50,6 +51,7 @@ object ExternalEvaluatorGenerator
             case "shape.unit.square" => generateBooleanEvaluator( source, objectHandle, name )
             case "shape.unit.cube" => generateBooleanEvaluator( source, objectHandle, name )
             case "shape.unit.triangle" => generateBooleanEvaluator( source, objectHandle, name )
+            case "random.0d.equiprobable.tag" => generateEnsembleEvaluator( source, objectHandle, name )
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
     }
@@ -153,12 +155,27 @@ object ExternalEvaluatorGenerator
         val xiHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 )
         if( Fieldml_GetObjectName( source.fmlHandle, xiHandle ) == null )
         {
-            throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
+            throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )
         }
         val xiVariable = source.getArgumentEvaluator( xiHandle )
         
         val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
     
         return new BooleanFunctionEvaluatorValueSource( localName, fparams._1, xiVariable, evaluatorType )
+    }
+
+    private def generateEnsembleEvaluator( source : Deserializer, objectHandle : Int, name : String ) :
+        Evaluator =
+    {
+      val evaluatorType : EnsembleType = source.getEnsembleType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
+      
+      return name match {
+        case "random.0d.equiprobable.tag" =>
+          val evt : ArgumentEvaluator = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle,
+                                                                                 "random.0d.equiprobable.argument" ) )
+                                           .asInstanceOf[ArgumentEvaluator]
+          new RandomEvaluator( evt, evaluatorType )
+        case _ => System.err.println( "Unknown external evaluator " + name ); return null
+      }
     }
 }
