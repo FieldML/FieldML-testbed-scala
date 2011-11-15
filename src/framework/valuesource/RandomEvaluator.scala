@@ -32,7 +32,6 @@ class RandomEvaluator( val randomArgument : ArgumentEvaluator, valueType : Ensem
         case None => {
           cache = if (isEventuallyUnbound( state, randomArgument )) {
             val number = math.abs(Random.nextInt()) % valueType.elementCount
-            println( "EnsembleValue.apply: " + number )
             Some(EnsembleValue.apply( valueType,  number ))
           } else {
             println("Argument appears bound; random tag is identity function.");
