@@ -42,7 +42,8 @@ object ReferenceEvaluatorSerializer
         
         val evaluator : Evaluator = source.getEvaluator( remoteHandle )
         
-        val refEval = new ReferenceEvaluatorValueSource( name, evaluator )
+        val evaluatorType : ValueType = source.get( Fieldml_GetValueType( source.fmlHandle, objectHandle ) ).asInstanceOf[ValueType]
+        val refEval = new ReferenceEvaluatorValueSource( name, evaluator, evaluatorType )
         
         for( b <- GetBinds( source, objectHandle ) ) refEval.bind( b )
         

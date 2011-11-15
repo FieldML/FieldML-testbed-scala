@@ -126,7 +126,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
     def createReferenceEvaluator( name : String, refEvaluatorName : String, refRegion : Region ) : ReferenceEvaluator =
     {
         val refEvaluator : Evaluator = refRegion.getObject( refEvaluatorName )
-        val evaluator = new ReferenceEvaluatorValueSource( name, refEvaluator )
+        val evaluator = new ReferenceEvaluatorValueSource( name, refEvaluator, refEvaluator.valueType )
         
         put( evaluator )
         

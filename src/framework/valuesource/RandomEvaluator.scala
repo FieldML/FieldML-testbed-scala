@@ -28,11 +28,17 @@ class RandomEvaluator( val randomArgument : ArgumentEvaluator, valueType : Ensem
 
     def evaluate( state : EvaluationState ) : Option[Value] =
     {
+      evaluateForType( state, valueType)
+    }
+
+    def evaluateForType( state : EvaluationState,
+                         forType : ValueType ) : Option[Value] =
+    {
       cache match {
         case None => {
           cache = if (isEventuallyUnbound( state, randomArgument )) {
-            val number = math.abs(Random.nextInt()) % valueType.elementCount
-            Some(EnsembleValue.apply( valueType,  number ))
+            val number = math.abs(Random.nextInt()) % forType.asInstanceOf[EnsembleType].elementCount
+            Some(EnsembleValue.apply( forType.asInstanceOf[EnsembleType],  number ))
           } else {
             println("Argument appears bound; random tag is identity function.");
             randomArgument.evaluate( state )
