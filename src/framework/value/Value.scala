@@ -36,4 +36,16 @@ object Value
             case _ => throw new FmlException( "Cannot create a " + vType.name + " value with " + value )
         }
     }
+    
+    
+    def apply( vType : ValueType, value : String ) : Value =
+    {
+        //TODO Currently only supports scalar values
+        vType match
+        {
+            case t : BooleanType => BooleanValue( t, value.toBoolean )
+            case t : ContinuousType => ContinuousValue( t, value.toDouble )
+            case t : EnsembleType => EnsembleValue( t, value.toInt )
+        }
+    }
 }

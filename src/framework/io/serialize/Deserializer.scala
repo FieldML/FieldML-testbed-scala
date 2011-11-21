@@ -38,10 +38,11 @@ class Deserializer( val fmlHandle : Int )
             case FHT_DATA_SOURCE => getDataSource( objectHandle )
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
-            case FHT_ARGUMENT_EVALUATOR => return getArgumentEvaluator( objectHandle )
+            case FHT_ARGUMENT_EVALUATOR => return getArgumentOrSubtypeEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
-            case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
+            case FHT_EXTERNAL_EVALUATOR => return getExternalEvaluator( objectHandle )
+            case FHT_CONSTANT_EVALUATOR => return getConstantEvaluator( objectHandle )
             case _ => throw new FmlException( "Extracting object type " + objectType + " not yet supported" );
         }
     }
@@ -60,10 +61,11 @@ class Deserializer( val fmlHandle : Int )
         {
             case FHT_REFERENCE_EVALUATOR => return getReferenceEvaluator( objectHandle )
             case FHT_PARAMETER_EVALUATOR => return getParameterEvaluator( objectHandle )
-            case FHT_ARGUMENT_EVALUATOR => return getArgumentEvaluator( objectHandle )
+            case FHT_ARGUMENT_EVALUATOR => return getArgumentOrSubtypeEvaluator( objectHandle )
             case FHT_AGGREGATE_EVALUATOR => return getAggregateEvaluator( objectHandle )
             case FHT_PIECEWISE_EVALUATOR => return getPiecewiseEvaluator( objectHandle )
-            case FHT_EXTERNAL_EVALUATOR => getExternalEvaluator( objectHandle )
+            case FHT_EXTERNAL_EVALUATOR => return getExternalEvaluator( objectHandle )
+            case FHT_CONSTANT_EVALUATOR => return getConstantEvaluator( objectHandle )
             case FHT_UNKNOWN => throw new FmlUnknownObjectException( objectHandle )
             case _ => throw new FmlInvalidObjectException( Fieldml_GetObjectName( fmlHandle, objectHandle ) + " is not a known evaluator" )
         }
@@ -221,6 +223,16 @@ class Deserializer( val fmlHandle : Int )
     }
     
     
+    def getConstantEvaluator( objectHandle : Int ) : ConstantEvaluator =
+    {
+        getTypedObject( objectHandle, FHT_CONSTANT_EVALUATOR, classOf[ConstantEvaluator] ) match
+        {
+            case s : Some[ConstantEvaluator] => s.get
+            case None => objects( objectHandle ) = ConstantEvaluatorSerializer.extract( this, objectHandle ); objects( objectHandle ).asInstanceOf[ConstantEvaluator]
+        }
+    }
+    
+    
     def getParameterEvaluator( objectHandle : Int ) : ParameterEvaluator =
     {
         getTypedObject( objectHandle, FHT_PARAMETER_EVALUATOR, classOf[ParameterEvaluator] ) match
@@ -266,12 +278,17 @@ class Deserializer( val fmlHandle : Int )
     }
     
     
-    private def buildArgumentSubtypeEvaluator( evaluator : SubtypeEvaluator )
+    def getArgumentEvaluator( objectHandle : Int ) : ArgumentEvaluator =
     {
-        
+        getTypedObject( objectHandle, FHT_ARGUMENT_EVALUATOR, classOf[ArgumentEvaluator] ) match
+        {
+            case s : Some[ArgumentEvaluator] => s.get
+            case None => addEvaluator( objectHandle, ArgumentEvaluatorSerializer.extract( this, objectHandle ) ); objects( objectHandle ).asInstanceOf[ArgumentEvaluator]
+        }
     }
-
-    def getArgumentEvaluator( objectHandle : Int ) : Evaluator =
+    
+    
+    def getArgumentOrSubtypeEvaluator( objectHandle : Int ) : Evaluator =
     {
         getTypedObject( objectHandle, FHT_ARGUMENT_EVALUATOR, classOf[ArgumentEvaluator] ) match
         {

@@ -206,7 +206,7 @@ object ParameterEvaluatorSerializer
     
     
     private def initializeDokValues[T<:AnyVal:Manifest]( source : Deserializer, valueReader : Int, keyReader : Int, dok : DokDataDescription,
-        SlabReader : ( Int, Int, Array[Int], Array[Int], Array[T] ) => Int,
+        SlabReader : ( Int, Array[Int], Array[Int], Array[T] ) => Int,
         ValueGenerator : ( ValueType, T* ) => Value ) : Unit =
     {
         val indexCount = dok.sparseIndexes.size
@@ -231,12 +231,11 @@ object ParameterEvaluatorSerializer
         
         val indexOffsets = Array[Int]( 0, 0 )
         val indexSizes = Array[Int]( 1, indexCount )
-        
-        while( Fieldml_ReadIntSlab( source.fmlHandle, keyReader, indexOffsets, indexSizes, keys ) == FML_ERR_NO_ERROR )
-        {
-            iterator.reset()
 
-            err = SlabReader( source.fmlHandle, valueReader, offsets, sizes, buffer )
+        //TODO Use the data source's size to determine the number of key-sets.
+        while( Fieldml_ReadIntSlab( keyReader, indexOffsets, indexSizes, keys ) == FML_ERR_NO_ERROR )
+        {
+            err = SlabReader( valueReader, offsets, sizes, buffer )
             if( err != FML_ERR_NO_ERROR )
             {
                 throw new FmlException( "Read error in DOK value data after " + total + ": code " + err )
@@ -244,9 +243,10 @@ object ParameterEvaluatorSerializer
             
             total += bufferSize
             
+            iterator.reset()
             for( i <- 0 until bufferSize )
             {
-                dok( iterator.next ) = ValueGenerator( dok.valueType, buffer( i ) )
+                dok( keys ++ iterator.next ) = ValueGenerator( dok.valueType, buffer( i ) )
             }
             
             offsets( 0 ) = offsets( 0 ) + 1
@@ -257,7 +257,7 @@ object ParameterEvaluatorSerializer
     
 
     private def initializeDenseValues[T:Manifest]( source : Deserializer, reader : Int, dense : DenseDataDescription,
-        SlabReader : ( Int, Int, Array[Int], Array[Int], Array[T] ) => Int,
+        SlabReader : ( Int, Array[Int], Array[Int], Array[T] ) => Int,
         ValueGenerator : ( ValueType, T* ) => Value ) : Unit =
     {
         val sizes = dense.denseIndexes.map( _.valueType.asInstanceOf[EnsembleType].elementCount ).toArray
@@ -281,12 +281,8 @@ object ParameterEvaluatorSerializer
 
         while( iterator.hasNext )
         {
-            err = SlabReader( source.fmlHandle, reader, offsets, sizes, buffer )
+            err = SlabReader( reader, offsets, sizes, buffer )
             
-            println( "Offsets = " + offsets.deepToString )
-            println( "Sizes = " + sizes.deepToString )
-            println( "Read " + bufferSize + " values, err = " + err )
-
             if( err != FML_ERR_NO_ERROR )
             {
                 throw new FmlException( "Read error in dense data from " + reader + ": code " + err )
@@ -314,9 +310,9 @@ object ParameterEvaluatorSerializer
         val sizes = Array( count )
         val values = new Array[Int]( count )
         
-        val readCount = Fieldml_ReadIntSlab( source.fmlHandle, reader, offsets, sizes, values )
+        val readCount = Fieldml_ReadIntSlab( reader, offsets, sizes, values )
         
-        Fieldml_CloseReader( source.fmlHandle, reader )
+        Fieldml_CloseReader( reader )
         
         return values
     }
@@ -359,7 +355,7 @@ object ParameterEvaluatorSerializer
             throw new FmlException( "Cannot create DOK value reader: " + Fieldml_GetLastError( source.fmlHandle )  )
         }
         
-        val keyReader = Fieldml_OpenReader( source.fmlHandle, dataHandle )
+        val keyReader = Fieldml_OpenReader( source.fmlHandle, keyDataHandle )
         if( keyReader == FML_INVALID_HANDLE )
         {
             throw new FmlException( "Cannot create DOK key reader: " + Fieldml_GetLastError( source.fmlHandle )  )
@@ -380,8 +376,8 @@ object ParameterEvaluatorSerializer
             throw new FmlException( "Cannot yet initialize " + valueType.name + " valued parameter evaluator" )
         }
         
-        Fieldml_CloseReader( source.fmlHandle, valueReader )
-        Fieldml_CloseReader( source.fmlHandle, keyReader )
+        Fieldml_CloseReader( valueReader )
+        Fieldml_CloseReader( keyReader )
         
         dok
     }
@@ -430,7 +426,7 @@ object ParameterEvaluatorSerializer
             throw new FmlException( "Cannot yet initialize " + valueType.name + " valued parameter evaluator" )
         }
         
-        Fieldml_CloseReader( source.fmlHandle, reader )
+        Fieldml_CloseReader( reader )
         
         dense
     }

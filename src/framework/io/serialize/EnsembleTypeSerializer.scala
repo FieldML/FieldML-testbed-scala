@@ -37,11 +37,7 @@ object EnsembleTypeSerializer
         
         val strides = elementArray.foldLeft( Pair( new BitSet, min ) )( ( t, i ) => Pair( t._1 + ( i - t._2 ),  i ) )._1
         
-        for( i <- strides )
-        {
-            print( i + " " )
-        }
-        println
+        //TODO Handle non-trivial element sets.
     }
 
     
@@ -89,7 +85,7 @@ object EnsembleTypeSerializer
             
             offsets( 0 ) = 0
             sizes( 0 ) = count
-            var result = Fieldml_ReadIntSlab( source.fmlHandle, streamHandle, offsets, sizes, entries )
+            var result = Fieldml_ReadIntSlab( streamHandle, offsets, sizes, entries )
             
             while( result == count )
             {
@@ -102,10 +98,10 @@ object EnsembleTypeSerializer
                 
                 offsets( 0 ) += count
                 
-                result = Fieldml_ReadIntSlab( source.fmlHandle, streamHandle, offsets, sizes, entries )
+                result = Fieldml_ReadIntSlab( streamHandle, offsets, sizes, entries )
             }
             
-            Fieldml_CloseReader( source.fmlHandle, streamHandle )
+            Fieldml_CloseReader( streamHandle )
         }
     }
 

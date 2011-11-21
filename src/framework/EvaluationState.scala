@@ -37,22 +37,27 @@ class EvaluationState
     {
         if( stack.size > 0 )
         {
-            stack.push( new Context( location, stack( 0 ) ) )
+            stack.push( new Context( location, Some( stack.top ), binds ) )
         }
         else
         {
-            stack.push( new Context( location ) )
-        }
-        
-        for( b <- binds )
-        {
-            stack.top.setBind( b._1, b._2 )
+            stack.push( new Context( location, None, binds ) )
         }
     }
     
     
     def getBind( variable : Evaluator ) : Option[Evaluator] =
     {
-        return stack( 0 ).getBind( variable )
+        return stack.top.getBind( variable )
+    }
+    
+    
+    def restart( location : String, argument : Evaluator, binds : Seq[Tuple2[Evaluator, Evaluator]] ) : EvaluationState =
+    {
+        val newState = new EvaluationState()
+        
+        newState.stack.push( new Context( location, stack.top.getBindContext( argument ), binds ) )
+        
+        return newState
     }
 }

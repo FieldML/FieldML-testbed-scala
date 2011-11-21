@@ -12,30 +12,26 @@ import valuesource._
 
 import util.exception._
 
-class Context( val location : String, initialBinds : Seq[Tuple2[Evaluator, Evaluator]] )
+class Context( val location : String,
+    inheritedBinds : Seq[Tuple2[Evaluator, Tuple2[Evaluator, Context]]],
+    initialBinds : Seq[Tuple2[Evaluator, Evaluator]] )
 {
-    def this( location : String )
+    def this( location : String, otherContext : Option[Context], initialBinds : Seq[Tuple2[Evaluator, Evaluator]] )
     {
-        this( location, Seq[Tuple2[Evaluator, Evaluator]]() )
+        this( location, otherContext.toSeq.flatMap( _.binds.toSeq ), initialBinds )
     }
     
-    
-    def this( location : String, otherContext : Context )
-    {
-        this( location, otherContext.binds.toSeq )
-    }
-    
-    private val binds = Map[Evaluator, Evaluator]( initialBinds:_* )
-    
+    private val binds = Map[Evaluator, Tuple2[Evaluator, Context]]( inheritedBinds ++
+        initialBinds.map( x => Tuple2( x._1, Tuple2( x._2, this ) ) ):_* )
     
     def getBind( evaluator : Evaluator ) : Option[Evaluator] =
     {
-        binds.get( evaluator )
+        binds.get( evaluator ).map( _._1 )
     }
     
     
-    def setBind( evaluator : Evaluator, source : Evaluator ) : Unit =
+    def getBindContext( evaluator : Evaluator ) : Option[Context] =
     {
-        binds( evaluator ) = source
+        binds.get( evaluator ).map( _._2 )
     }
 }

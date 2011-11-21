@@ -114,14 +114,14 @@ object ExternalEvaluatorGenerator
         {
             throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
         }
-        val xiVariable = source.getArgumentEvaluator( xiHandle )
+        val xiVariable = source.getArgumentOrSubtypeEvaluator( xiHandle )
         
         val phiHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._3 )
         if( Fieldml_GetObjectName( source.fmlHandle, phiHandle ) == null )
         {
             throw new FmlInvalidObjectException( "Object " + fparams._3 + " needed by " + name + " is not local" )            
         }
-        val phiVariable = source.getArgumentEvaluator( phiHandle )
+        val phiVariable = source.getArgumentOrSubtypeEvaluator( phiHandle )
         
         val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
     
@@ -155,7 +155,7 @@ object ExternalEvaluatorGenerator
         {
             throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
         }
-        val xiVariable = source.getArgumentEvaluator( xiHandle )
+        val xiVariable = source.getArgumentOrSubtypeEvaluator( xiHandle )
         
         val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
     
