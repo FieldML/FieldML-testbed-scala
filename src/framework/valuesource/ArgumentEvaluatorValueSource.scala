@@ -19,19 +19,10 @@ class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, val ex
     {
         if( state.getBind( this ) == None )
         {
-            println( "==================" )
-            println( name + " is unbound" )
-            state.printStack
-            println( "==================" )
+            return None
         }
         
         val argumentBinds = explicitVariables.flatMap( x => Some( Tuple2[Evaluator, Evaluator]( x, new ConstantValueSource( x.evaluate( state ).get ) ) ) )
-        
-        println( name + " has " + explicitVariables.size )
-        for( x <- explicitVariables )
-        {
-            println( x )
-        }
         
         val tempState = state.restart( name, this, argumentBinds )
         

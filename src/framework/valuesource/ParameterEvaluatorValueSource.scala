@@ -23,8 +23,6 @@ class ParameterEvaluatorValueSource( name : String, valueType : ValueType, dataS
             value <- eval.evaluate( state ) ) 
                 yield value.eValue
         
-        println( "Evaluating " + name + " at " + indexes.foldLeft( "" )( _ + " " + _ ) )
-        
         if( dataStore.description.indexEvaluators.size != indexes.size )
         {
             return None

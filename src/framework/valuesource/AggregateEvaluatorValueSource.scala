@@ -18,7 +18,6 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        println( "START Aggregating " + name + " over " + indexBinds(1).valueType )
         val indexType = indexBinds(1).valueType.asInstanceOf[EnsembleType]
         
         val indexEvaluator = new VariableValueSource( name + ".index", indexType )
@@ -35,11 +34,8 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
         
         if( values.size != indexValues.size )
         {
-            println( "Some aggregate evaluators in " + name + " failed" )
             return None
         }
-        
-        println( "DONE Aggregating over " + indexBinds(1).valueType )
         
         return Some( new ContinuousValue( valueType, values.flatMap( _.cValue ) ) )
     }
