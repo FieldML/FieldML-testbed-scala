@@ -34,7 +34,6 @@ class AggregateEvaluatorValueSource( name : String, valueType : ContinuousType )
         
         if( values.size != indexValues.size )
         {
-            println( "Some aggregate evaluators in " + name + " failed" )
             return None
         }
         

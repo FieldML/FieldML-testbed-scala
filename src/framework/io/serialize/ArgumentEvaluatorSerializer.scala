@@ -29,10 +29,12 @@ object ArgumentEvaluatorSerializer
         
         val typeHandle = Fieldml_GetValueType( source.fmlHandle, objectHandle )
         
-        if( typeHandle < 0 ) println( name + " has no type" )
-        
         val valueType = source.getType( typeHandle )
         
-        new ArgumentEvaluatorValueSource( name, valueType )
+        val args = ( 1 to Fieldml_GetArgumentCount( source.fmlHandle, objectHandle, 1, 1 ) ).map(
+            x=>source.getArgumentEvaluator( Fieldml_GetArgument( source.fmlHandle, objectHandle, x, 1, 1 ) )
+            )
+        
+        new ArgumentEvaluatorValueSource( name, valueType, args:_* )
     }
 }

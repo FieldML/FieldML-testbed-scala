@@ -9,6 +9,7 @@ import fieldml.DataResource
 import fieldml.evaluator.Evaluator
 import fieldml.evaluator.ArgumentEvaluator
 import fieldml.evaluator.AggregateEvaluator
+import fieldml.evaluator.ConstantEvaluator
 import fieldml.evaluator.PiecewiseEvaluator
 import fieldml.evaluator.ParameterEvaluator
 import fieldml.evaluator.ReferenceEvaluator
@@ -38,7 +39,7 @@ package object serialize
         val bindCount = Fieldml_GetBindCount( source.fmlHandle, objectHandle )
         
         for( i <- 1 to bindCount;
-            variable = source.getArgumentEvaluator( Fieldml_GetBindArgument( source.fmlHandle, objectHandle, i ) );
+            variable = source.getArgumentOrSubtypeEvaluator( Fieldml_GetBindArgument( source.fmlHandle, objectHandle, i ) );
             evaluator = source.getEvaluator( Fieldml_GetBindEvaluator( source.fmlHandle, objectHandle, i ) )
             )
             yield Tuple2( variable, evaluator )
@@ -55,4 +56,5 @@ package object serialize
     implicit def parameterEvaluatorSerializer( evaluator : ParameterEvaluator ) = ParameterEvaluatorSerializer
     implicit def aggregateEvaluatorSerializer( evaluator : AggregateEvaluator ) = AggregateEvaluatorSerializer
     implicit def referenceEvaluatorSerializer( evaluator : ReferenceEvaluator ) = ReferenceEvaluatorSerializer
+    implicit def constantEvaluatorSerializer( evaluator : ConstantEvaluator ) = ConstantEvaluatorSerializer
 }

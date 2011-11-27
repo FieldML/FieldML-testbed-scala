@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Fieldml version="0.4.0" xsi:noNamespaceSchemaLocation="http://www.fieldml.org/resources/xml/0.4/FieldML_0.4.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <Region name="btex20_comp2">
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
+   <ImportType localName="real.1d" remoteName="real.1d"/>
+   <ImportType localName="linear.parameters.type" remoteName="parameters.1d.unit.linearLagrange"/>
+   <ImportType localName="rc3.type" remoteName="coordinates.rc.3d"/>
+   <ImportType localName="linear.node.type" remoteName="localNodes.1d.line2"/>
+   
+   <ImportEvaluator localName="linear.node.argument" remoteName="localNodes.1d.line2.argument"/>
+   <ImportEvaluator localName="shape.line" remoteName="shape.unit.line"/>
+   <ImportEvaluator localName="linear.parameters.argument" remoteName="parameters.1d.unit.linearLagrange.argument"/>
+   <ImportEvaluator localName="chart.argument" remoteName="chart.1d.argument"/>
+   <ImportEvaluator localName="linear.interpolator" remoteName="interpolator.1d.unit.linearLagrange"/>
+   <ImportEvaluator localName="rc3.component" remoteName="coordinates.rc.3d.component.argument"/>
+  </Import>
+
+  <DataResource name="btex20_comp2.data">
+    <DataResourceDescription>
+      <DataResourceHref xlink:href="btex20_comp2.txt" format="PLAIN_TEXT"/>
+    </DataResourceDescription>
+    <ArrayDataSource name="ct_values" location="2" rank="2">
+      <RawArraySize>
+        6 81
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="x_values" location="11" rank="1">
+      <RawArraySize>
+        81
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="t_values" location="14" rank="1">
+      <RawArraySize>
+        6
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="tmesh.connectivity.data" location="20" rank="2">
+      <RawArraySize>
+        5 2
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="xmesh.connectivity.data" location="17" rank="2">
+      <RawArraySize>
+        80 2
+      </RawArraySize>
+    </ArrayDataSource>
+  </DataResource>
+
+  <EnsembleType name="x_mesh.nodes">
+   <Members>
+    <MemberRange min="1" max="81"/>
+   </Members>
+  </EnsembleType>
+  <ArgumentEvaluator name="x_mesh.nodes.argument" valueType="x_mesh.nodes"/>
+
+  <MeshType name="x_mesh">
+   <Elements name="element">
+    <Members>
+     <MemberRange min="1" max="80"/>
+    </Members>
+   </Elements>
+   <Chart name="xi">
+    <Components name="x_mesh.xi.component" count="1"/>
+   </Chart>
+   <Shapes evaluator="shape.line"/>
+  </MeshType>
+  <ArgumentEvaluator name="x_mesh.argument" valueType="x_mesh"/>
+  
+  <ArgumentEvaluator name="x_mesh.dofs.nodal" valueType="real.1d">
+   <Arguments>
+    <Argument name="x_mesh.nodes.argument"/>
+   </Arguments>
+  </ArgumentEvaluator>
+  
+  <ParameterEvaluator name="x_mesh.line.2_nodes" valueType="x_mesh.nodes">
+   <DenseArrayData data="xmesh.connectivity.data">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="x_mesh.argument.element" />
+     <IndexEvaluator evaluator="linear.node.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+  <ParameterEvaluator name="x_mesh.locations" valueType="real.1d">
+   <DenseArrayData data="x_values">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="x_mesh.nodes.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+  <AggregateEvaluator name="x_mesh.element_params.linear_lagrange" valueType="linear.parameters.type">
+   <Bindings>
+     <BindIndex argument="linear.node.argument" indexNumber="1"/>
+     <Bind argument="x_mesh.nodes.argument" source="x_mesh.line.2_nodes"/>
+   </Bindings>
+   <ComponentEvaluators default="x_mesh.dofs.nodal" />
+  </AggregateEvaluator>
+
+  <ReferenceEvaluator name="x_mesh.linear_lagrange" evaluator="linear.interpolator" valueType="real.1d">
+   <Bindings>
+    <Bind argument="linear.parameters.argument" source="x_mesh.element_params.linear_lagrange" />
+    <Bind argument="chart.argument" source="x_mesh.argument.xi" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+
+
+
+
+  <EnsembleType name="t_mesh.nodes">
+   <Members>
+    <MemberRange min="1" max="6"/>
+   </Members>
+  </EnsembleType>
+  <ArgumentEvaluator name="t_mesh.nodes.argument" valueType="t_mesh.nodes"/>
+  
+  <MeshType name="t_mesh">
+   <Elements name="element">
+    <Members>
+     <MemberRange min="1" max="5"/>
+    </Members>
+   </Elements>
+   <Chart name="xi">
+    <Components name="t_mesh.xi.component" count="1"/>
+   </Chart>
+   <Shapes evaluator="shape.line"/>
+  </MeshType>
+  <ArgumentEvaluator name="t_mesh.argument" valueType="t_mesh"/>
+  
+  <ArgumentEvaluator name="t_mesh.dofs.nodal" valueType="real.1d">
+    <Arguments>
+    <Argument name="t_mesh.nodes.argument"/>
+   </Arguments>
+  </ArgumentEvaluator>
+  
+  <ParameterEvaluator name="t_mesh.line.2_nodes" valueType="t_mesh.nodes">
+   <DenseArrayData data="tmesh.connectivity.data">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="t_mesh.argument.element" />
+     <IndexEvaluator evaluator="linear.node.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+  <ParameterEvaluator name="t_mesh.timestamps" valueType="real.1d">
+   <DenseArrayData data="t_values">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="t_mesh.nodes.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+  <AggregateEvaluator name="t_mesh.element_params.linear_lagrange" valueType="linear.parameters.type">
+   <Bindings>
+     <BindIndex argument="linear.node.argument" indexNumber="1"/>
+     <Bind argument="t_mesh.nodes.argument" source="t_mesh.line.2_nodes"/>
+   </Bindings>
+   <ComponentEvaluators default="t_mesh.dofs.nodal" />
+  </AggregateEvaluator>
+
+  <ReferenceEvaluator name="t_mesh.linear_lagrange" evaluator="linear.interpolator" valueType="real.1d">
+   <Bindings>
+    <Bind argument="linear.parameters.argument" source="t_mesh.element_params.linear_lagrange" />
+    <Bind argument="chart.argument" source="t_mesh.argument.xi" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+  <ParameterEvaluator name="btex20_comp2.ct_nodal" valueType="real.1d">
+   <DenseArrayData data="ct_values">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="t_mesh.nodes.argument" />
+     <IndexEvaluator evaluator="x_mesh.nodes.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+
+  <ReferenceEvaluator name="btex20_comp2.time" evaluator="t_mesh.linear_lagrange" valueType="real.1d">
+   <Bindings>
+    <Bind argument="t_mesh.dofs.nodal" source="t_mesh.timestamps" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+  <ReferenceEvaluator name="btex20_comp2.x" evaluator="x_mesh.linear_lagrange" valueType="real.1d">
+   <Bindings>
+    <Bind argument="x_mesh.dofs.nodal" source="x_mesh.locations" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+  <ReferenceEvaluator name="btex20_comp2.ct_x" evaluator="x_mesh.linear_lagrange" valueType="real.1d">
+   <Bindings>
+    <Bind argument="x_mesh.dofs.nodal" source="btex20_comp2.ct_nodal" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+  <ReferenceEvaluator name="btex20_comp2.ct" evaluator="t_mesh.linear_lagrange" valueType="real.1d">
+   <Bindings>
+    <Bind argument="t_mesh.dofs.nodal" source="btex20_comp2.ct_x" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+
+
+  <AggregateEvaluator name="btex20_comp2.coordinates" valueType="rc3.type">
+   <Bindings>
+     <BindIndex argument="rc3.component" indexNumber="1"/>
+   </Bindings>
+   <ComponentEvaluators>
+    <ComponentEvaluator component="1" evaluator="btex20_comp2.time" />
+    <ComponentEvaluator component="2" evaluator="btex20_comp2.x" />
+    <ComponentEvaluator component="3" evaluator="btex20_comp2.ct" />
+   </ComponentEvaluators>
+  </AggregateEvaluator>
+ </Region>
+</Fieldml>

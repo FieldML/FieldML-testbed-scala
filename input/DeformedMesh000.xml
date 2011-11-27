@@ -119,7 +119,7 @@
    <IndexEvaluators>
      <IndexEvaluator evaluator="deformed_mesh.mesh.argument.element" indexNumber="1" />
    </IndexEvaluators>
-   <EvaluatorMap defaultEvaluator="deformed_mesh.bilinearSimplex" />
+   <EvaluatorMap default="deformed_mesh.bilinearSimplex" />
   </PiecewiseEvaluator>
 
 

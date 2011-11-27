@@ -227,6 +227,7 @@ class UserRegion private( name : String, val imports : Array[Pair[String, String
         case e : ParameterEvaluator => e.insert( handle, e )
         case e : ReferenceEvaluator => e.insert( handle, e )
         case e : AggregateEvaluator => e.insert( handle, e )
+        case e : ConstantEvaluator => e.insert( handle, e )
         case unknown => println( "Cannot yet serialize " + unknown )
         }
         )
@@ -243,7 +244,7 @@ object UserRegion
 {
     private def getTypeHandles( fmlHandle : Int, handleType : FieldmlHandleType ) : Seq[Int] =
     {
-        val locals = for( index <- 1 to Fieldml_GetObjectCount( fmlHandle, handleType ) ; objectHandle = Fieldml_GetObject( fmlHandle, handleType, index ) if Fieldml_IsObjectLocal( fmlHandle, objectHandle ) == 1 )
+        val locals = for( index <- 1 to Fieldml_GetObjectCount( fmlHandle, handleType ) ; objectHandle = Fieldml_GetObject( fmlHandle, handleType, index ) if Fieldml_IsObjectLocal( fmlHandle, objectHandle, 1 ) == 1 )
             yield objectHandle
             
         val imports = for(
@@ -270,7 +271,7 @@ object UserRegion
             if( obj != null )
             {
                 region.put( obj )
-                if( Fieldml_IsObjectLocal( fmlHandle, objectHandle ) != 1 )
+                if( Fieldml_IsObjectLocal( fmlHandle, objectHandle, 1 ) != 1 )
                 {
                     obj.isLocal = false
                 }

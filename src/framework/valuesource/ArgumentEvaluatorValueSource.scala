@@ -11,7 +11,7 @@ import framework.value.Value
 import framework.Context
 import framework.EvaluationState
 
-class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, explicitVariables : ArgumentEvaluator* )
+class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, val explicitVariables : ArgumentEvaluator* )
     extends ArgumentEvaluator( name, valueType, explicitVariables:_* )
     with ValueSource
 {
@@ -19,9 +19,13 @@ class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, explic
     {
         if( state.getBind( this ) == None )
         {
-            println( name + " is unbound" )
+            return None
         }
-
-        state.getBind( this ).flatMap( _.evaluate( state ) )
+        
+        val argumentBinds = explicitVariables.flatMap( x => Some( Tuple2[Evaluator, Evaluator]( x, new ConstantValueSource( x.evaluate( state ).get ) ) ) )
+        
+        val tempState = state.restart( name, this, argumentBinds )
+        
+        tempState.getBind( this ).flatMap( _.evaluate( tempState ) )
     }
 }

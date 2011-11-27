@@ -44,14 +44,14 @@ object BiquadraticTest
 
 
 
-        val realType : ContinuousType = region.getObject( "library.real.1d" )
-        val real3Type : ContinuousType = region.getObject( "library.real.3d" )
+        val realType : ContinuousType = region.getObject( "real.1d" )
+        val real3Type : ContinuousType = region.getObject( "real.3d" )
     
-        val rc3ensemble : EnsembleType = region.getObject( "library.ensemble.rc.3d" )
-        val real3IndexVariable : ArgumentEvaluator = region.getObject( "library.ensemble.rc.3d.argument" )
+        val rc3ensemble : EnsembleType = region.getObject( "ensemble.rc.3d" )
+        val real3IndexVariable : ArgumentEvaluator = region.getObject( "ensemble.rc.3d.argument" )
        
-        val xi2dType : ContinuousType = region.getObject( "library.xi.2d" )
-        val xi2dVar : ArgumentEvaluator = region.getObject( "library.xi.2d.argument" )
+        val xi2dType : ContinuousType = region.getObject( "xi.2d" )
+        val xi2dVar : ArgumentEvaluator = region.getObject( "xi.2d.argument" )
 
         val meshType = region.createMeshType( "test.mesh.type", 9, 2 )
         val meshVariable = region.createArgumentEvaluator( "test.mesh", meshType )
@@ -61,18 +61,18 @@ object BiquadraticTest
         val nodes = region.createEnsembleType( "test.nodes.type", 48, false )
         val nodesVariable = region.createArgumentEvaluator( "test.nodes", nodes )
         
-        val bilinearParametersType : ContinuousType = region.getObject( "library.parameters.2d.bilinearLagrange" )
-        val bilinearParametersVariable : ArgumentEvaluator = region.getObject( "library.parameters.2d.bilinearLagrange.argument" )
-        val bilinearIndexVariable : ArgumentEvaluator = region.getObject( "library.localNodes.2d.square2x2.argument" )
+        val bilinearParametersType : ContinuousType = region.getObject( "parameters.2d.bilinearLagrange" )
+        val bilinearParametersVariable : ArgumentEvaluator = region.getObject( "parameters.2d.bilinearLagrange.argument" )
+        val bilinearIndexVariable : ArgumentEvaluator = region.getObject( "localNodes.2d.square2x2.argument" )
         
-        val biquadraticParametersType : ContinuousType = region.getObject( "library.parameters.2d.biquadraticLagrange" )
-        val biquadraticParametersVariable : ArgumentEvaluator = region.getObject( "library.parameters.2d.biquadraticLagrange.argument" )
-        val biquadraticIndexVariable : ArgumentEvaluator = region.getObject( "library.localNodes.2d.square3x3.argument" )
+        val biquadraticParametersType : ContinuousType = region.getObject( "parameters.2d.biquadraticLagrange" )
+        val biquadraticParametersVariable : ArgumentEvaluator = region.getObject( "parameters.2d.biquadraticLagrange.argument" )
+        val biquadraticIndexVariable : ArgumentEvaluator = region.getObject( "localNodes.2d.square3x3.argument" )
         
-        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "library.interpolator.2d.unit.bilinearLagrange", region )
+        val bilinearInterpolator = region.createReferenceEvaluator( "test.bilinear_interpolator", "interpolator.2d.unit.bilinearLagrange", region )
         bilinearInterpolator.bind( xi2dVar -> xiVariable )
         
-        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "library.interpolator.2d.unit.biquadraticLagrange", region )
+        val biquadraticInterpolator = region.createReferenceEvaluator( "test.biquadratic_interpolator", "interpolator.2d.unit.biquadraticLagrange", region )
         biquadraticInterpolator.bind( xi2dVar -> xiVariable )
         
         val parameterDescription = new DenseDataDescription( realType, Array( real3IndexVariable, nodesVariable ) )
