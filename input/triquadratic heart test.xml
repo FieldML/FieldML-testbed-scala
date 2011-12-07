@@ -16,6 +16,7 @@
     <ImportEvaluator localName="triquadratic.parameters.argument" remoteName="parameters.3d.unit.triquadraticLagrange.argument"/>
     <ImportEvaluator localName="triquadratic.interpolator" remoteName="interpolator.3d.unit.triquadraticLagrange"/>
     <ImportEvaluator localName="chart.argument" remoteName="chart.3d.argument"/>
+    <ImportEvaluator localName="shape.unit.cube" remoteName="shape.unit.cube" />
   </Import>
   
 
@@ -51,8 +52,6 @@
 
 
   <ArgumentEvaluator name="heart.nodes.argument" valueType="heart.nodes.type" />
-  
-  <ExternalEvaluator name="shape.unit.cube" valueType="boolean" />
   
   <MeshType name="heart.mesh.type">
    <Elements name="element">
