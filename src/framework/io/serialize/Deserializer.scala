@@ -172,7 +172,7 @@ class Deserializer( val fmlHandle : Int )
         //At the moment, the only structured types out there are one-deep, and must be forward declared, which means
         //the object should already be in the cache
         
-        val superObject = objects( superHandle )
+        val superObject = objects.getOrElse( superHandle, null )
         if( superObject == null )
         {
             return None

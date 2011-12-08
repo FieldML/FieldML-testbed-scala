@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Fieldml version="0.4"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xsi:noNamespaceSchemaLocation="http://api.fieldml.googlecode.com/hg/Fieldml.xsd">
+ <Region name="hierarchical">
+ 
+  <Import xlink:href="http://www.fieldml.org/resources/xml/0.4/FieldML_Library_0.4.xml" region="library">
+    <ImportType localName="real" remoteName="real.1d"/>
+    <ImportType localName="bilinear.parameters" remoteName="parameters.2d.unit.bilinearLagrange"/>
+    <ImportType localName="rc3.ensemble" remoteName="coordinates.rc.3d.component"/>
+    <ImportType localName="rc3" remoteName="coordinates.rc.3d"/>
+    <ImportType localName="boolean" remoteName="boolean"/>
+    <ImportType localName="chart.2d" remoteName="chart.2d"/>
+
+    <ImportEvaluator localName="bilinear.node.argument" remoteName="localNodes.2d.square2x2.argument"/>
+    <ImportEvaluator localName="bilinear.parameters.argument" remoteName="parameters.2d.unit.bilinearLagrange.argument"/>
+    <ImportEvaluator localName="bilinear.interpolator" remoteName="interpolator.2d.unit.bilinearLagrange"/>
+    <ImportEvaluator localName="chart.argument" remoteName="chart.2d.argument"/>
+    <ImportEvaluator localName="shape.unit.square" remoteName="shape.unit.square"/>
+  </Import>
+  
+
+  <DataResource name="connectivity.resource">
+    <DataResourceDescription>
+      <DataResourceString>
+        1 2 3 4
+        1 9 6 7
+        9 2 7 8
+        6 7 3 5
+        7 8 5 4
+        9 19 16 17
+        19 2 17 18
+        16 17 7 15
+        17 18 15 8
+        6 14 11 12
+        14 7 12 13
+        11 12 3 10
+        12 13 10 5
+        26 27 15 25
+        27 28 25 8
+        17 29 26 27
+        29 18 27 28
+        21 22 10 20
+        22 23 20 5
+        12 24 21 22
+        24 13 22 23
+      </DataResourceString>
+    </DataResourceDescription>
+    <ArrayDataSource name="dof_index.data" location="1" rank="2">
+      <RawArraySize>
+        21 4
+      </RawArraySize>
+      <ArrayDataSize>
+        21 4
+      </ArrayDataSize>
+    </ArrayDataSource>
+  </DataResource>
+  
+  
+  <DataResource name="dofs.coordinates.resource">
+    <DataResourceDescription>
+      <DataResourceString>
+        0.0 0.0 1
+        1.0 0.0 2
+        0.0 1.0 2
+        1.0 1.0 1
+        0.5 1.0 3
+        0.0 0.5 2
+        0.5 0.5 2
+        1.0 0.5 3
+        0.5 0.0 2
+        0.25 1.0 3
+        0.0 0.75 2
+        0.25 0.75 3
+        0.5 0.75 3
+        0.25 0.5 2
+        0.75 0.5 3
+        0.5 0.25 2
+        0.75 0.25 3
+        1.0 0.25 3
+        0.75 0.0 2
+        0.375 1.0 3
+        0.25 0.875 3
+        0.375 0.875 3
+        0.5 0.875 3
+        0.375 0.75 3
+        0.875 0.5 3
+        0.75 0.375 3
+        0.875 0.375 3
+        1.0 0.375 3
+        0.875 0.25 3
+      </DataResourceString>
+    </DataResourceDescription>
+    <ArrayDataSource name="dofs.coordinates.data" location="1" rank="2">
+      <RawArraySize>
+        29 3
+      </RawArraySize>
+    </ArrayDataSource>
+  </DataResource>
+  
+  
+  <DataResource name="field_element_data.resource">
+    <DataResourceDescription>
+      <DataResourceString>
+        1  0  1  1  0  0  0  0  1  0  0  0  1  0  0  0  0  0  0  0  0
+        1  3  4  9  13
+        2 3 4 5
+        6 7 8 9
+        10 11 12 13
+        16 17 14 15
+        20 21 18 19
+      </DataResourceString>
+    </DataResourceDescription>
+    <ArrayDataSource name="field_element_type.data" location="1" rank="1">
+      <RawArraySize>
+        21
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="field_element_key.data" location="3" rank="2">
+      <RawArraySize>
+        5 1
+      </RawArraySize>
+    </ArrayDataSource>
+    <ArrayDataSource name="field_element_subelement.data" location="4" rank="2">
+      <RawArraySize>
+        5 4
+      </RawArraySize>
+    </ArrayDataSource>
+  </DataResource>
+  
+  
+  <EnsembleType name="field_element_type">
+   <Members>
+    <MemberRange min="0" max="1" />
+   </Members>
+  </EnsembleType>
+
+  <ArgumentEvaluator name="field_element_type.argument" valueType="field_element_type" />
+
+  <EnsembleType name="refinement.2x2.element">
+   <Members>
+    <MemberRange min="1" max="4" />
+   </Members>
+  </EnsembleType>
+
+  <ArgumentEvaluator name="refinement.2x2.element.argument" valueType="refinement.2x2.element" />
+
+  <EnsembleType name="nodes">
+   <Members>
+    <MemberRange min="1" max="6" />
+   </Members>
+  </EnsembleType>
+
+  <ArgumentEvaluator name="nodes.argument" valueType="nodes" />
+
+
+  <EnsembleType name="dofs">
+   <Members>
+    <MemberRange min="1" max="29" />
+   </Members>
+  </EnsembleType>
+
+  <ArgumentEvaluator name="dofs.argument" valueType="dofs" />
+  
+  <EnsembleType name="field_element">
+   <Members>
+    <MemberRange min="1" max="21" />
+   </Members>
+  </EnsembleType>
+
+  <ArgumentEvaluator name="field_element.argument" valueType="field_element" />
+  
+  <ArgumentEvaluator name="field_child_element.argument" valueType="field_element" />
+  
+  <ArgumentEvaluator name="chart_child.argument" valueType="chart.2d" />
+  
+  <MeshType name="mesh">
+   <Elements name="element">
+     <Members>
+       <MemberRange min="1" max="1"/>
+     </Members>
+   </Elements>
+   <Chart name="xi">
+     <Components name="mesh.chart.components" count="2"/>
+   </Chart>
+   <Shapes evaluator="shape.unit.square"/>
+  </MeshType>
+  
+  <ArgumentEvaluator name="mesh.argument" valueType="mesh" />
+
+
+  <ArgumentEvaluator name="dof_values" valueType="real">
+   <Arguments>
+     <Argument name="dofs.argument" />
+   </Arguments>
+  </ArgumentEvaluator>
+  
+  <ParameterEvaluator name="square.2x2_dofs" valueType="dofs">
+   <DenseArrayData data="dof_index.data">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="field_element.argument" />
+     <IndexEvaluator evaluator="bilinear.node.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+
+
+  <AggregateEvaluator name="element_params.bilinear_lagrange" valueType="bilinear.parameters">
+   <Bindings>
+     <BindIndex argument="bilinear.node.argument" indexNumber="1"/>
+     <Bind argument="dofs.argument" source="square.2x2_dofs"/>
+   </Bindings>
+   <ComponentEvaluators default="dof_values" />
+  </AggregateEvaluator>
+
+  
+  <ReferenceEvaluator name="bilinear_lagrange" evaluator="bilinear.interpolator" valueType="real">
+   <Bindings>
+    <Bind argument="bilinear.parameters.argument" source="element_params.bilinear_lagrange" />
+   </Bindings>
+  </ReferenceEvaluator>
+
+
+  <ParameterEvaluator name="field_element_type.evaluator" valueType="field_element_type">
+   <DenseArrayData data="field_element_type.data">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="field_element.argument" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+  
+  <ExternalEvaluator name="refinement.square.2x2.element" valueType="refinement.2x2.element">
+    <Arguments>
+      <Argument name="chart.argument"/>
+    </Arguments>
+  </ExternalEvaluator>
+  
+  <ExternalEvaluator name="refinement.square.2x2.xi" valueType="chart.2d">
+    <Arguments>
+      <Argument name="chart.argument"/>
+    </Arguments>
+  </ExternalEvaluator>
+
+  <ParameterEvaluator name="refinement.2x2.subelement" valueType="field_element">
+   <DOKArrayData keyData="field_element_key.data" valueData="field_element_subelement.data">
+    <SparseIndexes>
+     <IndexEvaluator evaluator="field_element.argument" />
+    </SparseIndexes>
+    <DenseIndexes>
+     <IndexEvaluator evaluator="refinement.2x2.element.argument" />
+    </DenseIndexes>
+   </DOKArrayData>
+  </ParameterEvaluator>
+
+
+  <ReferenceEvaluator name="refinement.square.2x2" evaluator="refinement_child.square.2x2">
+    <Bindings>
+      <Bind argument="refinement.2x2.element.argument" source="refinement.square.2x2.element" />
+      <Bind argument="chart_child.argument" source="refinement.square.2x2.xi" />
+      <Bind argument="field_child_element.argument" source="refinement.2x2.subelement"/>
+    </Bindings>
+  </ReferenceEvaluator>
+  
+  <ReferenceEvaluator name="refinement_child.square.2x2" evaluator="field_element.template">
+    <Bindings>
+      <Bind argument="field_element.argument" source="field_child_element.argument"/>
+      <Bind argument="chart.argument" source="chart_child.argument"/>
+    </Bindings>
+  </ReferenceEvaluator>
+
+  <ArgumentEvaluator name="refinement_1" valueType="real">
+    <Arguments>
+      <Argument name="chart.argument"/>
+      <Argument name="field_element.argument"/>
+    </Arguments>
+  </ArgumentEvaluator>
+
+
+  <PiecewiseEvaluator name="field_element.template" valueType="real">
+   <IndexEvaluators>
+     <IndexEvaluator evaluator="field_element_type.evaluator" indexNumber="1" />
+   </IndexEvaluators>
+   <EvaluatorMap>
+     <EvaluatorMapEntry value="0" evaluator="bilinear_lagrange"/>
+     <EvaluatorMapEntry value="1" evaluator="refinement_1"/>
+   </EvaluatorMap>
+  </PiecewiseEvaluator>
+
+
+  <ArgumentEvaluator name="rc3.component" valueType="rc3.ensemble" />
+
+  <ParameterEvaluator name="dofs.coordinates" valueType="real">
+   <DenseArrayData data="dofs.coordinates.data">
+    <DenseIndexes>
+     <IndexEvaluator evaluator="dofs.argument" />
+     <IndexEvaluator evaluator="rc3.component" />
+    </DenseIndexes>
+   </DenseArrayData>
+  </ParameterEvaluator>
+  
+  <ConstantEvaluator name="field_element.1" value="1" valueType="field_element"/>
+  
+  <AggregateEvaluator name="coordinates" valueType="rc3">
+   <Bindings>
+     <BindIndex argument="rc3.component" indexNumber="1"/>
+     <Bind argument="dof_values" source="dofs.coordinates"/>
+     <Bind argument="field_element.argument" source="field_element.1"/>
+     <Bind argument="chart.argument" source="mesh.argument.xi"/>
+     <Bind argument="refinement_1" source="refinement.square.2x2"/>
+   </Bindings>
+   <ComponentEvaluators>
+    <ComponentEvaluator component="1" evaluator="field_element.template" />
+    <ComponentEvaluator component="2" evaluator="field_element.template" />
+    <ComponentEvaluator component="3" evaluator="field_element.template" />
+   </ComponentEvaluators>
+  </AggregateEvaluator>
+
+ </Region>
+</Fieldml>

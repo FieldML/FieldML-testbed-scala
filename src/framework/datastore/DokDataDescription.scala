@@ -18,7 +18,7 @@ class DokDataDescription( valueType : ValueType, val denseOrders : Array[Array[I
     }
     
 
-    override val indexEvaluators : Array[Evaluator] = Array.concat( denseIndexes, sparseIndexes )
+    override val indexEvaluators : Array[Evaluator] = Array.concat( sparseIndexes, denseIndexes )
     
     private val counts = indexEvaluators.map( _.valueType.asInstanceOf[EnsembleType].elementSet.size )
     
@@ -34,6 +34,8 @@ class DokDataDescription( valueType : ValueType, val denseOrders : Array[Array[I
             {
                 return false
             }
+            
+            count = count * counts(e)
         }
         
         return true
