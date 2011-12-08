@@ -17,15 +17,8 @@ class ArgumentEvaluatorValueSource( name : String, valueType : ValueType, val ex
 {
     override def evaluate( state : EvaluationState ) : Option[Value] =
     {
-        if( state.getBind( this ) == None )
-        {
-            return None
-        }
+        val argumentBinds = explicitVariables.flatMap( x => Some( Tuple2[ValueSource, ValueSource]( x, new ConstantValueSource( x.evaluate( state ).get ) ) ) )
         
-        val argumentBinds = explicitVariables.flatMap( x => Some( Tuple2[Evaluator, Evaluator]( x, new ConstantValueSource( x.evaluate( state ).get ) ) ) )
-        
-        val tempState = state.restart( name, this, argumentBinds )
-        
-        tempState.getBind( this ).flatMap( _.evaluate( tempState ) )
+        state.resolve( this, argumentBinds )
     }
 }

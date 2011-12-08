@@ -1,12 +1,12 @@
-package framework
+package framework.valuesource
 
 import fieldml.evaluator._
 import fieldml.valueType._
 import scala.util.Random
 
-import framework.valuesource._
+import framework.value._
 
-import value._
+import framework.EvaluationState
 
 class RandomEvaluator( val randomArgument : ArgumentEvaluator, valueType : EnsembleType )
     extends Evaluator( "random.0d.equiprobable", valueType )

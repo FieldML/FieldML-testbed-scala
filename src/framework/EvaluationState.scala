@@ -4,6 +4,10 @@ import scala.collection.mutable.Stack
 
 import fieldml.FieldmlObject
 import fieldml.evaluator.Evaluator
+import fieldml.evaluator.ArgumentEvaluator
+
+import framework.value.Value
+import framework.valuesource.ValueSource
 
 class EvaluationState
 {
@@ -20,7 +24,7 @@ class EvaluationState
     def printStack
     {
         var depth = 0;
-        for( s <- stack.toSeq )
+        for( s <- stack.toSeq.reverse )
         {
             printContext( depth, s )
             depth = depth + 1
@@ -52,12 +56,27 @@ class EvaluationState
     }
     
     
-    def restart( location : String, argument : Evaluator, binds : Seq[Tuple2[Evaluator, Evaluator]] ) : EvaluationState =
+    private def restart( argument : Evaluator, binds : Seq[Tuple2[Evaluator, Evaluator]] ) : EvaluationState =
     {
         val newState = new EvaluationState()
         
-        newState.stack.push( new Context( location, stack.top.getBindContext( argument ), binds ) )
+        newState.stack.push( new Context( "TEMP for " + argument.name, stack.top.getBindContext( argument ), binds ) )
         
         return newState
+    }
+    
+    
+    def resolve( argument : ArgumentEvaluator, binds : Seq[Tuple2[Evaluator, Evaluator]] ) : Option[Value] =
+    {
+        if( getBind( argument ) == None )
+        {
+            None
+        }
+        else
+        {
+            val tempState = restart( argument, binds )
+            
+            tempState.getBind( argument ).flatMap( _.asInstanceOf[ValueSource].evaluate( tempState ) )
+        }
     }
 }

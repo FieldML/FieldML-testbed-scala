@@ -58,7 +58,7 @@ object AggregateEvaluatorSerializer
         {
             val element = Fieldml_GetEvaluatorElement( source.fmlHandle, objectHandle, i )
             val evaluator = Fieldml_GetEvaluator( source.fmlHandle, objectHandle, i )
-            if( ( element > 0 ) && ( evaluator != FML_INVALID_HANDLE ) )
+            if( ( element >= 0 ) && ( evaluator != FML_INVALID_HANDLE ) )
             {
                 aggEval.map( element -> source.getEvaluator( evaluator ) )
             }

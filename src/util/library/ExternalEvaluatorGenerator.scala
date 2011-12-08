@@ -13,7 +13,6 @@ import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 
 import framework.valuesource._
-import framework.RandomEvaluator
 import framework.region._
 import framework.io.serialize.Deserializer
 
@@ -47,10 +46,12 @@ object ExternalEvaluatorGenerator
             case "interpolator.2d.unit.biquadraticLagrange" => generateContinuousEvaluator( source, objectHandle, name )
             case "interpolator.3d.unit.triquadraticLagrange" => generateContinuousEvaluator( source, objectHandle, name )
             case "interpolator.2d.unit.bilinearSimplex" => generateContinuousEvaluator( source, objectHandle, name )
+            case "refinement.square.2x2.xi" => generateContinuousEvaluator( source, objectHandle, name )
             case "shape.unit.line" => generateBooleanEvaluator( source, objectHandle, name )
             case "shape.unit.square" => generateBooleanEvaluator( source, objectHandle, name )
             case "shape.unit.cube" => generateBooleanEvaluator( source, objectHandle, name )
             case "shape.unit.triangle" => generateBooleanEvaluator( source, objectHandle, name )
+            case "refinement.square.2x2.element" => generateEnsembleEvaluator( source, objectHandle, name )
             case "random.0d.equiprobable.tag" => generateEnsembleEvaluator( source, objectHandle, name )
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
@@ -108,6 +109,7 @@ object ExternalEvaluatorGenerator
             case "interpolator.2d.unit.biquadraticLagrange" => ( new QuadraticLagrange( 2 ).evaluate _, xiNames( 2 ), quadraticParamNames( 2 ) )
             case "interpolator.3d.unit.triquadraticLagrange" => ( new QuadraticLagrange( 3 ).evaluate _, xiNames( 3 ), quadraticParamNames( 3 ) )
             case "interpolator.2d.unit.bilinearSimplex" => ( new BilinearSimplex().evaluate _, xiNames( 2 ), linearSimplexParamNames( 2 ) )
+            case "refinement.square.2x2.xi" => ( new GridRefinementXi( Array( 2, 2 ) ).evaluate _, xiNames( 2 ), xiNames( 2 ) )
             case _ => System.err.println( "Unknown external evaluator " + name ); return null
         }
         
@@ -167,15 +169,39 @@ object ExternalEvaluatorGenerator
     private def generateEnsembleEvaluator( source : Deserializer, objectHandle : Int, name : String ) :
         Evaluator =
     {
-      val evaluatorType : EnsembleType = source.getEnsembleType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
-      
-      return name match {
-        case "random.0d.equiprobable.tag" =>
-          val evt : ArgumentEvaluator = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle,
-                                                                                 "random.0d.equiprobable.argument" ) )
-                                           .asInstanceOf[ArgumentEvaluator]
-          new RandomEvaluator( evt, evaluatorType )
-        case _ => System.err.println( "Unknown external evaluator " + name ); return null
-      }
+        val evaluatorType : EnsembleType = source.getEnsembleType( Fieldml_GetValueType( source.fmlHandle, objectHandle ) )
+        
+            if( name == "random.0d.equiprobable.tag" )
+            {
+                val evt : ArgumentEvaluator = source.getArgumentEvaluator( Fieldml_GetObjectByDeclaredName( source.fmlHandle,
+                                                                                       "random.0d.equiprobable.argument" ) )
+                                                 .asInstanceOf[ArgumentEvaluator]
+                return new RandomEvaluator( evt, evaluatorType )
+            }
+
+            val xiNames = Array[String](
+                null,
+                "chart.1d.argument",
+                "chart.2d.argument",
+                "chart.3d.argument"
+                )
+
+            val fparams =
+            name match
+            {
+                case "refinement.square.2x2.element" => ( new GridRefinementElement( Array( 2, 2 ) ).evaluate _, xiNames( 2 ) )
+                case _ => System.err.println( "Unknown external evaluator " + name ); return null
+            }
+            
+            val argHandle = Fieldml_GetObjectByDeclaredName( source.fmlHandle, fparams._2 )
+            if( Fieldml_GetObjectName( source.fmlHandle, argHandle ) == null )
+            {
+                throw new FmlInvalidObjectException( "Object " + fparams._2 + " needed by " + name + " is not local" )            
+            }
+            val xiVariable = source.getArgumentOrSubtypeEvaluator( argHandle )
+            
+            val localName = Fieldml_GetObjectName( source.fmlHandle, objectHandle )
+        
+            return new EnsembleFunctionEvaluatorValueSource( localName, fparams._1, xiVariable, evaluatorType )
     }
 }

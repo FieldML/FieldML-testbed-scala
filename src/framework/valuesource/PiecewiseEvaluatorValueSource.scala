@@ -28,7 +28,7 @@ class PiecewiseEvaluatorValueSource( name : String, valueType : ValueType, index
         {
             val key = index.evaluate( state );
             val eval = delegations.get( key.get.eValue );
-            println( "eval failed " + key + " in " + name )
+            println( name + " failed for key " + key )
         }
         
         return value
