@@ -7,7 +7,7 @@ import fieldml.valueType.EnsembleType
 import util.exception._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.EnsembleMembersType._
+import fieldml.jni.FieldmlEnsembleMembersType._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlApiConstants._
 
@@ -60,7 +60,7 @@ object EnsembleTypeSerializer
         
         val membersType = Fieldml_GetEnsembleMembersType( source.fmlHandle, objectHandle )
         
-        if( membersType == MEMBER_RANGE )
+        if( membersType == FML_ENSEMBLE_MEMBER_RANGE )
         {
             val min = Fieldml_GetEnsembleMembersMin( source.fmlHandle, objectHandle )
             val max = Fieldml_GetEnsembleMembersMax( source.fmlHandle, objectHandle )
@@ -76,9 +76,9 @@ object EnsembleTypeSerializer
             
             val count = membersType match
             {
-                case MEMBER_LIST_DATA => 1
-                case MEMBER_RANGE_DATA => 2
-                case MEMBER_STRIDE_RANGE_DATA => 3
+                case FML_ENSEMBLE_MEMBER_LIST_DATA => 1
+                case FML_ENSEMBLE_MEMBER_RANGE_DATA => 2
+                case FML_ENSEMBLE_MEMBER_STRIDE_RANGE_DATA => 3
             }
             val offsets = new Array[Int]( 1 );
             val sizes = new Array[Int]( 1 );
@@ -91,9 +91,9 @@ object EnsembleTypeSerializer
             {
                 membersType match
                 {
-                    case MEMBER_LIST_DATA => ensemble.elementSet.add( entries( 0 ) )
-                    case MEMBER_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), 1 )
-                    case MEMBER_STRIDE_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), entries( 2 ) )
+                    case FML_ENSEMBLE_MEMBER_LIST_DATA => ensemble.elementSet.add( entries( 0 ) )
+                    case FML_ENSEMBLE_MEMBER_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), 1 )
+                    case FML_ENSEMBLE_MEMBER_STRIDE_RANGE_DATA => ensemble.elementSet.add( entries( 0 ), entries( 1 ), entries( 2 ) )
                 }
                 
                 offsets( 0 ) += count

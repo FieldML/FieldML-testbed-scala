@@ -4,7 +4,7 @@ import fieldml.DataResource
 import util.exception._
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
-import fieldml.jni.DataResourceType._
+import fieldml.jni.FieldmlDataResourceType._
 import fieldml.TextFileDataResource
 import fieldml.InlineDataResource
 import fieldml.DataSource
@@ -73,8 +73,8 @@ object DataResourceSerializer
         
         sourceType match
         {
-            case DATA_RESOURCE_HREF => extractFileResource( source.fmlHandle, objectHandle )
-            case DATA_RESOURCE_INLINE => extractInlineResource( source.fmlHandle, objectHandle )
+            case FML_DATA_RESOURCE_HREF => extractFileResource( source.fmlHandle, objectHandle )
+            case FML_DATA_RESOURCE_INLINE => extractInlineResource( source.fmlHandle, objectHandle )
         }
     }
 }

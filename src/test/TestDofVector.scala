@@ -2,9 +2,9 @@ package test
 
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
-import fieldml.jni.DataDescriptionType._
-import fieldml.jni.DataResourceType._
-import fieldml.jni.DataSourceType._
+import fieldml.jni.FieldmlDataDescriptionType._
+import fieldml.jni.FieldmlDataResourceType._
+import fieldml.jni.FieldmlDataSourceType._
 
 object TestDofVector 
 {
@@ -35,7 +35,7 @@ object TestDofVector
 
         val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
-        Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, connectivity, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsVariable, FML_INVALID_HANDLE )
         
@@ -50,7 +50,7 @@ object TestDofVector
         
         val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
         val nodalParams = Fieldml_CreateParameterEvaluator( fml, "test.nodal_params", fieldValue )
-        Fieldml_SetParameterDataDescription( fml, nodalParams, DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, nodalParams, FML_DATA_DESCRIPTION_DOK_ARRAY )
         Fieldml_AddSparseIndexEvaluator( fml, nodalParams, nodesVariable )
 
         val nodalResource = Fieldml_CreateInlineDataResource( fml, "test.nodal_params.resource" )
@@ -65,7 +65,7 @@ object TestDofVector
         Fieldml_AddInlineData( fml, nodalResource, "0.0 0.5 1.0 1.5\n", 16 ) 
         
         val elementParams = Fieldml_CreateParameterEvaluator( fml, "test.element_params", fieldValue )
-        Fieldml_SetParameterDataDescription( fml, elementParams, DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, elementParams, FML_DATA_DESCRIPTION_DOK_ARRAY )
         Fieldml_AddSparseIndexEvaluator( fml, elementParams, elementsVariable )
 
         val elementResource = Fieldml_CreateInlineDataResource( fml, "test.element_params.resource" )
@@ -80,7 +80,7 @@ object TestDofVector
         Fieldml_AddInlineData( fml, elementData, "2.0\n", 4 )
 
         val globalParams = Fieldml_CreateParameterEvaluator( fml, "test.global_params", fieldValue )
-        Fieldml_SetParameterDataDescription( fml, globalParams, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, globalParams, FML_DATA_DESCRIPTION_DENSE_ARRAY )
 
         val globalResource = Fieldml_CreateInlineDataResource( fml, "test.global_params.resource" )
         val globalData = Fieldml_CreateArrayDataSource( fml, "test.global_params.data", globalResource, "1", 1 )
@@ -135,7 +135,7 @@ object TestDofVector
         Fieldml_SetMeshShapes( fml, meshType, boundsEvaluator )
         
         val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
-        Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, connectivity, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
@@ -154,7 +154,7 @@ object TestDofVector
         val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
 
         val dofParams = Fieldml_CreateParameterEvaluator( fml, "test.dof_params", fieldValue )
-        Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, dofParams, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
         val dofResource = Fieldml_CreateInlineDataResource( fml, "test.dof_params.resource" )
@@ -165,7 +165,7 @@ object TestDofVector
         Fieldml_AddInlineData( fml, dofData, "0.0 0.5 1.0 1.5 2.0 3.0\n", 24 )
         
         val nodalIndexes = Fieldml_CreateParameterEvaluator( fml, "test.nodal_indexes", dofIndexType )
-        Fieldml_SetParameterDataDescription( fml, nodalIndexes, DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, nodalIndexes, FML_DATA_DESCRIPTION_DOK_ARRAY )
         Fieldml_AddSparseIndexEvaluator( fml, nodalIndexes, nodesType )
         
         val nodalIndexResource = Fieldml_CreateInlineDataResource( fml, "test.nodal_indexes.resource" )
@@ -180,7 +180,7 @@ object TestDofVector
         Fieldml_SetDataSource( fml, nodalIndexes, nodalIndexData )
         
         val elementIndexes = Fieldml_CreateParameterEvaluator( fml, "test.element_indexes", dofIndexType )
-        Fieldml_SetParameterDataDescription( fml, elementIndexes, DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, elementIndexes, FML_DATA_DESCRIPTION_DOK_ARRAY )
         Fieldml_AddSparseIndexEvaluator( fml, elementIndexes, elementsType )
         
         val elementIndexResource = Fieldml_CreateInlineDataResource( fml, "test.element_indexes.resource" )
@@ -195,7 +195,7 @@ object TestDofVector
         Fieldml_SetDataSource( fml, elementIndexes, elementIndexData )
 
         val globalIndexes = Fieldml_CreateParameterEvaluator( fml, "test.global_indexes", dofIndexType )
-        Fieldml_SetParameterDataDescription( fml, globalIndexes, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, globalIndexes, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         
         val globalIndexResource = Fieldml_CreateInlineDataResource( fml, "test.global_indexes.resource" )
         val globalIndexData = Fieldml_CreateArrayDataSource( fml, "test.global_indexes.data", globalIndexResource, "1", 1 )
@@ -257,7 +257,7 @@ object TestDofVector
         
         val connectivity = Fieldml_CreateParameterEvaluator( fml, "test.bilinear_connectivity", nodesType )
         
-        Fieldml_SetParameterDataDescription( fml, connectivity, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, connectivity, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, bilinearNodesVariable, FML_INVALID_HANDLE )
         Fieldml_AddDenseIndexEvaluator( fml, connectivity, elementsType, FML_INVALID_HANDLE )
         
@@ -277,7 +277,7 @@ object TestDofVector
         val fieldValue = Fieldml_GetObjectByName( fml, "real.1d" )
 
         val dofParams = Fieldml_CreateParameterEvaluator( fml, "test.dof_params", fieldValue )
-        Fieldml_SetParameterDataDescription( fml, dofParams, DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, dofParams, FML_DATA_DESCRIPTION_DENSE_ARRAY )
         Fieldml_AddDenseIndexEvaluator( fml, dofParams, dofIndexType, FML_INVALID_HANDLE )
         
         val dofResource = Fieldml_CreateInlineDataResource( fml, "test.dof_params.resource" )
@@ -291,7 +291,7 @@ object TestDofVector
         Fieldml_SetEnsembleMembersRange( fml, dofTypeType, 1, 3, 1 )
         
         val dofIndexes = Fieldml_CreateParameterEvaluator( fml, "test.dof_indexes", dofIndexType )
-        Fieldml_SetParameterDataDescription( fml, dofIndexes, DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( fml, dofIndexes, FML_DATA_DESCRIPTION_DOK_ARRAY )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, dofTypeType )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, nodesType )
         Fieldml_AddSparseIndexEvaluator( fml, dofIndexes, elementsType )

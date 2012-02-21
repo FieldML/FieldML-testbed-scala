@@ -7,8 +7,8 @@ import fieldml.valueType._
 
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
-import fieldml.jni.DataDescriptionType._
-import fieldml.jni.DataSourceType._
+import fieldml.jni.FieldmlDataDescriptionType._
+import fieldml.jni.FieldmlDataSourceType._
 import fieldml.jni.FieldmlHandleType._
 import fieldml.jni.FieldmlHandleType
 

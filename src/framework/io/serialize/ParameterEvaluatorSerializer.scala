@@ -9,10 +9,10 @@ import framework.datastore._
 import fieldml.evaluator.Evaluator
 import fieldml.evaluator.ParameterEvaluator
 
-import fieldml.jni.DataSourceType
+import fieldml.jni.FieldmlDataSourceType
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
-import fieldml.jni.DataDescriptionType
+import fieldml.jni.FieldmlDataDescriptionType
 
 import framework.valuesource.ParameterEvaluatorValueSource
 import framework.value.Value
@@ -65,7 +65,7 @@ object ParameterEvaluatorSerializer
     
     private def insertDok( handle : Int, objectHandle : Int, description : DokDataDescription ) : Unit =
     {
-        Fieldml_SetParameterDataDescription( handle, objectHandle, DataDescriptionType.DESCRIPTION_DOK_ARRAY )
+        Fieldml_SetParameterDataDescription( handle, objectHandle, FieldmlDataDescriptionType.FML_DATA_DESCRIPTION_DOK_ARRAY )
         
         for( index <- description.sparseIndexes )
         {
@@ -82,7 +82,7 @@ object ParameterEvaluatorSerializer
     
     private def insertDense( handle : Int, objectHandle : Int, description : DenseDataDescription ) : Unit =
     {
-        Fieldml_SetParameterDataDescription( handle, objectHandle, DataDescriptionType.DESCRIPTION_DENSE_ARRAY )
+        Fieldml_SetParameterDataDescription( handle, objectHandle, FieldmlDataDescriptionType.FML_DATA_DESCRIPTION_DENSE_ARRAY )
         
         for( index <- description.denseIndexes )
         {
@@ -285,6 +285,10 @@ object ParameterEvaluatorSerializer
             
             if( err != FML_ERR_NO_ERROR )
             {
+                System.out.println("ValueType of evaluator causing error: " + dense.valueType.name)
+
+                System.out.println("Sizes = " +
+                                   sizes.foldLeft("")(((x : String, y : Int) =>x + " " + y)) + " offsets = " + offsets)
                 throw new FmlException( "Read error in dense data from " + reader + ": code " + err )
             }
             
@@ -441,8 +445,8 @@ object ParameterEvaluatorSerializer
 
         val dataDescription = Fieldml_GetParameterDataDescription( source.fmlHandle, objectHandle ) match
         {
-            case DataDescriptionType.DESCRIPTION_DENSE_ARRAY => extractDense( source, objectHandle, valueType )
-            case DataDescriptionType.DESCRIPTION_DOK_ARRAY => extractDok( source, objectHandle, valueType )
+            case FieldmlDataDescriptionType.FML_DATA_DESCRIPTION_DENSE_ARRAY => extractDense( source, objectHandle, valueType )
+            case FieldmlDataDescriptionType.FML_DATA_DESCRIPTION_DOK_ARRAY => extractDok( source, objectHandle, valueType )
             case d => throw new FmlException( "Unsupported data description: " + d ) 
         }
         

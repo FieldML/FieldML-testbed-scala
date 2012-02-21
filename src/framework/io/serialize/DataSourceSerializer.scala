@@ -6,7 +6,7 @@ import util.exception._
 
 import fieldml.jni.FieldmlApi._
 import fieldml.jni.FieldmlApiConstants._
-import fieldml.jni.DataSourceType._
+import fieldml.jni.FieldmlDataSourceType._
 import fieldml.ArrayDataSource
 import fieldml.DataSource
 
@@ -49,7 +49,7 @@ object DataSourceSerializer
         
         sourceType match
         {
-            case DATA_SOURCE_ARRAY => extractArrayDataSource( source, objectHandle )
+            case FML_DATA_SOURCE_ARRAY => extractArrayDataSource( source, objectHandle )
         }
     }
 }

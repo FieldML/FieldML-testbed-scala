@@ -14,7 +14,7 @@ import framework.value._
 import framework._
 
 import fieldml.jni.FieldmlApi._
-import fieldml.jni.DataSourceType
+import fieldml.jni.FieldmlDataSourceType
 
 import util.ColladaExporter
 import framework.region._
